@@ -92,7 +92,7 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
     <style type="text/css">
         /* Critical CSS - Masculine Dark Blue/Steel Theme */
         html, body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #34495e 75%, #2c3e50 100%) !important;
+            background: linear-gradient(135deg, #00a000 0%, #00b000 25%, #00c000 75%, #00d000 100%) !important;
             background-attachment: fixed !important;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
             min-height: 100vh !important;
@@ -521,7 +521,7 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
         
         /* Gradient card styling for level card */
         .gradient-card-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #34495e 75%, #2c3e50 100%) !important;
+            background: linear-gradient(135deg, #00a000 0%, #00b000 25%, #00c000 75%, #00d000 100%) !important;
             backdrop-filter: blur(20px) !important;
             border: 1px solid rgba(255, 255, 255, 0.25) !important;
             border-radius: 16px !important;
