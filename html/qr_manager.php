@@ -401,6 +401,65 @@ function deleteQR(qrId) {
     }
 }
 
+function printQR(qrId, qrCode, imagePath) {
+    const imageUrl = imagePath && imagePath.trim() !== '' ? imagePath : `/uploads/qr/${qrCode}.png`;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print QR Code - ${qrCode}</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    text-align: center; 
+                    margin: 20px;
+                }
+                .qr-container {
+                    display: inline-block;
+                    padding: 20px;
+                    border: 2px solid #000;
+                    margin: 20px;
+                }
+                .qr-code {
+                    width: 200px;
+                    height: 200px;
+                    margin: 10px auto;
+                }
+                .qr-label {
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin-top: 10px;
+                }
+                @media print {
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="no-print">
+                <button onclick="window.print()">Print</button>
+                <button onclick="window.close()">Close</button>
+            </div>
+            
+            <div class="qr-container">
+                <img src="${imageUrl}" alt="QR Code" class="qr-code" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display:none;">
+                    <div style="width:200px;height:200px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;margin:10px auto;">
+                        QR Code<br>Image Missing
+                    </div>
+                </div>
+                <div class="qr-label">${qrCode}</div>
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
+}
+
 function previewQR(qrId, qrCode, imagePath) {
     currentQRId = qrId;
     currentQRCode = qrCode;
@@ -414,85 +473,106 @@ function previewQR(qrId, qrCode, imagePath) {
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
+        <p class="mt-2">Loading QR code preview...</p>
     `;
     
     modal.show();
     
-    // If we have a direct image path, try that first
-    if (imagePath && imagePath.trim() !== '') {
+    // Try multiple image paths
+    const possiblePaths = [
+        imagePath,
+        `/uploads/qr/${qrCode}.png`,
+        `/uploads/qr/1/${qrCode}.png`,
+        `/uploads/qr/business/${qrCode}.png`,
+        `/assets/img/qr/${qrCode}.png`
+    ].filter(path => path && path.trim() !== '');
+    
+    let imageFound = false;
+    let currentPathIndex = 0;
+    
+    function tryNextImage() {
+        if (currentPathIndex >= possiblePaths.length) {
+            // No image found, try API generation
+            generatePreviewViaAPI();
+            return;
+        }
+        
         const img = new Image();
         img.onload = function() {
+            imageFound = true;
             content.innerHTML = `
-                <div class="mb-3">
-                    <img src="${imagePath}" alt="QR Code" class="img-fluid" style="max-width: 300px; border: 1px solid #ddd; border-radius: 8px;">
+                <div class="text-center">
+                    <img src="${possiblePaths[currentPathIndex]}" alt="QR Code" 
+                         style="max-width: 100%; max-height: 400px;" class="img-fluid border">
+                    <div class="mt-3">
+                        <p><strong>Code:</strong> ${qrCode}</p>
+                        <p><strong>Path:</strong> ${possiblePaths[currentPathIndex]}</p>
+                    </div>
                 </div>
-                <h6>QR Code: ${qrCode}</h6>
-                <p class="text-muted">Scan this code with your phone to test</p>
-                <small class="text-success">Image loaded from: ${imagePath}</small>
             `;
         };
+        
         img.onerror = function() {
-            // If direct path fails, try fallback paths
-            tryFallbackPaths();
+            currentPathIndex++;
+            tryNextImage();
         };
-        img.src = imagePath;
-        return;
+        
+        img.src = possiblePaths[currentPathIndex];
     }
     
-    // Fallback to trying multiple paths
-    tryFallbackPaths();
-    
-    function tryFallbackPaths() {
-        const possiblePaths = [
-            `/uploads/qr/${qrCode}.png`,
-            `/uploads/qr/1/${qrCode}.png`,
-            `/uploads/qr/business/${qrCode}.png`,
-            `/assets/img/qr/${qrCode}.png`
-        ];
-        
-        let pathIndex = 0;
-        
-        function tryLoadImage() {
-            if (pathIndex >= possiblePaths.length) {
-                // No image found, show error
+    function generatePreviewViaAPI() {
+        // Try to generate preview via API
+        fetch('/api/qr/basic-preview.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `qr_id=${qrId}&action=regenerate`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.preview_data) {
                 content.innerHTML = `
-                    <div class="mb-3">
-                        <div class="alert alert-warning">
-                            <i class="bi bi-exclamation-triangle me-2"></i>
-                            QR code image not found. The QR code may need to be regenerated.
-                        </div>
-                        <div class="bg-light p-4 rounded">
-                            <i class="bi bi-qr-code display-4 text-muted"></i>
+                    <div class="text-center">
+                        <img src="data:image/png;base64,${data.preview_data}" alt="QR Code" 
+                             style="max-width: 100%; max-height: 400px;" class="img-fluid border">
+                        <div class="mt-3">
+                            <p><strong>Code:</strong> ${qrCode}</p>
+                            <p><strong>Status:</strong> Generated via API</p>
                         </div>
                     </div>
-                    <h6>QR Code: ${qrCode}</h6>
-                    <p class="text-muted">Image file missing - please regenerate this QR code</p>
+                `;
+            } else {
+                showPreviewError();
+            }
+        })
+        .catch(error => {
+            console.error('API Error:', error);
+            showPreviewError();
+        });
+    }
+    
+    function showPreviewError() {
+        content.innerHTML = `
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle fs-1 mb-3"></i>
+                <h5>QR Code Image Not Found</h5>
+                <p>The QR code image file could not be located.</p>
+                <p><strong>Code:</strong> ${qrCode}</p>
+                <p><strong>ID:</strong> ${qrId}</p>
+                <div class="mt-3">
                     <button class="btn btn-primary" onclick="regenerateQR(${qrId}, '${qrCode}')">
                         <i class="bi bi-arrow-clockwise me-1"></i>Regenerate QR Code
                     </button>
-                `;
-                return;
-            }
-            
-            const img = new Image();
-            img.onload = function() {
-                content.innerHTML = `
-                    <div class="mb-3">
-                        <img src="${possiblePaths[pathIndex]}" alt="QR Code" class="img-fluid" style="max-width: 300px; border: 1px solid #ddd; border-radius: 8px;">
-                    </div>
-                    <h6>QR Code: ${qrCode}</h6>
-                    <p class="text-muted">Scan this code with your phone to test</p>
-                    <small class="text-success">Image loaded from: ${possiblePaths[pathIndex]}</small>
-                `;
-            };
-            img.onerror = function() {
-            pathIndex++;
-            tryLoadImage();
-        };
-        img.src = possiblePaths[pathIndex];
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">Searched paths:</small><br>
+                    ${possiblePaths.map(path => `<small class="text-muted">${path}</small>`).join('<br>')}
+                </div>
+            </div>
+        `;
     }
     
-    setTimeout(tryLoadImage, 500);
+    // Start trying images
+    tryNextImage();
 }
 
 function printQR(qrId, qrCode, imagePath) {

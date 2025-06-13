@@ -48,7 +48,7 @@ require_once __DIR__ . '/core/includes/header.php';
 ?>
 
 <!-- QR Code Generation Library -->
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js">function generatePreview() { console.log("Preview clicked!"); const qrType = document.getElementById("qrType").value; const qrPreview = document.getElementById("qrPreview"); const placeholder = document.getElementById("previewPlaceholder"); if (!qrType) { showToast("Please select QR type first", "warning"); return; } qrPreview.innerHTML = "<div class=\"text-center\"><div class=\"spinner-border text-primary\"></div><p>Generating...</p></div>"; qrPreview.style.display = "block"; placeholder.style.display = "none"; setTimeout(() => { qrPreview.innerHTML = "<div class=\"text-center text-success\"><i class=\"bi bi-check-circle\" style=\"font-size: 3rem;\"></i><p>Preview working! (Demo mode)</p></div>"; showToast("Preview generated!", "success"); }, 1000); }
 </script>
 
 <style>

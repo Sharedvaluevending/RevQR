@@ -49,7 +49,6 @@ require_once __DIR__ . '/core/includes/header.php';
 
 <!-- QR Code Generation Library -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-</script>
 
 <style>
 /* Advanced QR Generator Styles */
@@ -839,7 +838,6 @@ require_once __DIR__ . '/core/includes/header.php';
                         </div>
                     </div>
 
-                    <button type="button" onclick="generatePreview()" class="btn btn-outline-primary me-2"><i class="bi bi-eye"></i> Preview</button>
                     <button type="button" onclick="generateQRCode()" class="btn-generate-download">
                         <i class="bi bi-download"></i>
                         Generate & Download QR Code
@@ -1143,7 +1141,424 @@ function showToast(message, type = 'success') {
 }
 
 // Generate QR code preview
-function generatePreview() { console.log("Preview clicked!"); const qrType = document.getElementById("qrType").value; const qrPreview = document.getElementById("qrPreview"); const placeholder = document.getElementById("previewPlaceholder"); if (!qrType) { showToast("Please select QR type first", "warning"); return; } qrPreview.innerHTML = "<div class=\"text-center\"><div class=\"spinner-border text-primary\"></div><p>Generating...</p></div>"; qrPreview.style.display = "block"; placeholder.style.display = "none"; setTimeout(() => { qrPreview.innerHTML = "<div class=\"text-center text-success\"><i class=\"bi bi-check-circle\" style=\"font-size: 3rem;\"></i><p>Preview working! (Demo mode)</p></div>"; showToast("Preview generated!", "success"); }, 1000); }
+function generatePreview() {
+    const qrType = document.getElementById('qrType').value;
+    const size = parseInt(document.getElementById('sizeRange').value);
+    const foregroundColor = document.getElementById('foregroundColor').value;
+    const backgroundColor = document.getElementById('backgroundColor').value;
+    
+    if (!qrType) {
+        showPlaceholder();
+        return;
+    }
+    
+    let content = '';
+    
+    // Generate content based on QR type
+    switch(qrType) {
+        case 'static':
+            const url = document.getElementById('url').value;
+            content = url || 'https://example.com';
+            break;
+        case 'dynamic':
+            const dynamicUrl = document.getElementById('url').value;
+            content = dynamicUrl || 'https://example.com';
+            break;
+        case 'dynamic_voting':
+            content = 'https://revenueqr.sharedvaluevending.com/vote.php?campaign_id=1';
+            break;
+        case 'dynamic_vending':
+            const machineName = document.getElementById('machineName').value;
+            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineName || 'Sample Machine')}&view=vending`;
+            break;
+        case 'machine_sales':
+            content = 'https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=Sample Machine';
+            break;
+        case 'spin_wheel':
+            content = 'https://revenueqr.sharedvaluevending.com/public/spin-wheel.php?wheel_id=1';
+            break;
+        case 'pizza_tracker':
+            content = 'https://revenueqr.sharedvaluevending.com/public/pizza-tracker.php?tracker_id=1';
+            break;
+        default:
+            content = 'https://example.com';
+    }
+    
+    // Generate QR code
+    const qrPreview = document.getElementById('qrPreview');
+    const placeholder = document.getElementById('previewPlaceholder');
+    
+    QRCode.toCanvas(content, {
+        width: Math.min(size, 300), // Limit preview size
+        height: Math.min(size, 300),
+        color: {
+            dark: foregroundColor,
+            light: backgroundColor
+        },
+        margin: 2,
+        errorCorrectionLevel: 'H'
+    }, function (error, canvas) {
+        if (error) {
+            console.error('QR generation error:', error);
+            showPlaceholder();
+            return;
+        }
+        
+        // Clear previous content
+        qrPreview.innerHTML = '';
+        qrPreview.appendChild(canvas);
+        
+        // Show preview, hide placeholder
+        qrPreview.style.display = 'block';
+        placeholder.style.display = 'none';
+    });
+}
+
+function showPlaceholder() {
+    const qrPreview = document.getElementById('qrPreview');
+    const placeholder = document.getElementById('previewPlaceholder');
+    
+    qrPreview.style.display = 'none';
+    placeholder.style.display = 'block';
+}
+
+// Add event listeners for real-time preview updates
+document.addEventListener('DOMContentLoaded', function() {
+    // Color changes
+    document.getElementById('foregroundColor').addEventListener('input', generatePreview);
+    document.getElementById('backgroundColor').addEventListener('input', generatePreview);
+    document.getElementById('foregroundHex').addEventListener('input', generatePreview);
+    document.getElementById('backgroundHex').addEventListener('input', generatePreview);
+    
+    // URL changes
+    document.getElementById('url').addEventListener('input', generatePreview);
+    
+    // Machine name changes
+    const machineNameField = document.getElementById('machineName');
+    if (machineNameField) {
+        machineNameField.addEventListener('input', generatePreview);
+    }
+});
+
+// MISSING FUNCTIONALITY: QR Code Generation and Download
+function generateQRCode() {
+    const form = document.getElementById('qrGeneratorForm');
+    const formData = new FormData(form);
+    
+    // Validate required fields
+    const qrType = document.getElementById('qrType').value;
+    if (!qrType) {
+        showToast('Please select a QR code type', 'danger');
+        return;
+    }
+    
+    // Type-specific validation
+    if (qrType === 'static' || qrType === 'dynamic') {
+        const url = document.getElementById('url').value;
+        if (!url) {
+            showToast('Please enter a URL', 'danger');
+            return;
+        }
+    } else if (qrType === 'dynamic_voting') {
+        const campaignId = document.getElementById('campaignId').value;
+        if (!campaignId) {
+            showToast('Please select a campaign', 'danger');
+            return;
+        }
+    } else if (qrType === 'dynamic_vending') {
+        const machineName = document.getElementById('machineName').value;
+        if (!machineName) {
+            showToast('Please enter a machine name', 'danger');
+            return;
+        }
+    } else if (qrType === 'machine_sales') {
+        const machineNameSales = document.getElementById('machineName').value;
+        if (!machineNameSales) {
+            showToast('Please enter a machine name', 'danger');
+            return;
+        }
+    } else if (qrType === 'promotion') {
+        const machineNamePromotion = document.getElementById('machineName').value;
+        if (!machineNamePromotion) {
+            showToast('Please enter a machine name', 'danger');
+            return;
+        }
+    } else if (qrType === 'spin_wheel') {
+        const spinWheelId = document.getElementById('spinWheelId').value;
+        if (!spinWheelId) {
+            showToast('Please select a spin wheel', 'danger');
+            return;
+        }
+    } else if (qrType === 'pizza_tracker') {
+        const pizzaTrackerId = document.getElementById('pizzaTrackerSelect').value;
+        if (!pizzaTrackerId) {
+            showToast('Please select a pizza tracker', 'danger');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const generateBtn = document.querySelector('button[type="submit"]');
+    const originalText = generateBtn.innerHTML;
+    generateBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Generating...';
+    generateBtn.disabled = true;
+    
+    // Build proper request data
+    const requestData = {
+        qr_type: qrType,
+        size: parseInt(document.getElementById('sizeRange')?.value || 400),
+        foreground_color: document.getElementById('foregroundColor')?.value || '#000000',
+        background_color: document.getElementById('backgroundColor')?.value || '#FFFFFF',
+        error_correction_level: 'H'
+    };
+    
+    // Add type-specific data
+    if (qrType === 'static' || qrType === 'dynamic') {
+        requestData.content = document.getElementById('url').value;
+    } else if (qrType === 'dynamic_voting') {
+        requestData.campaign_id = document.getElementById('campaignId').value;
+    } else if (qrType === 'dynamic_vending') {
+        requestData.machine_name = document.getElementById('machineName').value;
+    }
+    
+    // Submit to the API
+    fetch('/api/qr/generate.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(result => {
+        console.log('API Response:', result);
+        if (result.success) {
+            // Create download link
+            const link = document.createElement('a');
+            link.href = result.data.qr_code_url;
+            link.download = `qr-code-${qrType}-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('QR code generated and downloaded successfully!', 'success');
+            
+            // Show success modal
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        } else {
+            throw new Error(result.message || 'QR generation failed');
+        }
+    })
+    .catch(error => {
+        console.error('QR generation error:', error);
+        showToast(`Error: ${error.message}`, 'danger');
+    })
+    .finally(() => {
+        // Reset button
+        generateBtn.innerHTML = originalText;
+        generateBtn.disabled = false;
+    });
+}
+
+// Preview-only generation (different from download generation)
+function generatePreviewOnly() {
+    const qrType = document.getElementById('qrType').value;
+    const size = parseInt(document.getElementById('sizeRange').value);
+    const foregroundColor = document.getElementById('foregroundColor').value;
+    const backgroundColor = document.getElementById('backgroundColor').value;
+    
+    if (!qrType) {
+        showPlaceholder();
+        return;
+    }
+    
+    let content = '';
+    
+    // Generate content based on QR type
+    switch(qrType) {
+        case 'static':
+            const url = document.getElementById('url').value;
+            content = url || 'https://example.com';
+            break;
+        case 'dynamic':
+            const dynamicUrl = document.getElementById('url').value;
+            content = dynamicUrl || 'https://example.com';
+            break;
+        case 'dynamic_voting':
+            content = 'https://revenueqr.sharedvaluevending.com/vote.php?campaign_id=1';
+            break;
+        case 'dynamic_vending':
+            const machineName = document.getElementById('machineName').value;
+            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineName || 'Sample Machine')}&view=vending`;
+            break;
+        case 'machine_sales':
+            const machineNameSales = document.getElementById('machineName').value;
+            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineNameSales || 'Sample Machine')}`;
+            break;
+        case 'promotion':
+            const machineNamePromotion = document.getElementById('machineName').value;
+            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineNamePromotion || 'Sample Machine')}&view=promotions`;
+            break;
+        case 'spin_wheel':
+            content = 'https://revenueqr.sharedvaluevending.com/public/spin-wheel.php?wheel_id=1';
+            break;
+        case 'pizza_tracker':
+            content = 'https://revenueqr.sharedvaluevending.com/public/pizza-tracker.php?tracker_id=1';
+            break;
+        default:
+            content = 'https://example.com';
+    }
+    
+    // Generate QR code
+    const qrPreview = document.getElementById('qrPreview');
+    const placeholder = document.getElementById('previewPlaceholder');
+    
+    QRCode.toCanvas(content, {
+        width: Math.min(size, 300), // Limit preview size
+        height: Math.min(size, 300),
+        color: {
+            dark: foregroundColor,
+            light: backgroundColor
+        },
+        margin: 2,
+        errorCorrectionLevel: 'H'
+    }, function (error, canvas) {
+        if (error) {
+            console.error('QR generation error:', error);
+            showPlaceholder();
+            return;
+        }
+        
+        // Clear previous content
+        qrPreview.innerHTML = '';
+        qrPreview.appendChild(canvas);
+        
+        // Show preview, hide placeholder
+        qrPreview.style.display = 'block';
+        placeholder.style.display = 'none';
+    });
+}
+
+// Fixed Preview Generation Function
+function generatePreview() {
+    const qrType = document.getElementById("qrType").value;
+    
+    if (!qrType) {
+        showPlaceholder();
+        return;
+    }
+    
+    let content = "";
+    
+    // Generate content based on QR type
+    switch(qrType) {
+        case "static":
+        case "dynamic":
+            const url = document.getElementById("url")?.value;
+            content = url || "https://example.com";
+            break;
+        case "dynamic_voting":
+            const campaignId = document.getElementById("campaignId")?.value;
+            content = `https://revenueqr.sharedvaluevending.com/vote.php?campaign_id=${campaignId || "1"}`;
+            break;
+        case "dynamic_vending":
+            const machineName = document.getElementById("machineName")?.value;
+            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineName || "Sample Machine")}&view=vending`;
+            break;
+        default:
+            content = "https://example.com";
+    }
+    
+    const size = parseInt(document.getElementById("sizeRange")?.value || 300);
+    const foregroundColor = document.getElementById("foregroundColor")?.value || "#000000";
+    const backgroundColor = document.getElementById("backgroundColor")?.value || "#FFFFFF";
+    
+    // Generate QR code preview
+    const qrPreview = document.getElementById("qrPreview");
+    const placeholder = document.getElementById("previewPlaceholder");
+    
+    if (!qrPreview || !placeholder) {
+        console.error("Preview elements not found");
+        return;
+    }
+    
+    // Use QRCode library to generate preview
+    QRCode.toCanvas(content, {
+        width: Math.min(size, 300),
+        height: Math.min(size, 300),
+        color: {
+            dark: foregroundColor,
+            light: backgroundColor
+        },
+        margin: 2,
+        errorCorrectionLevel: "H"
+    }, function (error, canvas) {
+        if (error) {
+            console.error("QR generation error:", error);
+            showPlaceholder();
+            return;
+        }
+        
+        // Clear previous content and add new canvas
+        qrPreview.innerHTML = "";
+        qrPreview.appendChild(canvas);
+        
+        // Show preview, hide placeholder
+        qrPreview.style.display = "block";
+        placeholder.style.display = "none";
+    });
+}
+
+function showPlaceholder() {
+    const qrPreview = document.getElementById("qrPreview");
+    const placeholder = document.getElementById("previewPlaceholder");
+    
+    if (qrPreview) qrPreview.style.display = "none";
+    if (placeholder) placeholder.style.display = "block";
+}
+
+// Toast notification function
+function showToast(message, type = "info") {
+    console.log(`Toast: ${message} (${type})`);
+    
+    // Remove existing toasts
+    const existingToasts = document.querySelectorAll(".toast-notification");
+    existingToasts.forEach(toast => toast.remove());
+    
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.className = `alert alert-${type} toast-notification`;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="bi bi-${type === "success" ? "check-circle" : type === "danger" ? "exclamation-triangle" : "info-circle"} me-2"></i>
+            <span>${message}</span>
+            <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
 </script>
 
-<?php require_once __DIR__ . "/core/includes/footer.php"; ?>
+<?php require_once __DIR__ . '/core/includes/footer.php'; ?> 
