@@ -458,7 +458,7 @@ class QRGeneratorV2 {
             console.log('Updating preview with data:', data);
 
             // Call preview API
-            const response = await fetch('/api/qr/preview.php', {
+            const response = await fetch('/api/qr/enhanced-preview.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -694,7 +694,7 @@ class QRGeneratorV2 {
 
             console.log('Generating final QR code with data:', data);
 
-            const response = await fetch('/api/qr/generate.php', {
+            const response = await fetch('/api/qr/enhanced-generate.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

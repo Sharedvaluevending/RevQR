@@ -1304,7 +1304,7 @@ function generateQRCode() {
     generateBtn.disabled = true;
     
     // Submit to the working enhanced API
-    fetch('/api/qr/enhanced-generate.php', {
+    fetch('/api/qr/generate.php', {
         method: 'POST',
         body: formData
     })
