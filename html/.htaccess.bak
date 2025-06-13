@@ -1,0 +1,11 @@
+# RevenueQR - Simple Configuration
+RewriteEngine On
+
+# MIME type settings
+AddType text/css .css
+AddType application/javascript .js
+AddType image/png .png
+AddType image/x-icon .ico
+
+# Redirect old header references
+RewriteRule ^templates/header\.php$ /core/includes/header.php [R=301,L] 

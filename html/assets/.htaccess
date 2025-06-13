@@ -1,0 +1,240 @@
+# ==================================================
+# ASSET OPTIMIZATION AND CACHING
+# High-performance configuration for RevenueQR
+# ==================================================
+
+# Enable rewrite engine
+RewriteEngine On
+
+# ==================================================
+# COMPRESSION
+# ==================================================
+
+# Enable gzip compression
+<IfModule mod_deflate.c>
+    # Compress HTML, CSS, JavaScript, Text, XML and fonts
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE application/x-font-otf
+    AddOutputFilterByType DEFLATE application/x-font-truetype
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+
+    # Remove browser bugs (only needed for really old browsers)
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+    Header append Vary User-Agent
+</IfModule>
+
+# ==================================================
+# CACHE CONTROL HEADERS
+# ==================================================
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # CSS and JavaScript - DISABLED to prevent conflicts with FilesMatch rules
+    # ExpiresByType text/css "access plus 1 year"
+    # ExpiresByType application/javascript "access plus 1 year"
+    # ExpiresByType application/x-javascript "access plus 1 year"
+    
+    # Images - 1 month (frequently updated)
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # Fonts - 1 year
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+    ExpiresByType font/eot "access plus 1 year"
+    ExpiresByType font/opentype "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType application/x-font-woff "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    
+    # Documents and data files - 1 month
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType application/json "access plus 1 month"
+    ExpiresByType application/xml "access plus 1 month"
+    ExpiresByType text/xml "access plus 1 month"
+    ExpiresByType text/csv "access plus 1 month"
+</IfModule>
+
+# ==================================================
+# CACHE CONTROL WITH HEADERS
+# ==================================================
+
+<IfModule mod_headers.c>
+    # CSS files - REDUCED cache to prevent navigation issues
+    <FilesMatch "\.(css)$">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+        Header append Vary "Accept-Encoding"
+        FileETag MTime Size
+    </FilesMatch>
+    
+    # JavaScript files - REDUCED cache to prevent navigation issues
+    <FilesMatch "\.(js)$">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+        Header append Vary "Accept-Encoding"
+        FileETag MTime Size
+    </FilesMatch>
+    
+    # Image files
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg)$">
+        Header set Cache-Control "public, max-age=2592000"
+        Header append Vary "Accept-Encoding"
+        FileETag MTime Size
+    </FilesMatch>
+    
+    # Font files
+    <FilesMatch "\.(eot|ttf|otf|woff|woff2)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+        Header set Access-Control-Allow-Origin "*"
+        FileETag MTime Size
+    </FilesMatch>
+    
+    # Special handling for navigation JavaScript - NO CACHE to fix F5 issue
+    <FilesMatch "optimized\.min\.js$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+        Header append Vary "Accept-Encoding"
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+    
+    # CSS can use short-term cache (main issue was JavaScript)
+    <FilesMatch "optimized\.min\.css$">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+        Header append Vary "Accept-Encoding"
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+</IfModule>
+
+# ==================================================
+# WEBP IMAGE SUPPORT
+# ==================================================
+
+<IfModule mod_rewrite.c>
+    # Serve WebP images if available and browser supports it
+    RewriteCond %{HTTP_ACCEPT} image/webp
+    RewriteCond %{REQUEST_FILENAME} \.(jpe?g|png)$
+    RewriteCond %{REQUEST_FILENAME}\.webp -f
+    RewriteRule ^(.+)\.(jpe?g|png)$ $1.$2.webp [T=image/webp,E=accept:1]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header append Vary Accept env=REDIRECT_accept
+</IfModule>
+
+# ==================================================
+# SECURITY HEADERS
+# ==================================================
+
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Content Security Policy for assets
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self';"
+</IfModule>
+
+# ==================================================
+# PERFORMANCE OPTIMIZATIONS
+# ==================================================
+
+# Disable ETags for better caching (since we use Last-Modified)
+FileETag None
+
+# Remove Server Signature
+ServerSignature Off
+
+# Disable access to sensitive files
+<FilesMatch "(^#.*#|\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|sw[op])|~)$">
+    Require all denied
+</FilesMatch>
+
+# ==================================================
+# URL REWRITING FOR VERSIONED ASSETS
+# ==================================================
+
+<IfModule mod_rewrite.c>
+    # Remove version numbers from CSS/JS files for caching
+    # style.v123.css -> style.css
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.+)\.v\d+\.(css|js)$ $1.$2 [L]
+    
+    # Serve optimized versions if available
+    # Redirect to minified version in production
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_URI} !(\.min\.)
+    RewriteCond %{REQUEST_URI} \.(css|js)$
+    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
+    RewriteRule ^(.+)\.(css|js)$ $1.min.$2 [L]
+</IfModule>
+
+# ==================================================
+# DEVELOPMENT vs PRODUCTION
+# ==================================================
+
+# Development mode - disable caching for specific files
+<Files "custom.css">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </IfModule>
+</Files>
+
+<Files "custom.js">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </IfModule>
+</Files>
+
+# ==================================================
+# PRELOAD CRITICAL RESOURCES
+# ==================================================
+
+<IfModule mod_headers.c>
+    # Preload critical CSS
+    <FilesMatch "optimized\.min\.css$">
+        Header add Link "</assets/css/optimized.min.css>; rel=preload; as=style"
+    </FilesMatch>
+    
+    # Preload critical JS
+    <FilesMatch "optimized\.min\.js$">
+        Header add Link "</assets/js/optimized.min.js>; rel=preload; as=script"
+    </FilesMatch>
+</IfModule> 

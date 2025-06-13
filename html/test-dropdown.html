@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Test</title>
+    <style>
+        body {
+            padding: 50px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .test-dropdown {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            background: white;
+            color: black;
+        }
+        
+        .test-dropdown option {
+            background: white;
+            color: black;
+            padding: 5px;
+        }
+        
+        /* Nuclear blue line removal */
+        select, option {
+            text-decoration: none !important;
+            text-decoration-line: none !important;
+            text-decoration-style: none !important;
+            text-decoration-color: transparent !important;
+            spellcheck: false !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dropdown Blue Line Test</h1>
+    
+    <h3>Test 1: Basic Dropdown</h3>
+    <select class="test-dropdown">
+        <option value="">Select an option</option>
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+        <option value="3">Option 3</option>
+    </select>
+    
+    <h3>Test 2: Bootstrap-style Dropdown</h3>
+    <select class="form-select test-dropdown">
+        <option value="">All Priorities</option>
+        <option value="high">High Priority</option>
+        <option value="medium">Medium Priority</option>
+        <option value="low">Low Priority</option>
+    </select>
+    
+    <h3>Test 3: Disabled Spellcheck</h3>
+    <select class="test-dropdown" spellcheck="false" autocomplete="off">
+        <option value="">Performance</option>
+        <option value="best">Best Performance</option>
+        <option value="good">Good Performance</option>
+        <option value="poor">Poor Performance</option>
+    </select>
+    
+    <script>
+        // Disable spellcheck on all elements
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('select, option').forEach(el => {
+                el.setAttribute('spellcheck', 'false');
+                el.setAttribute('autocomplete', 'off');
+                el.style.textDecoration = 'none';
+                el.style.textDecorationLine = 'none';
+                el.style.textDecorationColor = 'transparent';
+            });
+        });
+    </script>
+</body>
+</html> 

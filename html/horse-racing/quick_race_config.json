@@ -1,0 +1,122 @@
+{
+    "horses": [
+        {
+            "horse_name": "Thunder Bolt",
+            "jockey_name": "Lightning Larry",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/bluejokeybluehorse.png",
+            "jockey_color": "#007bff",
+            "specialty": "Speed demon on short tracks",
+            "base_speed": 85
+        },
+        {
+            "horse_name": "Golden Arrow",
+            "jockey_name": "Swift Sarah",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/brownjokeybrownhorse.png",
+            "jockey_color": "#8B4513",
+            "specialty": "Consistent performer",
+            "base_speed": 82
+        },
+        {
+            "horse_name": "Emerald Flash",
+            "jockey_name": "Speedy Steve",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/greenjokeybluehorse.png",
+            "jockey_color": "#28a745",
+            "specialty": "Strong finisher",
+            "base_speed": 88
+        },
+        {
+            "horse_name": "Crimson Comet",
+            "jockey_name": "Rapid Rita",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/redjockeybrownhorse.png",
+            "jockey_color": "#dc3545",
+            "specialty": "Early leader",
+            "base_speed": 90
+        },
+        {
+            "horse_name": "Sunset Streak",
+            "jockey_name": "Turbo Tom",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/greenjokeyorangehorse.png",
+            "jockey_color": "#fd7e14",
+            "specialty": "Clutch performer",
+            "base_speed": 86
+        },
+        {
+            "horse_name": "Midnight Storm",
+            "jockey_name": "Flash Fiona",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/bluejokeybluehorse.png",
+            "jockey_color": "#6f42c1",
+            "specialty": "Night race specialist",
+            "base_speed": 84
+        },
+        {
+            "horse_name": "Silver Bullet",
+            "jockey_name": "Quick Quinn",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/brownjokeybluehorse.png",
+            "jockey_color": "#6c757d",
+            "specialty": "Surprise finisher",
+            "base_speed": 87
+        },
+        {
+            "horse_name": "Royal Thunder",
+            "jockey_name": "Dynamic Dan",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/redjokeyorangehorse.png",
+            "jockey_color": "#e83e8c",
+            "specialty": "Track champion",
+            "base_speed": 89
+        },
+        {
+            "horse_name": "Diamond Dash",
+            "jockey_name": "Velocity Val",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/greenjokeybluehorse.png",
+            "jockey_color": "#17a2b8",
+            "specialty": "Distance runner",
+            "base_speed": 83
+        },
+        {
+            "horse_name": "Phoenix Fire",
+            "jockey_name": "Blazing Bob",
+            "jockey_image": "\/horse-racing\/assets\/img\/jockeys\/redjockeybrownhorse.png",
+            "jockey_color": "#fd7e14",
+            "specialty": "Comeback king",
+            "base_speed": 91
+        }
+    ],
+    "betting_odds": {
+        "win": {
+            "min": 1.5,
+            "max": 15,
+            "description": "Horse must finish 1st"
+        },
+        "place": {
+            "min": 1.2,
+            "max": 3.5,
+            "description": "Horse must finish 1st or 2nd"
+        },
+        "show": {
+            "min": 1.1,
+            "max": 2.5,
+            "description": "Horse must finish 1st, 2nd, or 3rd"
+        },
+        "exacta": {
+            "min": 5,
+            "max": 50,
+            "description": "Pick 1st and 2nd in exact order"
+        },
+        "quinella": {
+            "min": 3,
+            "max": 25,
+            "description": "Pick 1st and 2nd in any order"
+        },
+        "trifecta": {
+            "min": 10,
+            "max": 200,
+            "description": "Pick 1st, 2nd, and 3rd in exact order"
+        },
+        "superfecta": {
+            "min": 50,
+            "max": 1000,
+            "description": "Pick 1st, 2nd, 3rd, and 4th in exact order"
+        }
+    },
+    "total_horses": 10
+}

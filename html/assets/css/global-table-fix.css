@@ -1,0 +1,74 @@
+/**
+ * Global Table Clear Background Fix
+ * Applies clear/transparent styling ONLY to actual HTML table elements
+ * Very specific targeting to avoid affecting navbar, dropdowns, or other components
+ */
+
+/* Only apply to actual HTML table elements with Bootstrap table class */
+table.table:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: #ffffff;
+}
+
+/* Headers for non-custom tables - must be inside actual table elements */
+table.table:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) th {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Cells for non-custom tables - must be inside actual table elements */
+table.table:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) td {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Override Bootstrap table-striped for actual table elements only */
+table.table-striped:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Override Bootstrap table-hover for actual table elements only */
+table.table-hover:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Table responsiveness - only for actual table elements */
+.table-responsive table.table:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: #ffffff;
+}
+
+/* Dark theme compatibility */
+.table-dark {
+    background: rgba(33, 37, 41, 0.8) !important;
+    color: #ffffff !important;
+}
+
+.table-dark th,
+.table-dark td {
+    background: rgba(33, 37, 41, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+/* Preserve existing light theme tables if they have explicit classes */
+.table-light {
+    background: rgba(248, 249, 250, 0.9) !important;
+    color: #212529 !important;
+}
+
+.table-light th,
+.table-light td {
+    background: rgba(248, 249, 250, 0.7) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: #212529 !important;
+} 

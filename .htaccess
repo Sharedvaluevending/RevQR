@@ -1,0 +1,41 @@
+# RevenueQR Business Portal Routing
+# Ensure consistent navigation by redirecting vending-vote-platform business pages to main system
+
+# Redirect vending-vote-platform business pages to main html business pages
+RewriteEngine On
+
+# Redirect specific business pages from vending-vote-platform to main system
+RewriteRule ^vending-vote-platform/business/(.+)$ /html/business/$1 [R=301,L]
+
+# Ensure QR Manager always loads from main system
+RewriteRule ^qr_manager\.php$ /html/qr_manager.php [R=301,L]
+RewriteRule ^qr-generator\.php$ /html/qr-generator.php [R=301,L]
+RewriteRule ^qr-generator-enhanced\.php$ /html/qr-generator-enhanced.php [R=301,L]
+RewriteRule ^qr-display\.php$ /html/qr-display.php [R=301,L]
+
+# Cache control for navigation files (prevent caching of PHP includes)
+<FilesMatch "\.(php)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+</FilesMatch>
+
+# Cache static assets aggressively (your optimization) - EXCEPT navigation-critical files
+<FilesMatch "\.(png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot)$">
+    Header set Cache-Control "public, max-age=31536000"
+    Header set Expires "Thu, 31 Dec 2025 23:59:59 GMT"
+</FilesMatch>
+
+# CSS/JS files get shorter cache to prevent navigation issues
+<FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+    Header set Expires "Thu, 01 Jan 1970 00:00:00 GMT"
+    Header append Vary "Accept-Encoding"
+</FilesMatch>
+
+# Completely disable caching for navigation-critical files
+<FilesMatch "(optimized\.min\.(css|js)|header|navbar|navigation)">
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "Thu, 01 Jan 1970 00:00:00 GMT"
+</FilesMatch> 

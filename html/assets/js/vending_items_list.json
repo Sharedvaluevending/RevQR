@@ -1,0 +1,380 @@
+{
+    "categories": {
+        "Candy and Chocolate Bars": {
+            "items": [
+                {
+                    "name": "3 Musketeers Bar",
+                    "brand": "3",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "5 Gum (Peppermint \"Cobalt\")",
+                    "brand": "5",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "5 Gum (Spearmint \"Rain\")",
+                    "brand": "5",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Aero (Milk Chocolate)",
+                    "brand": "Aero",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Aero (Mint)",
+                    "brand": "Aero",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Chips and Savory Snacks": {
+            "items": [
+                {
+                    "name": "Cheetos (Crunchy)",
+                    "brand": "Cheetos",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Doritos (Nacho Cheese)",
+                    "brand": "Doritos",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Fritos (Original)",
+                    "brand": "Fritos",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Lay's (Classic)",
+                    "brand": "Lay's",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Pringles (Original)",
+                    "brand": "Pringles",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "high",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Cookies (Brand-Name & Generic)": {
+            "items": [
+                {
+                    "name": "Chips Ahoy! (Chocolate Chip)",
+                    "brand": "Chips Ahoy!",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Oreo (Original)",
+                    "brand": "Oreo",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Pepperidge Farm Milano",
+                    "brand": "Pepperidge Farm",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Tate's Bake Shop (Chocolate Chip)",
+                    "brand": "Tate's",
+                    "retail_price": 1.25,
+                    "cost_price": 0.90,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Energy Drinks": {
+            "items": [
+                {
+                    "name": "Monster Energy (Original)",
+                    "brand": "Monster",
+                    "retail_price": 2.50,
+                    "cost_price": 1.75,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Red Bull (Original)",
+                    "brand": "Red Bull",
+                    "retail_price": 2.50,
+                    "cost_price": 1.75,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Rockstar (Original)",
+                    "brand": "Rockstar",
+                    "retail_price": 2.50,
+                    "cost_price": 1.75,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Bang Energy (Blue Razz)",
+                    "brand": "Bang",
+                    "retail_price": 2.50,
+                    "cost_price": 1.75,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Healthy Snacks": {
+            "items": [
+                {
+                    "name": "Kind Bar (Dark Chocolate Nuts & Sea Salt)",
+                    "brand": "Kind",
+                    "retail_price": 1.75,
+                    "cost_price": 1.25,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Larabar (Apple Pie)",
+                    "brand": "Larabar",
+                    "retail_price": 1.75,
+                    "cost_price": 1.25,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "RXBAR (Chocolate Sea Salt)",
+                    "brand": "RXBAR",
+                    "retail_price": 1.75,
+                    "cost_price": 1.25,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "That's It (Apple + Mango)",
+                    "brand": "That's It",
+                    "retail_price": 1.75,
+                    "cost_price": 1.25,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Juices and Bottled Teas": {
+            "items": [
+                {
+                    "name": "Honest Tea (Green Tea)",
+                    "brand": "Honest Tea",
+                    "retail_price": 1.75,
+                    "cost_price": 1.25,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Naked Juice (Green Machine)",
+                    "brand": "Naked",
+                    "retail_price": 2.00,
+                    "cost_price": 1.50,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Simply Orange",
+                    "brand": "Simply",
+                    "retail_price": 1.75,
+                    "cost_price": 1.25,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Tropicana (Orange)",
+                    "brand": "Tropicana",
+                    "retail_price": 1.75,
+                    "cost_price": 1.25,
+                    "popularity": "high",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Odd or Unique Items (Novelty & Imports)": {
+            "items": [
+                {
+                    "name": "Japanese Kit Kat (Matcha)",
+                    "brand": "Kit Kat",
+                    "retail_price": 2.50,
+                    "cost_price": 1.75,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Mexican Coca-Cola",
+                    "brand": "Coca-Cola",
+                    "retail_price": 2.00,
+                    "cost_price": 1.50,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Polish Chocolate (Wedel)",
+                    "brand": "Wedel",
+                    "retail_price": 2.00,
+                    "cost_price": 1.50,
+                    "popularity": "low",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Turkish Delight",
+                    "brand": "Lokum",
+                    "retail_price": 2.00,
+                    "cost_price": 1.50,
+                    "popularity": "low",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Protein and Meal Replacement Bars": {
+            "items": [
+                {
+                    "name": "Clif Bar (Chocolate Chip)",
+                    "brand": "Clif",
+                    "retail_price": 2.00,
+                    "cost_price": 1.50,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Quest Bar (Cookies & Cream)",
+                    "brand": "Quest",
+                    "retail_price": 2.50,
+                    "cost_price": 1.75,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Think! (Brownie Crunch)",
+                    "brand": "Think!",
+                    "retail_price": 2.00,
+                    "cost_price": 1.50,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "ZonePerfect (Fudge Graham)",
+                    "brand": "ZonePerfect",
+                    "retail_price": 2.00,
+                    "cost_price": 1.50,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Soft Drinks and Carbonated Beverages": {
+            "items": [
+                {
+                    "name": "Coca-Cola (Classic)",
+                    "brand": "Coca-Cola",
+                    "retail_price": 1.50,
+                    "cost_price": 1.00,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Dr Pepper",
+                    "brand": "Dr Pepper",
+                    "retail_price": 1.50,
+                    "cost_price": 1.00,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Mountain Dew",
+                    "brand": "Mountain Dew",
+                    "retail_price": 1.50,
+                    "cost_price": 1.00,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Sprite",
+                    "brand": "Sprite",
+                    "retail_price": 1.50,
+                    "cost_price": 1.00,
+                    "popularity": "high",
+                    "shelf_life": 180
+                }
+            ]
+        },
+        "Water and Flavored Water": {
+            "items": [
+                {
+                    "name": "Dasani (Spring Water)",
+                    "brand": "Dasani",
+                    "retail_price": 1.25,
+                    "cost_price": 0.75,
+                    "popularity": "high",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Smartwater",
+                    "brand": "Smartwater",
+                    "retail_price": 1.50,
+                    "cost_price": 1.00,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Vitamin Water (XXX)",
+                    "brand": "Vitamin Water",
+                    "retail_price": 1.75,
+                    "cost_price": 1.25,
+                    "popularity": "medium",
+                    "shelf_life": 180
+                },
+                {
+                    "name": "Zephyrhills (Spring Water)",
+                    "brand": "Zephyrhills",
+                    "retail_price": 1.25,
+                    "cost_price": 0.75,
+                    "popularity": "high",
+                    "shelf_life": 180
+                }
+            ]
+        }
+    }
+} 

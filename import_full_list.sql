@@ -1,0 +1,87 @@
+-- Import full list of items into master_items table
+INSERT INTO master_items (name, type, brand, suggested_price, suggested_cost, popularity, shelf_life, is_seasonal, is_imported, is_healthy, category, status) VALUES
+-- NOODLES & COOKIES
+('Mr. Noodles', 'snack', 'Mr. Noodles', 1.50, 0.80, 'medium', 180, 0, 0, 0, 'Noodles and Cookies', 'active'),
+('Big Daddy Cookie (Oatmeal Raisin)', 'snack', 'Big Daddy', 1.75, 0.80, 'medium', 180, 0, 0, 0, 'Noodles and Cookies', 'active'),
+('Big Daddy Cookie (Chocolate Chunk)', 'snack', 'Big Daddy', 1.75, 0.80, 'high', 180, 0, 0, 0, 'Noodles and Cookies', 'active'),
+('Shire Cookies', 'snack', 'Shire', 1.50, 1.15, 'medium', 180, 0, 0, 0, 'Noodles and Cookies', 'active'),
+
+-- CHIPS (SMALL BAGS)
+('Ruffles All Dressed', 'snack', 'Ruffles', 1.50, 0.86, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Ruffles Sour Cream', 'snack', 'Ruffles', 1.50, 0.90, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Doritos Nacho', 'snack', 'Doritos', 1.50, 0.90, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Doritos Zesty', 'snack', 'Doritos', 1.50, 0.91, 'medium', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Lays Classic', 'snack', 'Lays', 1.50, 0.84, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Miss Vickies Original', 'snack', 'Miss Vickies', 1.50, 0.84, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Miss Vickies Sweet Chili', 'snack', 'Miss Vickies', 1.50, 0.93, 'medium', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Miss Vickies Jalapeno', 'snack', 'Miss Vickies', 1.50, 0.83, 'medium', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Cheetos Crunchy', 'snack', 'Cheetos', 1.50, 0.93, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Cheetos Jalapeno', 'snack', 'Cheetos', 1.50, 0.93, 'medium', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+
+-- CHIPS (BIG BAGS)
+('Ruffles All Dressed Big', 'snack', 'Ruffles', 2.50, 1.10, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Doritos Nacho Big', 'snack', 'Doritos', 2.50, 1.10, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Lays Classic Big', 'snack', 'Lays', 2.50, 1.10, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+('Miss Vickies Original Big', 'snack', 'Miss Vickies', 2.50, 1.10, 'high', 180, 0, 0, 0, 'Chips and Savory Snacks', 'active'),
+
+-- CANDY & CHOCOLATE
+('M&Ms Peanut', 'snack', 'M&Ms', 1.75, 1.30, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('M&Ms Chocolate', 'snack', 'M&Ms', 1.75, 1.30, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('M&Ms Milk Chocolate', 'snack', 'M&Ms', 1.75, 1.10, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('M&Ms Milk Chocolate Big', 'snack', 'M&Ms', 2.50, 5.51, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Crispy Crunch', 'snack', 'Crispy Crunch', 1.75, 1.24, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Aero', 'snack', 'Aero', 1.75, 1.42, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Dairy Milk', 'snack', 'Dairy Milk', 1.75, 1.15, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Starburst', 'snack', 'Starburst', 1.75, 1.21, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Mr. Big', 'snack', 'Mr. Big', 1.75, 1.24, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('O Henry', 'snack', 'O Henry', 1.75, 1.03, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('O Henry Big', 'snack', 'O Henry', 2.50, 1.80, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Skittles Original', 'snack', 'Skittles', 1.75, 1.17, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Skittles Sour', 'snack', 'Skittles', 1.75, 1.15, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Skittles Gummies', 'snack', 'Skittles', 1.75, 1.33, 'medium', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Skittles Gummies Sour', 'snack', 'Skittles', 1.75, 1.33, 'medium', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Skittles Tropical', 'snack', 'Skittles', 1.75, 1.17, 'medium', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Skittles Berry', 'snack', 'Skittles', 1.75, 1.17, 'medium', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Kit Kat', 'snack', 'Kit Kat', 1.75, 2.04, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Coffee Crisp', 'snack', 'Coffee Crisp', 1.75, 1.42, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Coffee Crisp King Size', 'snack', 'Coffee Crisp', 2.50, 1.67, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Smarties', 'snack', 'Smarties', 1.75, 1.42, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+('Smarties Share Size', 'snack', 'Smarties', 2.50, 1.83, 'high', 180, 0, 0, 0, 'Candy and Chocolate Bars', 'active'),
+
+-- POP (CANS)
+('Coke Zero', 'drink', 'Coca-Cola', 1.50, 0.62, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Cherry Coke Zero', 'drink', 'Coca-Cola', 1.50, 0.80, 'medium', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Coke Regular', 'drink', 'Coca-Cola', 1.50, 0.62, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Pepsi', 'drink', 'Pepsi', 1.50, 0.54, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Pepsi Zero', 'drink', 'Pepsi', 1.50, 0.54, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Diet Pepsi', 'drink', 'Pepsi', 1.50, 0.54, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Canada Dry', 'drink', 'Canada Dry', 1.50, 0.79, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Schweppes', 'drink', 'Schweppes', 1.50, 0.68, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Nestea Zero', 'drink', 'Nestea', 1.50, 0.79, 'medium', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Mountain Dew', 'drink', 'Mountain Dew', 1.50, 0.68, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Mountain Dew Zero', 'drink', 'Mountain Dew', 1.50, 0.68, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Mountain Dew Major Melon', 'drink', 'Mountain Dew', 1.75, 1.17, 'medium', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Mountain Dew Spark', 'drink', 'Mountain Dew', 1.75, 1.17, 'medium', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Mountain Dew Voltage', 'drink', 'Mountain Dew', 1.75, 1.17, 'medium', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+
+-- POP (BOTTLES)
+('Sprite', 'drink', 'Sprite', 2.00, 1.42, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Coke Zero', 'drink', 'Coca-Cola', 2.00, 1.42, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Coke Regular', 'drink', 'Coca-Cola', 2.00, 1.42, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Diet Coke', 'drink', 'Coca-Cola', 2.00, 1.42, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Pepsi', 'drink', 'Pepsi', 2.00, 2.00, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Gingerale', 'drink', 'Gingerale', 2.00, 2.00, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Dr Pepper', 'drink', 'Dr Pepper', 2.00, 2.00, 'high', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+('Dr Pepper Cream Soda', 'drink', 'Dr Pepper', 2.00, 2.00, 'medium', 180, 0, 0, 0, 'Soft Drinks and Carbonated Beverages', 'active'),
+
+-- JUICE & ENERGY DRINKS
+('Dole Orange Juice', 'drink', 'Dole', 1.75, 0.80, 'high', 180, 0, 0, 1, 'Juices and Bottled Teas', 'active'),
+('Dole Apple Juice', 'drink', 'Dole', 1.75, 0.75, 'high', 180, 0, 0, 1, 'Juices and Bottled Teas', 'active'),
+('Oasis Apple Juice', 'drink', 'Oasis', 1.75, 0.75, 'high', 180, 0, 0, 1, 'Juices and Bottled Teas', 'active'),
+('Gatorade', 'drink', 'Gatorade', 2.00, 1.00, 'high', 180, 0, 0, 1, 'Energy Drinks', 'active'),
+('Gatorade Grape', 'drink', 'Gatorade', 2.00, 1.34, 'high', 180, 0, 0, 1, 'Energy Drinks', 'active'),
+('Powerade Orange', 'drink', 'Powerade', 2.00, 1.76, 'high', 180, 0, 0, 1, 'Energy Drinks', 'active'),
+('Powerade Blue', 'drink', 'Powerade', 2.00, 1.76, 'high', 180, 0, 0, 1, 'Energy Drinks', 'active'),
+('Red Bull', 'drink', 'Red Bull', 3.00, 2.84, 'high', 180, 0, 0, 0, 'Energy Drinks', 'active'),
+('Red Bull Zero', 'drink', 'Red Bull', 3.00, 1.59, 'high', 180, 0, 0, 0, 'Energy Drinks', 'active'),
+('Red Bull Sugar Free', 'drink', 'Red Bull', 3.00, 1.59, 'high', 180, 0, 0, 0, 'Energy Drinks', 'active'); 

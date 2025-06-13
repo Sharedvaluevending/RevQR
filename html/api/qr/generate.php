@@ -1,0 +1,278 @@
+<?php
+require_once __DIR__ . '/../../core/config.php';
+require_once __DIR__ . '/../../core/auth.php';
+require_once __DIR__ . '/../../includes/QRGenerator.php';
+
+// Check if user is authenticated
+if (!is_logged_in()) {
+    http_response_code(401);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Unauthorized'
+    ]);
+    exit;
+}
+
+// Get request data
+$data = json_decode(file_get_contents('php://input'), true);
+
+if (!$data) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Invalid request data'
+    ]);
+    exit;
+}
+
+try {
+    // Validate required fields
+    $requiredFields = ['qr_type', 'content'];
+    foreach ($requiredFields as $field) {
+        if (empty($data[$field])) {
+            throw new Exception("Missing required field: {$field}");
+        }
+    }
+
+    // Initialize QR generator
+    $generator = new QRGenerator();
+
+    // Set basic options
+    $options = [
+        'type' => $data['qr_type'],
+        'content' => $data['content'],
+        'size' => $data['size'] ?? 300,
+        'foreground_color' => $data['foreground_color'] ?? '#000000',
+        'background_color' => $data['background_color'] ?? '#FFFFFF',
+        'error_correction_level' => $data['error_correction_level'] ?? 'H',
+        'preview' => false
+    ];
+
+    // Add logo if specified
+    if (!empty($data['logo'])) {
+        $options['logo'] = $data['logo'];
+    }
+
+    // Add module customization
+    if (isset($data['module_shape'])) {
+        $options['module_shape'] = $data['module_shape'];
+    }
+    if (isset($data['module_size'])) {
+        $options['module_size'] = $data['module_size'];
+    }
+    if (isset($data['module_spacing'])) {
+        $options['module_spacing'] = $data['module_spacing'];
+    }
+    if (isset($data['module_glow'])) {
+        $options['module_glow'] = $data['module_glow'];
+        if ($data['module_glow']) {
+            $options['module_glow_color'] = $data['module_glow_color'] ?? '#000000';
+            $options['module_glow_intensity'] = $data['module_glow_intensity'] ?? 5;
+        }
+    }
+
+    // Add gradient options
+    if (isset($data['gradient_type']) && $data['gradient_type'] !== 'none') {
+        $options['gradient'] = [
+            'type' => $data['gradient_type'],
+            'start' => $data['gradient_start'] ?? '#000000',
+            'end' => $data['gradient_end'] ?? '#0000FF',
+            'angle' => $data['gradient_angle'] ?? 45,
+            'opacity' => $data['gradient_opacity'] ?? 1.0
+        ];
+    }
+
+    // Add eye customization
+    if (isset($data['eye_style'])) {
+        $options['eye'] = [
+            'style' => $data['eye_style'],
+            'color' => $data['eye_color'] ?? '#000000',
+            'size' => $data['eye_size'] ?? 1
+        ];
+
+        if (isset($data['eye_border']) && $data['eye_border']) {
+            $options['eye']['border'] = [
+                'color' => $data['eye_border_color'] ?? '#000000',
+                'width' => $data['eye_border_width'] ?? 1
+            ];
+        }
+
+        if (isset($data['eye_glow']) && $data['eye_glow']) {
+            $options['eye']['glow'] = [
+                'color' => $data['eye_glow_color'] ?? '#000000',
+                'intensity' => $data['eye_glow_intensity'] ?? 5
+            ];
+        }
+    }
+
+    // Add frame customization
+    if (isset($data['frame_style']) && $data['frame_style'] !== 'none') {
+        $options['frame'] = [
+            'style' => $data['frame_style'],
+            'color' => $data['frame_color'] ?? '#000000',
+            'width' => $data['frame_width'] ?? 2,
+            'radius' => $data['frame_radius'] ?? 5
+        ];
+
+        if (isset($data['frame_glow']) && $data['frame_glow']) {
+            $options['frame']['glow'] = [
+                'color' => $data['frame_glow_color'] ?? '#000000',
+                'intensity' => $data['frame_glow_intensity'] ?? 5
+            ];
+        }
+    }
+
+    // Add text options
+    if (!empty($data['label_text'])) {
+        $options['label'] = [
+            'text' => $data['label_text'],
+            'font' => $data['label_font'] ?? 'Arial',
+            'size' => $data['label_size'] ?? 12,
+            'color' => $data['label_color'] ?? '#000000',
+            'alignment' => $data['label_alignment'] ?? 'center',
+            'rotation' => $data['label_rotation'] ?? 0
+        ];
+
+        if (isset($data['label_glow']) && $data['label_glow']) {
+            $options['label']['glow'] = [
+                'color' => $data['label_glow_color'] ?? '#000000',
+                'intensity' => $data['label_glow_intensity'] ?? 5
+            ];
+        }
+    }
+
+    // Add bottom text options
+    if (!empty($data['bottom_text'])) {
+        $options['bottom_text'] = [
+            'text' => $data['bottom_text'],
+            'font' => $data['bottom_font'] ?? 'Arial',
+            'size' => $data['bottom_size'] ?? 12,
+            'color' => $data['bottom_color'] ?? '#000000',
+            'alignment' => $data['bottom_alignment'] ?? 'center',
+            'rotation' => $data['bottom_rotation'] ?? 0
+        ];
+
+        if (isset($data['bottom_glow']) && $data['bottom_glow']) {
+            $options['bottom_text']['glow'] = [
+                'color' => $data['bottom_glow_color'] ?? '#000000',
+                'intensity' => $data['bottom_glow_intensity'] ?? 5
+            ];
+        }
+    }
+
+    // Add effects
+    if (isset($data['shadow']) && $data['shadow']) {
+        $options['shadow'] = [
+            'color' => $data['shadow_color'] ?? '#000000',
+            'blur' => $data['shadow_blur'] ?? 5,
+            'offset_x' => $data['shadow_offset_x'] ?? 2,
+            'offset_y' => $data['shadow_offset_y'] ?? 2,
+            'opacity' => $data['shadow_opacity'] ?? 0.5
+        ];
+    }
+
+    // Add statistics options
+    if (isset($data['enable_stats']) && $data['enable_stats']) {
+        $options['stats'] = [
+            'enabled' => true,
+            'display' => $data['stats_display'] ?? 'none'
+        ];
+    }
+
+    // Generate QR code
+    $result = $generator->generate($options);
+
+    if (!$result['success']) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => $result['message'] ?? 'QR code generation failed'
+        ]);
+        exit;
+    }
+
+    try {
+        // Save to database
+        global $pdo;
+        
+        // Get business_id - CRITICAL FIX
+        require_once __DIR__ . '/../../core/business_utils.php';
+        $business_id = getOrCreateBusinessId($pdo, $_SESSION['user_id']);
+        
+        // Prepare meta data
+        $meta = [
+            'business_id' => $business_id,
+            'content' => $data['content'],
+            'size' => $data['size'] ?? 300,
+            'foreground_color' => $data['foreground_color'] ?? '#000000',
+            'background_color' => $data['background_color'] ?? '#FFFFFF',
+            'error_correction_level' => $data['error_correction_level'] ?? 'H',
+            'file_path' => $result['data']['qr_code_url']
+        ];
+
+        // Remove null values
+        $meta = array_filter($meta, function($value) {
+            return $value !== null;
+        });
+
+        $stmt = $pdo->prepare("
+            INSERT INTO qr_codes (
+                business_id, campaign_id, code, qr_type, machine_name, machine_location, url, meta, status
+            ) VALUES (
+                :business_id, :campaign_id, :code, :qr_type, :machine_name, :location, :url, :meta, :status
+            )
+        ");
+
+        // Extract campaign_id from content if it's a dynamic voting/vending QR
+        $campaign_id = null;
+        if (isset($data['campaign_id'])) {
+            $campaign_id = $data['campaign_id'];
+        } else if (preg_match('/campaign_id=(\d+)/', $data['content'], $matches)) {
+            $campaign_id = (int)$matches[1];
+        } else if (preg_match('/campaign=(\d+)/', $data['content'], $matches)) {
+            $campaign_id = (int)$matches[1];
+        }
+
+        $stmt->execute([
+            'business_id' => $business_id,
+            'campaign_id' => $campaign_id,
+            'code' => $result['data']['code'],
+            'qr_type' => $data['qr_type'],
+            'machine_name' => $data['machine_name'] ?? null,
+            'location' => $data['location'] ?? null,
+            'url' => $data['content'], // CRITICAL FIX: Store the actual URL
+            'meta' => json_encode($meta),
+            'status' => 'active'
+        ]);
+
+        // Return success response
+        echo json_encode([
+            'success' => true,
+            'data' => [
+                'code' => $result['data']['code'],
+                'qr_code_url' => $result['data']['qr_code_url'],
+                'preview_url' => $result['data']['preview_url'] ?? null
+            ]
+        ]);
+
+    } catch (PDOException $e) {
+        error_log("Database Error: " . $e->getMessage());
+        // Still return success since QR code was generated
+        echo json_encode([
+            'success' => true,
+            'data' => [
+                'code' => $result['data']['code'],
+                'qr_code_url' => $result['data']['qr_code_url'],
+                'preview_url' => $result['data']['preview_url'] ?? null
+            ]
+        ]);
+    }
+
+} catch (Exception $e) {
+    error_log("QR Generation Error: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ]);
+} 

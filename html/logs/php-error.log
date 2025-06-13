@@ -1,0 +1,181 @@
+[13-Jun-2025 05:17:09 America/Toronto] Login attempt - Username: sharedvaluevending, Role: business
+[13-Jun-2025 05:17:09 America/Toronto] Attempting authentication for username: sharedvaluevending
+[13-Jun-2025 05:17:09 America/Toronto] Found user: Array
+(
+    [id] => 1
+    [username] => sharedvaluevending
+    [role] => business
+    [business_id] => 1
+)
+
+[13-Jun-2025 05:17:10 America/Toronto] Authentication successful for user: sharedvaluevending
+[13-Jun-2025 05:17:10 America/Toronto] Authentication successful, checking role match
+[13-Jun-2025 05:17:10 America/Toronto] Role match successful, setting session data
+[13-Jun-2025 05:17:10 America/Toronto] Session data set, redirecting to dashboard
+[13-Jun-2025 05:17:11 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 05:17:51 America/Toronto] Error loading pizza trackers: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tracker_name' in 'field list'
+[13-Jun-2025 05:18:02 America/Toronto] Enhanced QR: Attempting to save to database
+[13-Jun-2025 05:18:02 America/Toronto] Enhanced QR: Business ID: 1
+[13-Jun-2025 05:18:02 America/Toronto] Enhanced QR: QR Code URL: /uploads/qr/qr_684becca351eb1.20846438.png
+[13-Jun-2025 05:18:02 America/Toronto] Enhanced QR: Metadata: {"business_id":1,"content":"https:\/\/revenueqr.sharedvaluevending.com\/vote.php?code=qr_684becc9621107.66630854","file_path":"\/uploads\/qr\/qr_684becca351eb1.20846438.png","location":"Test Location","options":{"type":"dynamic_voting","content":"https:\/\/revenueqr.sharedvaluevending.com\/vote.php?code=qr_684becc9621107.66630854","size":400,"foreground_color":"#000000","background_color":"#ffffff","error_correction_level":"H","output_format":"svg","location":"Test Location","machine_name":"","campaign_id":"12","spin_wheel_id":null,"pizza_tracker_id":null},"validated_machine_id":null,"validated_machine_name":null,"spin_wheel_id":null}
+[13-Jun-2025 05:18:02 America/Toronto] Enhanced QR: Database insert successful
+[13-Jun-2025 05:18:05 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 05:32:33 America/Toronto] Error loading pizza trackers: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tracker_name' in 'field list'
+[13-Jun-2025 05:32:42 America/Toronto] Enhanced QR: Attempting to save to database
+[13-Jun-2025 05:32:42 America/Toronto] Enhanced QR: Business ID: 1
+[13-Jun-2025 05:32:42 America/Toronto] Enhanced QR: QR Code URL: /uploads/qr/qr_684bf03a96b313.80065393.png
+[13-Jun-2025 05:32:42 America/Toronto] Enhanced QR: Metadata: {"business_id":1,"content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/promotions.php?machine=Test+Machine","file_path":"\/uploads\/qr\/qr_684bf03a96b313.80065393.png","location":"Test Location","options":{"type":"machine_sales","content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/promotions.php?machine=Test+Machine","size":400,"foreground_color":"#000000","background_color":"#ffffff","error_correction_level":"H","output_format":"svg","location":"Test Location","machine_name":"Test Machine","campaign_id":"","spin_wheel_id":null,"pizza_tracker_id":null},"validated_machine_id":230,"validated_machine_name":"Test Machine","spin_wheel_id":null}
+[13-Jun-2025 05:32:42 America/Toronto] Enhanced QR: Database error: SQLSTATE[HY000]: General error: 1366 Incorrect integer value: '' for column 'campaign_id' at row 1
+[13-Jun-2025 05:34:46 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 05:34:51 America/Toronto] Login attempt - Username: sharedvaluevending, Role: business
+[13-Jun-2025 05:34:51 America/Toronto] Attempting authentication for username: sharedvaluevending
+[13-Jun-2025 05:34:51 America/Toronto] Found user: Array
+(
+    [id] => 1
+    [username] => sharedvaluevending
+    [role] => business
+    [business_id] => 1
+)
+
+[13-Jun-2025 05:34:52 America/Toronto] Authentication successful for user: sharedvaluevending
+[13-Jun-2025 05:34:52 America/Toronto] Authentication successful, checking role match
+[13-Jun-2025 05:34:52 America/Toronto] Role match successful, setting session data
+[13-Jun-2025 05:34:52 America/Toronto] Session data set, redirecting to dashboard
+[13-Jun-2025 05:34:52 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 05:36:12 America/Toronto] Error loading pizza trackers: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tracker_name' in 'field list'
+[13-Jun-2025 05:36:27 America/Toronto] Enhanced QR: Attempting to save to database
+[13-Jun-2025 05:36:27 America/Toronto] Enhanced QR: Business ID: 1
+[13-Jun-2025 05:36:27 America/Toronto] Enhanced QR: QR Code URL: /uploads/qr/qr_684bf11b0155b3.68354352.png
+[13-Jun-2025 05:36:27 America/Toronto] Enhanced QR: Metadata: {"business_id":1,"content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/promotions.php?machine=Test+Machine&view=vending","file_path":"\/uploads\/qr\/qr_684bf11b0155b3.68354352.png","location":"Test Location","options":{"type":"dynamic_vending","content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/promotions.php?machine=Test+Machine&view=vending","size":400,"foreground_color":"#000000","background_color":"#ffffff","error_correction_level":"H","output_format":"svg","location":"Test Location","machine_name":"Test Machine","campaign_id":"13","spin_wheel_id":null,"pizza_tracker_id":null},"validated_machine_id":230,"validated_machine_name":"Test Machine","spin_wheel_id":null}
+[13-Jun-2025 05:36:27 America/Toronto] Enhanced QR: Database error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`revenueqr`.`qr_codes`, CONSTRAINT `qr_codes_machine_fk` FOREIGN KEY (`machine_id`) REFERENCES `machines` (`id`) ON DELETE SET NULL)
+[13-Jun-2025 05:36:49 America/Toronto] Error loading pizza trackers: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tracker_name' in 'field list'
+[13-Jun-2025 05:37:00 America/Toronto] Enhanced QR: Attempting to save to database
+[13-Jun-2025 05:37:00 America/Toronto] Enhanced QR: Business ID: 1
+[13-Jun-2025 05:37:00 America/Toronto] Enhanced QR: QR Code URL: /uploads/qr/qr_684bf13c65ea10.41621601.png
+[13-Jun-2025 05:37:00 America/Toronto] Enhanced QR: Metadata: {"business_id":1,"content":"https:\/\/www.facebook.com\/profile.php?id=61560043171526&mibextid=ZbWKwL","file_path":"\/uploads\/qr\/qr_684bf13c65ea10.41621601.png","location":"Test Location","options":{"type":"static","content":"https:\/\/www.facebook.com\/profile.php?id=61560043171526&mibextid=ZbWKwL","size":400,"foreground_color":"#000000","background_color":"#ffffff","error_correction_level":"H","output_format":"svg","location":"Test Location","machine_name":"","campaign_id":"","spin_wheel_id":null,"pizza_tracker_id":null},"validated_machine_id":null,"validated_machine_name":null,"spin_wheel_id":null}
+[13-Jun-2025 05:37:00 America/Toronto] Enhanced QR: Database error: SQLSTATE[HY000]: General error: 1366 Incorrect integer value: '' for column 'campaign_id' at row 1
+[13-Jun-2025 05:44:17 America/Toronto] Error loading pizza trackers: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tracker_name' in 'field list'
+[13-Jun-2025 05:44:31 America/Toronto] Enhanced QR: Attempting to save to database
+[13-Jun-2025 05:44:31 America/Toronto] Enhanced QR: Business ID: 1
+[13-Jun-2025 05:44:31 America/Toronto] Enhanced QR: QR Code URL: /uploads/qr/qr_684bf2ff182c42.65091180.png
+[13-Jun-2025 05:44:31 America/Toronto] Enhanced QR: Metadata: {"business_id":1,"content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/spin-wheel.php?wheel_id=4","file_path":"\/uploads\/qr\/qr_684bf2ff182c42.65091180.png","location":"Test Location","options":{"type":"spin_wheel","content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/spin-wheel.php?wheel_id=4","size":400,"foreground_color":"#000000","background_color":"#ffffff","error_correction_level":"H","output_format":"svg","location":"Test Location","machine_name":"","campaign_id":"","spin_wheel_id":"4","pizza_tracker_id":null},"validated_machine_id":null,"validated_machine_name":null,"spin_wheel_id":"4"}
+[13-Jun-2025 05:44:31 America/Toronto] Enhanced QR: Database error: SQLSTATE[HY000]: General error: 1366 Incorrect integer value: '' for column 'campaign_id' at row 1
+[13-Jun-2025 05:44:51 America/Toronto] Enhanced QR: Attempting to save to database
+[13-Jun-2025 05:44:51 America/Toronto] Enhanced QR: Business ID: 1
+[13-Jun-2025 05:44:51 America/Toronto] Enhanced QR: QR Code URL: /uploads/qr/qr_684bf312de45d8.60438686.png
+[13-Jun-2025 05:44:51 America/Toronto] Enhanced QR: Metadata: {"business_id":1,"content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/promotions.php?machine=Test+Machine&view=vending","file_path":"\/uploads\/qr\/qr_684bf312de45d8.60438686.png","location":"Test Location","options":{"type":"dynamic_vending","content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/promotions.php?machine=Test+Machine&view=vending","size":400,"foreground_color":"#000000","background_color":"#ffffff","error_correction_level":"H","output_format":"svg","location":"Test Location","machine_name":"Test Machine","campaign_id":"13","spin_wheel_id":null,"pizza_tracker_id":null},"validated_machine_id":230,"validated_machine_name":"Test Machine","spin_wheel_id":null}
+[13-Jun-2025 05:44:51 America/Toronto] Enhanced QR: Database error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`revenueqr`.`qr_codes`, CONSTRAINT `qr_codes_machine_fk` FOREIGN KEY (`machine_id`) REFERENCES `machines` (`id`) ON DELETE SET NULL)
+[13-Jun-2025 05:46:18 America/Toronto] Login attempt - Username: Sharedvaluevending, Role: business
+[13-Jun-2025 05:46:18 America/Toronto] Attempting authentication for username: Sharedvaluevending
+[13-Jun-2025 05:46:18 America/Toronto] Found user: Array
+(
+    [id] => 1
+    [username] => sharedvaluevending
+    [role] => business
+    [business_id] => 1
+)
+
+[13-Jun-2025 05:46:19 America/Toronto] Authentication successful for user: Sharedvaluevending
+[13-Jun-2025 05:46:19 America/Toronto] Authentication successful, checking role match
+[13-Jun-2025 05:46:19 America/Toronto] Role match successful, setting session data
+[13-Jun-2025 05:46:19 America/Toronto] Session data set, redirecting to dashboard
+[13-Jun-2025 05:46:20 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 05:46:24 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 05:49:00 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:49:00 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:49:00 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:49:00 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:49:00 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 58
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 147
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 147
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 147
+[13-Jun-2025 05:50:14 America/Toronto] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /var/www/debug_qr_manager_issue.php on line 147
+[13-Jun-2025 07:23:32 America/Toronto] Login attempt - Username: Sharedvaluevending, Role: business
+[13-Jun-2025 07:23:32 America/Toronto] Attempting authentication for username: Sharedvaluevending
+[13-Jun-2025 07:23:32 America/Toronto] Found user: Array
+(
+    [id] => 1
+    [username] => sharedvaluevending
+    [role] => business
+    [business_id] => 1
+)
+
+[13-Jun-2025 07:23:32 America/Toronto] Authentication successful for user: Sharedvaluevending
+[13-Jun-2025 07:23:32 America/Toronto] Authentication successful, checking role match
+[13-Jun-2025 07:23:32 America/Toronto] Role match successful, setting session data
+[13-Jun-2025 07:23:32 America/Toronto] Session data set, redirecting to dashboard
+[13-Jun-2025 07:23:33 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 09:26:28 America/Toronto] Login attempt - Username: sharedvaluevending, Role: business
+[13-Jun-2025 09:26:28 America/Toronto] Attempting authentication for username: sharedvaluevending
+[13-Jun-2025 09:26:28 America/Toronto] Found user: Array
+(
+    [id] => 1
+    [username] => sharedvaluevending
+    [role] => business
+    [business_id] => 1
+)
+
+[13-Jun-2025 09:26:29 America/Toronto] Authentication successful for user: sharedvaluevending
+[13-Jun-2025 09:26:29 America/Toronto] Authentication successful, checking role match
+[13-Jun-2025 09:26:29 America/Toronto] Role match successful, setting session data
+[13-Jun-2025 09:26:29 America/Toronto] Session data set, redirecting to dashboard
+[13-Jun-2025 09:26:29 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 09:28:17 America/Toronto] Error loading spin wheel: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'b.logo_url' in 'field list'
+[13-Jun-2025 09:30:13 America/Toronto] Error loading pizza trackers: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tracker_name' in 'field list'
+[13-Jun-2025 09:31:07 America/Toronto] Enhanced QR: Attempting to save to database
+[13-Jun-2025 09:31:07 America/Toronto] Enhanced QR: Business ID: 1
+[13-Jun-2025 09:31:07 America/Toronto] Enhanced QR: QR Code URL: /uploads/qr/qr_684c281ac5df13.61833259.png
+[13-Jun-2025 09:31:07 America/Toronto] Enhanced QR: Metadata: {"business_id":1,"content":"www.youtube.com","file_path":"\/uploads\/qr\/qr_684c281ac5df13.61833259.png","location":"Test Location","options":{"type":"static","content":"www.youtube.com","size":400,"foreground_color":"#000000","background_color":"#ffffff","error_correction_level":"H","output_format":"svg","location":"Test Location","machine_name":"","campaign_id":"","spin_wheel_id":null,"pizza_tracker_id":null},"validated_machine_id":null,"validated_machine_name":null,"spin_wheel_id":null}
+[13-Jun-2025 09:31:07 America/Toronto] Enhanced QR: Database error: SQLSTATE[HY000]: General error: 1366 Incorrect integer value: '' for column 'campaign_id' at row 1
+[13-Jun-2025 09:32:19 America/Toronto] Login attempt - Username: Mike, Role: user
+[13-Jun-2025 09:32:19 America/Toronto] Attempting authentication for username: Mike
+[13-Jun-2025 09:32:20 America/Toronto] Found user: Array
+(
+    [id] => 2
+    [username] => Mike
+    [role] => user
+    [business_id] => 
+)
+
+[13-Jun-2025 09:32:20 America/Toronto] Authentication successful for user: Mike
+[13-Jun-2025 09:32:20 America/Toronto] Authentication successful, checking role match
+[13-Jun-2025 09:32:20 America/Toronto] Role match successful, setting session data
+[13-Jun-2025 09:32:20 America/Toronto] Session data set, redirecting to dashboard
+[13-Jun-2025 09:32:48 America/Toronto] Error loading spin wheel: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'b.logo_url' in 'field list'
+[13-Jun-2025 09:33:30 America/Toronto] SLOT MACHINE DEBUG - User 2, Business 1: {"base_spins":10,"bonus_spins":15,"total_spins":25,"spins_used":0,"spins_remaining":25,"active_packs":[{"name":"Extra Casino Spins (5)","spins_available":5,"expires_at":"2025-06-15 17:55:01"},{"name":"Extra Casino Spins (5)","spins_available":5,"expires_at":"2025-06-18 18:21:29"},{"name":"Extra Casino Spins (5)","spins_available":5,"expires_at":"2025-06-19 22:54:00"}]}
+[13-Jun-2025 09:37:15 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 09:37:16 America/Toronto] Business wallet add coins error: There is already an active transaction
+[13-Jun-2025 09:37:16 America/Toronto] Failed to credit business wallet for purchase ID: 8
+[13-Jun-2025 09:37:17 America/Toronto] Business purchase error: There is no active transaction
+[13-Jun-2025 09:37:23 America/Toronto] Business wallet add coins error: There is already an active transaction
+[13-Jun-2025 09:37:23 America/Toronto] Failed to credit business wallet for purchase ID: 9
+[13-Jun-2025 09:37:24 America/Toronto] Business purchase error: There is no active transaction
+[13-Jun-2025 09:37:29 America/Toronto] Business wallet add coins error: There is already an active transaction
+[13-Jun-2025 09:37:29 America/Toronto] Failed to credit business wallet for purchase ID: 10
+[13-Jun-2025 09:37:30 America/Toronto] Business purchase error: There is no active transaction
+[13-Jun-2025 09:37:45 America/Toronto] Business wallet add coins error: There is already an active transaction
+[13-Jun-2025 09:37:45 America/Toronto] Failed to credit business wallet for purchase ID: 11
+[13-Jun-2025 09:37:46 America/Toronto] Business purchase error: There is no active transaction
+[13-Jun-2025 12:45:04 America/Toronto] Login attempt - Username: Sharedvaluevending, Role: business
+[13-Jun-2025 12:45:04 America/Toronto] Attempting authentication for username: Sharedvaluevending
+[13-Jun-2025 12:45:04 America/Toronto] Found user: Array
+(
+    [id] => 1
+    [username] => sharedvaluevending
+    [role] => business
+    [business_id] => 1
+)
+
+[13-Jun-2025 12:45:05 America/Toronto] Authentication successful for user: Sharedvaluevending
+[13-Jun-2025 12:45:05 America/Toronto] Authentication successful, checking role match
+[13-Jun-2025 12:45:05 America/Toronto] Role match successful, setting session data
+[13-Jun-2025 12:45:05 America/Toronto] Session data set, redirecting to dashboard
+[13-Jun-2025 12:45:06 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 12:45:26 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 15:42:58 America/Toronto] PHP Warning:  Undefined array key "user_id" in /var/www/html/user/dashboard.php on line 12
+[13-Jun-2025 15:42:58 America/Toronto] Login required: No valid session found. Session data: []
