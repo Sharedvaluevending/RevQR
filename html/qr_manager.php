@@ -93,72 +93,70 @@ try {
 require_once __DIR__ . '/core/includes/header.php';
 ?>
 
-<!-- Complete CSS Reset - Match Live Site Clean Design -->
+<!-- Match Dashboard Green Theme -->
 <style>
-    /* COMPLETE OVERRIDE - Reset to clean Bootstrap defaults like live site */
+    /* MATCH THE GREEN DASHBOARD THEME */
     html, body {
-        background: #ffffff !important;
-        background-image: none !important;
-        background-attachment: initial !important;
-        color: #212529 !important;
+        background: linear-gradient(135deg, #00a000 0%, #00b000 25%, #00c000 75%, #00d000 100%) !important;
+        background-attachment: fixed !important;
+        color: #ffffff !important;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
     }
     
-    /* Reset all text colors to Bootstrap defaults */
+    /* White text on green theme */
     .text-dark, h1, h2, h3, h4, h5, h6, p, div, span, td, th {
-        color: #212529 !important;
+        color: #ffffff !important;
     }
     
     .text-muted {
-        color: #6c757d !important;
+        color: rgba(255, 255, 255, 0.8) !important;
     }
     
     .text-primary {
-        color: #0d6efd !important;
+        color: #64b5f6 !important;
     }
     
-    /* Reset all backgrounds to clean white */
+    /* Glass morphism cards like dashboard */
     .bg-white, .card, .card-body, .card-header {
-        background: #ffffff !important;
-        background-image: none !important;
-        backdrop-filter: none !important;
-        border: 1px solid #dee2e6 !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
     }
     
     .card {
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-        border-radius: 0.375rem !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 16px !important;
     }
     
     .card-header {
-        background-color: rgba(0, 0, 0, 0.03) !important;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
     
-    /* Reset table styling */
+    /* Table styling for green theme */
     .table {
-        color: #212529 !important;
-        background: #ffffff !important;
+        color: #ffffff !important;
+        background: transparent !important;
     }
     
     .table thead th {
-        background: #f8f9fa !important;
-        color: #212529 !important;
-        border-bottom: 2px solid #dee2e6 !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #ffffff !important;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
     }
     
     .table tbody tr {
-        background: #ffffff !important;
-        color: #212529 !important;
+        background: transparent !important;
+        color: #ffffff !important;
     }
     
     .table tbody tr:hover {
-        background: rgba(0, 0, 0, 0.075) !important;
+        background: transparent !important;
     }
     
     .table-striped > tbody > tr:nth-of-type(odd) > td,
     .table-striped > tbody > tr:nth-of-type(odd) > th {
-        background-color: rgba(0, 0, 0, 0.05) !important;
+        background-color: transparent !important;
     }
     
     /* Reset alerts */
@@ -209,30 +207,26 @@ require_once __DIR__ . '/core/includes/header.php';
         background-color: transparent !important;
     }
     
-    /* Reset navbar if present */
+    /* Keep standard dark navbar like rest of app */
     .navbar {
-        background: #ffffff !important;
-        background-image: none !important;
-        backdrop-filter: none !important;
-        border-bottom: 1px solid #dee2e6 !important;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        background: #212529 !important;
     }
     
     .navbar-brand, .nav-link {
-        color: #212529 !important;
+        color: #ffffff !important;
     }
     
     .nav-link:hover {
-        color: #0d6efd !important;
+        color: rgba(255, 255, 255, 0.8) !important;
     }
     
-    /* Container background */
+    /* Container background - transparent to show green gradient */
     .container-fluid {
-        background: #f8f9fa !important;
+        background: transparent !important;
     }
 </style>
 
-<div class="container-fluid py-4" style="background-color: #f8f9fa;">
+<div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -291,18 +285,7 @@ require_once __DIR__ . '/core/includes/header.php';
                 </div>
             <?php endif; ?>
 
-            <!-- Dynamic QR Manager Info -->
-            <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
-                <i class="bi bi-info-circle-fill me-3 fs-4"></i>
-                <div class="flex-grow-1">
-                    <h6 class="alert-heading mb-1">💡 Dynamic QR Management Available</h6>
-                    <p class="mb-2">Change QR code destinations without reprinting! Update URLs instantly while keeping the same QR image.</p>
-                    <a href="qr_dynamic_manager.php" class="btn btn-info btn-sm">
-                        <i class="bi bi-arrow-clockwise me-1"></i>Open Dynamic Manager
-                    </a>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+
 
             <!-- QR Codes Table -->
             <div class="card border-0 shadow-sm">
