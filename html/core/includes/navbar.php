@@ -29,7 +29,11 @@ if (is_logged_in() && has_role('business')) {
         <div class="navbar-brand d-flex align-items-center">
             <img src="<?php echo APP_URL; ?>/img/logoRQ.png" alt="RevenueQR Logo" height="32" class="me-2">
             <span class="d-none d-sm-inline">Revenue QR</span>
+<<<<<<< HEAD
             
+=======
+            <span class="badge ms-2" style="background-color: #ffc107; color: #000; font-size: 0.75rem; font-weight: bold;">BRANCH EDIT</span>
+>>>>>>> 09f3080 (🎨 Switch from green back to blue theme + add yellow BRANCH EDIT indicator)
         </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
