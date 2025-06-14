@@ -65,7 +65,7 @@ $stmt = $pdo->prepare("
               NULLIF(COUNT(*), 0), 1) as category_approval_rate,
         COUNT(DISTINCT vli.id) as items_in_category,
         AVG(HOUR(v.created_at)) as avg_vote_hour,
-        GROUP_CONCAT(DISTINCT vli.item_name ORDER BY COUNT(CASE WHEN v.vote_type = 'vote_in' THEN 1 END) DESC SEPARATOR ', ') as top_liked_items
+        GROUP_CONCAT(DISTINCT vli.item_name SEPARATOR ', ') as top_liked_items
     FROM votes v
     JOIN voting_list_items vli ON v.item_id = vli.id
     JOIN voting_lists vl ON vli.voting_list_id = vl.id
