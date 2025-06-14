@@ -33,6 +33,11 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
+    <!-- Force CSS reload with timestamp -->
+    <style id="cache-buster">
+        /* Cache buster: <?php echo time(); ?> */
+    </style>
+    
     <!-- Favicon -->
     <link rel="ihttps://revenueqr.sharedvaluevending.com/qr-generator.phpcon" type="image/png" href="<?php echo APP_URL; ?>/img/logoRQ.png">
     
