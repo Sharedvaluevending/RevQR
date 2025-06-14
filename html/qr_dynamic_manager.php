@@ -171,14 +171,14 @@ require_once __DIR__ . '/core/includes/header.php';
 
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-qr-code me-2"></i>Your QR Codes
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="card-title mb-0 text-dark">
+                        <i class="bi bi-qr-code me-2 text-primary"></i>Your QR Codes
                         <span class="badge bg-primary ms-2"><?php echo count($qr_codes); ?></span>
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body bg-white">
                     <?php if (empty($qr_codes)): ?>
                         <div class="text-center py-5">
                             <i class="bi bi-qr-code display-1 text-muted"></i>
@@ -190,8 +190,8 @@ require_once __DIR__ . '/core/includes/header.php';
                         </div>
                     <?php else: ?>
                         <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
+                            <table class="table table-dark table-hover border-secondary">
+                                <thead class="table-secondary">
                                     <tr>
                                         <th>Preview</th>
                                         <th>Type</th>
@@ -230,9 +230,9 @@ require_once __DIR__ . '/core/includes/header.php';
                                                          class="img-thumbnail" 
                                                          style="width: 60px; height: 60px;">
                                                 <?php else: ?>
-                                                    <div class="bg-light d-flex align-items-center justify-content-center" 
+                                                    <div class="bg-secondary d-flex align-items-center justify-content-center" 
                                                          style="width: 60px; height: 60px;">
-                                                        <i class="bi bi-qr-code text-muted"></i>
+                                                        <i class="bi bi-qr-code text-light"></i>
                                                     </div>
                                                 <?php endif; ?>
                                             </td>
@@ -331,10 +331,10 @@ require_once __DIR__ . '/core/includes/header.php';
 <!-- URL Edit Modal -->
 <div class="modal fade" id="editUrlModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
                 <h5 class="modal-title">Update QR Code URL</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
                 <div class="modal-body">

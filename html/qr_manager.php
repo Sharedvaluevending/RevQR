@@ -102,6 +102,10 @@ require_once __DIR__ . '/core/includes/header.php';
                     <a href="business/dashboard.php" class="btn btn-outline-secondary me-2">
                         <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
                     </a>
+                    <a href="qr_dynamic_manager.php" class="btn btn-outline-info me-2" 
+                       title="Manage dynamic QR codes - change URLs without reprinting">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Dynamic Manager
+                    </a>
                     <a href="qr-generator.php" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-1"></i>Generate New QR
                     </a>
@@ -146,14 +150,32 @@ require_once __DIR__ . '/core/includes/header.php';
                 </div>
             <?php endif; ?>
 
+            <!-- Dynamic QR Manager Info -->
+            <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading mb-1">💡 Dynamic QR Management Available</h6>
+                    <p class="mb-2">Change QR code destinations without reprinting! Update URLs instantly while keeping the same QR image.</p>
+                    <a href="qr_dynamic_manager.php" class="btn btn-info btn-sm">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Open Dynamic Manager
+                    </a>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
             <!-- QR Codes Table -->
             <div class="card bg-dark border-secondary">
                 <div class="card-header bg-gradient text-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bi bi-qr-code me-2"></i>Your QR Codes</h5>
-                        <a href="print-shop.php" class="btn btn-outline-light btn-sm">
-                            <i class="bi bi-printer me-1"></i>Print Shop
-                        </a>
+                        <div class="btn-group btn-group-sm">
+                            <a href="qr_dynamic_manager.php" class="btn btn-outline-light">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Dynamic Manager
+                            </a>
+                            <a href="print-shop.php" class="btn btn-outline-light">
+                                <i class="bi bi-printer me-1"></i>Print Shop
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body bg-dark text-white">

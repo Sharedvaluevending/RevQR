@@ -229,3 +229,6 @@
 [13-Jun-2025 17:52:08 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
 [13-Jun-2025 17:52:08 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
 [13-Jun-2025 17:52:08 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
+[13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
