@@ -145,6 +145,181 @@ $ad_stats = $adsManager->getBusinessAdStats($business_id, 30);
 require_once __DIR__ . '/../core/includes/header.php';
 ?>
 
+<!-- Match Dashboard Blue Theme -->
+<style>
+    /* MATCH THE BLUE DASHBOARD THEME */
+    html, body {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important;
+        background-attachment: fixed !important;
+        color: #ffffff !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    }
+    
+    /* White text on blue theme */
+    .text-dark, h1, h2, h3, h4, h5, h6, p, div, span, td, th {
+        color: #ffffff !important;
+    }
+    
+    .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    .text-primary {
+        color: #64b5f6 !important;
+    }
+    
+    /* Glass morphism cards like dashboard */
+    .bg-white, .card, .card-body, .card-header {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+    
+    .card {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 16px !important;
+    }
+    
+    .card-header {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* Table styling for blue theme */
+    .table {
+        color: #ffffff !important;
+        background: transparent !important;
+    }
+    
+    .table thead th {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #ffffff !important;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .table tbody tr {
+        background: transparent !important;
+        color: #ffffff !important;
+    }
+    
+    .table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Force ALL table elements transparent */
+    .table td, .table th {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Reset alerts */
+    .alert {
+        color: inherit !important;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1 !important;
+        border-color: #bee5eb !important;
+        color: #0c5460 !important;
+    }
+    
+    .alert-success {
+        background-color: #d1e7dd !important;
+        border-color: #badbcc !important;
+        color: #0f5132 !important;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da !important;
+        border-color: #f5c2c7 !important;
+        color: #842029 !important;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd !important;
+        border-color: #ffecb5 !important;
+        color: #664d03 !important;
+    }
+    
+    /* Reset buttons */
+    .btn-primary {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #ffffff !important;
+    }
+    
+    .btn-outline-primary {
+        color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d !important;
+        border-color: #6c757d !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-success {
+        color: #198754 !important;
+        border-color: #198754 !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-danger {
+        color: #dc3545 !important;
+        border-color: #dc3545 !important;
+        background-color: transparent !important;
+    }
+    
+    /* Badges */
+    .badge {
+        color: #ffffff !important;
+    }
+    
+    .badge.bg-success {
+        background-color: #198754 !important;
+    }
+    
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+    }
+    
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #000000 !important;
+    }
+    
+    /* Modal fixes */
+    .modal-content {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(20px) !important;
+        color: #212529 !important;
+    }
+    
+    .modal-header, .modal-body, .modal-footer {
+        color: #212529 !important;
+    }
+    
+    .form-control {
+        background: #ffffff !important;
+        border: 1px solid #ced4da !important;
+        color: #212529 !important;
+    }
+    
+    .form-control:focus {
+        background: #ffffff !important;
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        color: #212529 !important;
+    }
+    
+    /* Container background - transparent to show blue gradient */
+    .container-fluid {
+        background: transparent !important;
+    }
+</style>
+
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -197,7 +372,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card bg-info text-white">
+                    <div class="card bg-dark text-white">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
                                 <div>
@@ -210,7 +385,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card bg-warning text-white">
+                    <div class="card bg-secondary text-white">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
                                 <div>

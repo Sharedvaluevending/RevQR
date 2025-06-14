@@ -7,11 +7,20 @@ require_once __DIR__ . '/../core/config_manager.php';
 require_once __DIR__ . '/../core/business_qr_manager.php';
 require_once __DIR__ . '/../core/store_manager.php';
 
-// Require business role
-require_role('business');
+// Handle QR code visitors (public access)
+$is_qr_visitor = isset($_GET['source']) && $_GET['source'] === 'qr';
+$qr_business_id = isset($_GET['business_id']) ? (int)$_GET['business_id'] : null;
 
-$business_id = $_SESSION['business_id'];
-$user_id = $_SESSION['user_id'];
+if ($is_qr_visitor && $qr_business_id) {
+    // Public QR code access - don't require login
+    $business_id = $qr_business_id;
+    $user_id = null;
+} else {
+    // Regular business owner access - require login
+    require_role('business');
+    $business_id = $_SESSION['business_id'];
+    $user_id = $_SESSION['user_id'];
+}
 
 // Get business subscription
 $subscription = BusinessQRManager::getSubscription($business_id);

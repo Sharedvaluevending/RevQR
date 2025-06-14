@@ -66,9 +66,9 @@ return [
         'static',
         'dynamic',
         'dynamic_voting',
-        'dynamic_vending',
-        'machine_sales',
         'promotion',
+        'vending_discount_store',
+        'machine_sales',
         'cross_promo',
         'stackable'
     ],

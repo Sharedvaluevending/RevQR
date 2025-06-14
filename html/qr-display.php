@@ -95,20 +95,20 @@ require_once __DIR__ . '/core/includes/header.php';
                         <div class="col qr-card" data-type="<?php echo $qr['qr_type']; ?>">
                             <div class="card h-100 display-card">
                                 <div class="card-body text-center">
-                                    <img src="<?php echo htmlspecialchars($qr['qr_url']); ?>" 
+                                    <img src="<?php echo htmlspecialchars($qr['qr_url'] ?? ''); ?>" 
                                          alt="QR Code" 
                                          class="img-fluid mb-3" 
                                          style="max-width: 100%; border-radius: 8px;">
-                                    <h5 class="card-title"><?php echo htmlspecialchars($qr['name']); ?></h5>
+                                    <h5 class="card-title"><?php echo htmlspecialchars($qr['name'] ?? 'Unnamed QR Code'); ?></h5>
                                     <div class="mb-2">
                                         <?php
                                         $typeColors = [
                                             'static' => 'primary',
                                             'dynamic' => 'info', 
                                             'dynamic_voting' => 'success',
-                                            'dynamic_vending' => 'warning',
-                                            'machine_sales' => 'danger',
-                                            'promotion' => 'secondary',
+                                                    'promotion' => 'warning',
+        'vending_discount_store' => 'info',
+        'machine_sales' => 'danger',
                                             'spin_wheel' => 'warning',
                                             'pizza_tracker' => 'success'
                                         ];
@@ -121,11 +121,11 @@ require_once __DIR__ . '/core/includes/header.php';
                                     <p class="card-text">
                                         <small class="text-muted">
                                             <?php if ($qr['qr_type'] === 'spin_wheel' && $qr['spin_wheel_name']): ?>
-                                                <?php echo htmlspecialchars($qr['spin_wheel_name']); ?>
+                                                <?php echo htmlspecialchars($qr['spin_wheel_name'] ?? ''); ?>
                                             <?php elseif ($qr['qr_type'] === 'dynamic_voting' && $qr['campaign_name']): ?>
-                                                <?php echo htmlspecialchars($qr['campaign_name']); ?>
-                                            <?php elseif (in_array($qr['qr_type'], ['dynamic_vending', 'machine_sales', 'promotion'])): ?>
-                                                <?php echo htmlspecialchars($qr['machine_name'] ?: $qr['qr_machine_name']); ?>
+                                                <?php echo htmlspecialchars($qr['campaign_name'] ?? ''); ?>
+                                            <?php elseif (in_array($qr['qr_type'], ['promotion', 'machine_sales', 'vending_discount_store'])): ?>
+                                                <?php echo htmlspecialchars(($qr['machine_name'] ?: $qr['qr_machine_name']) ?? 'No machine name'); ?>
                                             <?php else: ?>
                                                 <?php echo date('M j, Y', strtotime($qr['created_at'])); ?>
                                             <?php endif; ?>

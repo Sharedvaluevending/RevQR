@@ -242,6 +242,17 @@ class VotingService {
             $is_daily_bonus = false;
             $vote_category = '';
             
+            // ENHANCED VOTE LIMIT ENFORCEMENT
+            // Check if user has exceeded total daily limit (1 daily + 2 weekly = max 3 per day)
+            if ($vote_status['total_votes_today'] >= (self::DAILY_FREE_VOTES + self::WEEKLY_BONUS_VOTES) && $vote_method !== 'premium') {
+                return [
+                    'success' => false,
+                    'message' => 'Daily vote limit reached (3 votes max). Use premium votes to continue.',
+                    'error_code' => 'DAILY_LIMIT_EXCEEDED',
+                    'suggest_premium' => true
+                ];
+            }
+            
             // Determine vote type and validate limits
             if ($vote_method === 'premium') {
                 // Premium vote logic
@@ -273,7 +284,7 @@ class VotingService {
                 // No free votes remaining
                 return [
                     'success' => false,
-                    'message' => 'No free votes remaining. Purchase a premium vote for ' . self::PREMIUM_VOTE_COST . ' QR coins?',
+                    'message' => 'No free votes remaining today. You get 1 daily + 2 weekly votes. Purchase premium votes for ' . self::PREMIUM_VOTE_COST . ' QR coins?',
                     'error_code' => 'NO_FREE_VOTES',
                     'suggest_premium' => true
                 ];

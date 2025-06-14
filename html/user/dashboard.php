@@ -5,11 +5,44 @@ require_once __DIR__ . '/../core/auth.php';
 require_once __DIR__ . '/../core/functions.php';
 require_once __DIR__ . '/../core/qr_coin_manager.php';
 require_once __DIR__ . '/../core/store_manager.php';
-require_once __DIR__ . '/../core/services/VotingService.php';
+// Simple weekly vote limit system (2 votes per week)
+$user_id = $_SESSION['user_id'] ?? null;
+$voter_ip = $_SERVER['REMOTE_ADDR'];
 
-// Initialize voting service and get vote status
-VotingService::init($pdo);
-$vote_status = VotingService::getUserVoteStatus($_SESSION['user_id'], $_SERVER['REMOTE_ADDR']);
+// Get user's weekly vote count
+$weekly_votes_used = 0;
+$weekly_vote_limit = 2;
+
+if ($user_id) {
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) as weekly_votes
+        FROM votes 
+        WHERE user_id = ? 
+        AND YEARWEEK(created_at, 1) = YEARWEEK(NOW(), 1)
+    ");
+    $stmt->execute([$user_id]);
+    $weekly_votes_used = (int) $stmt->fetchColumn();
+} else {
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) as weekly_votes
+        FROM votes 
+        WHERE voter_ip = ? 
+        AND user_id IS NULL
+        AND YEARWEEK(created_at, 1) = YEARWEEK(NOW(), 1)
+    ");
+    $stmt->execute([$voter_ip]);
+    $weekly_votes_used = (int) $stmt->fetchColumn();
+}
+
+$votes_remaining = max(0, $weekly_vote_limit - $weekly_votes_used);
+
+// Simple vote status for display
+$vote_status = [
+    'votes_used' => $weekly_votes_used,
+    'votes_remaining' => $votes_remaining,
+    'weekly_limit' => $weekly_vote_limit,
+    'qr_balance' => QRCoinManager::getBalance($_SESSION['user_id'])
+];
 
 // Require user role
 require_role('user');
@@ -667,55 +700,49 @@ require_once __DIR__ . '/../core/includes/header.php';
                     <!-- Left Column - Voting Power -->
                     <div class="col-md-6">
                         <!-- Daily Free Vote -->
-                        <div class="alert alert-success border-start border-4 border-success bg-success bg-opacity-10 mb-2 p-3">
+                        <!-- Votes Used This Week -->
+                        <div class="alert alert-<?php echo $vote_status['votes_used'] >= $vote_status['weekly_limit'] ? 'danger' : 'success'; ?> border-start border-4 border-<?php echo $vote_status['votes_used'] >= $vote_status['weekly_limit'] ? 'danger' : 'success'; ?> bg-<?php echo $vote_status['votes_used'] >= $vote_status['weekly_limit'] ? 'danger' : 'success'; ?> bg-opacity-10 mb-2 p-3">
                             <div class="d-flex align-items-center justify-content-center">
                                 <div class="me-3">
-                                    <img src="../assets/page/giftbox.png" alt="Gift Box" style="width: 48px; height: 48px;">
+                                    <img src="../assets/page/giftbox.png" alt="Vote Box" style="width: 48px; height: 48px;">
                                 </div>
                                 <div class="text-start">
-                                    <h4 class="mb-0"><?php echo $vote_status['daily_free_remaining']; ?></h4>
-                                    <h6 class="mb-1">Daily Free Vote<?php echo $vote_status['daily_free_remaining'] != 1 ? 's' : ''; ?></h6>
+                                    <h4 class="mb-0"><?php echo $vote_status['votes_used']; ?></h4>
+                                    <h6 class="mb-1">Vote<?php echo $vote_status['votes_used'] != 1 ? 's' : ''; ?> Used</h6>
                                     <div class="small text-muted">
-                                        <i class="bi bi-coin me-1"></i>Earns 30 QR coins
+                                        <i class="bi bi-clock me-1"></i>This week
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Weekly Bonus Votes -->
-                        <div class="alert alert-info border-start border-4 border-info bg-info bg-opacity-10 mb-2 p-3">
+                        <!-- Votes Remaining This Week -->
+                        <div class="alert alert-<?php echo $vote_status['votes_remaining'] > 0 ? 'info' : 'warning'; ?> border-start border-4 border-<?php echo $vote_status['votes_remaining'] > 0 ? 'info' : 'warning'; ?> bg-<?php echo $vote_status['votes_remaining'] > 0 ? 'info' : 'warning'; ?> bg-opacity-10 mb-2 p-3">
                             <div class="d-flex align-items-center justify-content-center">
                                 <div class="me-3">
                                     <img src="../assets/page/star.png" alt="Star" style="width: 48px; height: 48px;">
                                 </div>
                                 <div class="text-start">
-                                    <h4 class="mb-0"><?php echo $vote_status['weekly_bonus_remaining']; ?></h4>
-                                    <h6 class="mb-1">Weekly Bonus Vote<?php echo $vote_status['weekly_bonus_remaining'] != 1 ? 's' : ''; ?></h6>
+                                    <h4 class="mb-0"><?php echo $vote_status['votes_remaining']; ?></h4>
+                                    <h6 class="mb-1">Vote<?php echo $vote_status['votes_remaining'] != 1 ? 's' : ''; ?> Remaining</h6>
                                     <div class="small text-muted">
-                                        <i class="bi bi-coin me-1"></i>Earns 5 QR coins each
+                                        <i class="bi bi-coin me-1"></i>Earns 30 QR coins each
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Premium Votes -->
-                        <div class="alert alert-warning border-start border-4 border-warning bg-warning bg-opacity-10 mb-2 p-3">
+                        <!-- Weekly Limit -->
+                        <div class="alert alert-secondary border-start border-4 border-secondary bg-secondary bg-opacity-10 mb-2 p-3">
                             <div class="d-flex align-items-center justify-content-center">
                                 <div class="me-3">
-                                    <img src="../assets/page/votepre.png" alt="Premium Vote" style="width: 48px; height: 48px;">
+                                    <img src="../assets/page/votepre.png" alt="Weekly Limit" style="width: 48px; height: 48px;">
                                 </div>
                                 <div class="text-start">
-                                    <h4 class="mb-0"><?php echo $vote_status['premium_votes_available']; ?></h4>
-                                    <h6 class="mb-1">Premium Vote<?php echo $vote_status['premium_votes_available'] != 1 ? 's' : ''; ?></h6>
+                                    <h4 class="mb-0"><?php echo $vote_status['weekly_limit']; ?></h4>
+                                    <h6 class="mb-1">Weekly Limit</h6>
                                     <div class="small text-muted">
-                                        <?php if (isset($vote_status['vote_pack_votes']) && $vote_status['vote_pack_votes'] > 0): ?>
-                                            <i class="bi bi-gift me-1"></i><?php echo $vote_status['vote_pack_votes']; ?> from packs
-                                            <?php if ($vote_status['premium_from_coins'] > 0): ?>
-                                                + <?php echo $vote_status['premium_from_coins']; ?> from coins
-                                            <?php endif; ?>
-                                        <?php else: ?>
-                                            <i class="bi bi-coin me-1"></i>Costs 50 coins (net: 45 coins)
-                                        <?php endif; ?>
+                                        <i class="bi bi-calendar-week me-1"></i>Resets Monday
                                     </div>
                                 </div>
                             </div>
@@ -775,12 +802,12 @@ require_once __DIR__ . '/../core/includes/header.php';
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="small">
-                                        <strong>Today:</strong> <?php echo $vote_status['total_votes_today']; ?>
+                                        <strong>Used:</strong> <?php echo $vote_status['votes_used']; ?>/<?php echo $vote_status['weekly_limit']; ?>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="small">
-                                        <strong>This Week:</strong> <?php echo $vote_status['total_votes_this_week']; ?>
+                                        <strong>Remaining:</strong> <?php echo $vote_status['votes_remaining']; ?>
                                     </div>
                                 </div>
                                 <div class="col-6">
@@ -812,16 +839,16 @@ require_once __DIR__ . '/../core/includes/header.php';
                             <div class="card-body p-2">
                                 <div class="small">
                                     <div class="mb-2">
-                                        <i class="bi bi-gift-fill text-success me-1"></i>
-                                        <strong>Daily Free:</strong> 1 vote/day, earns 30 coins
+                                        <i class="bi bi-calendar-week text-primary me-1"></i>
+                                        <strong>Simple System:</strong> 2 votes per week maximum
                                     </div>
                                     <div class="mb-2">
-                                        <i class="bi bi-star-fill text-info me-1"></i>
-                                        <strong>Weekly Bonus:</strong> 2 votes/week, earns 5 coins each
+                                        <i class="bi bi-coin text-success me-1"></i>
+                                        <strong>Reward:</strong> 30 QR coins per vote
                                     </div>
                                     <div>
-                                        <i class="bi bi-lightning-fill text-warning me-1"></i>
-                                        <strong>Premium:</strong> Unlimited votes, 50 coins each (net: 45)
+                                        <i class="bi bi-arrow-clockwise text-info me-1"></i>
+                                        <strong>Reset:</strong> Every Monday at midnight
                                     </div>
                                 </div>
                             </div>

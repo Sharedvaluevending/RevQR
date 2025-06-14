@@ -232,3 +232,4 @@
 [13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
 [13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
 [13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[13-Jun-2025 22:06:37 America/Toronto] PHP Warning:  Undefined array key "REMOTE_ADDR" in /var/www/html/test_simple_voting.php on line 11

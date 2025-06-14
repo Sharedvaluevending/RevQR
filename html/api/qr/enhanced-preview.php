@@ -67,12 +67,17 @@ try {
             $content = APP_URL . '/public/vote.php?campaign=' . $data['campaign_id'];
             break;
             
-        case 'dynamic_vending':
+        case 'promotion':
             $machine_name = $data['machine_name'] ?? '';
             if (empty($machine_name)) {
                 throw new Exception('Machine name is required');
             }
-            $content = APP_URL . '/public/vote.php?machine=' . urlencode($machine_name);
+            $content = APP_URL . '/public/promotions.php?machine=' . urlencode($machine_name) . '&view=vending';
+            break;
+            
+        case 'vending_discount_store':
+            // Auto-link to business store - no additional parameters needed
+            $content = APP_URL . '/business/store.php?business_id=' . intval($business_id) . '&source=qr';
             break;
             
         case 'machine_sales':
@@ -100,6 +105,13 @@ try {
                 throw new Exception('Spin wheel is required for spin wheel QR codes');
             }
             $content = APP_URL . '/public/spin-wheel.php?wheel_id=' . intval($data['spin_wheel_id']);
+            break;
+            
+        case 'pizza_tracker':
+            if (empty($data['pizza_tracker_id'])) {
+                throw new Exception('Pizza tracker is required for pizza tracker QR codes');
+            }
+            $content = APP_URL . '/public/pizza-tracker.php?tracker_id=' . intval($data['pizza_tracker_id']) . '&source=qr';
             break;
             
         default:

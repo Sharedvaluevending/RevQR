@@ -130,6 +130,7 @@ try {
                (SELECT COUNT(*) FROM qr_code_stats WHERE qr_code_id = qr.id) as scan_count
         FROM qr_codes qr
         WHERE qr.business_id = ? AND qr.status != 'deleted'
+            AND qr.qr_type IN ('dynamic', 'dynamic_voting', 'dynamic_vending')
         ORDER BY qr.created_at DESC
     ");
     $stmt->execute([$business_id]);
@@ -142,17 +143,17 @@ try {
 require_once __DIR__ . '/core/includes/header.php';
 ?>
 
-<!-- Match Dashboard Green Theme -->
+<!-- Match Dashboard Blue Theme -->
 <style>
-    /* MATCH THE GREEN DASHBOARD THEME */
+    /* MATCH THE BLUE DASHBOARD THEME */
     html, body {
-        background: linear-gradient(135deg, #00a000 0%, #00b000 25%, #00c000 75%, #00d000 100%) !important;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important;
         background-attachment: fixed !important;
         color: #ffffff !important;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
     }
     
-    /* White text on green theme */
+    /* White text on blue theme */
     .text-dark, h1, h2, h3, h4, h5, h6, p, div, span, td, th {
         color: #ffffff !important;
     }
@@ -182,7 +183,7 @@ require_once __DIR__ . '/core/includes/header.php';
         border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
     
-    /* Table styling for green theme */
+    /* Table styling for blue theme */
     .table {
         color: #ffffff !important;
         background: transparent !important;
@@ -200,12 +201,13 @@ require_once __DIR__ . '/core/includes/header.php';
     }
     
     .table tbody tr:hover {
-        background: transparent !important;
+        background: rgba(255, 255, 255, 0.1) !important;
     }
     
-    .table-striped > tbody > tr:nth-of-type(odd) > td,
-    .table-striped > tbody > tr:nth-of-type(odd) > th {
-        background-color: transparent !important;
+    /* Force ALL table elements transparent */
+    .table td, .table th {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
     }
     
     /* Reset alerts */
@@ -283,7 +285,7 @@ require_once __DIR__ . '/core/includes/header.php';
         color: rgba(255, 255, 255, 0.8) !important;
     }
     
-    /* Container background - transparent to show green gradient */
+    /* Container background - transparent to show blue gradient */
     .container-fluid {
         background: transparent !important;
     }
@@ -297,7 +299,7 @@ require_once __DIR__ . '/core/includes/header.php';
                     <h1 class="h3 mb-1 text-dark">
                         <i class="bi bi-arrow-clockwise me-2 text-primary"></i>Dynamic QR Manager
                     </h1>
-                    <p class="text-muted mb-0">Update QR code destinations without regenerating them</p>
+                    <p class="text-muted mb-0">Manage dynamic QR codes - Vote, URL, and Vending types only</p>
                 </div>
                 <div class="btn-group">
                     <a href="qr-generator-enhanced.php" class="btn btn-primary shadow-sm">
@@ -318,34 +320,59 @@ require_once __DIR__ . '/core/includes/header.php';
         </div>
     <?php endif; ?>
 
+    <!-- Info Box -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info border-0 shadow-sm">
+                <h6 class="alert-heading mb-2">
+                    <i class="bi bi-info-circle me-2"></i>Dynamic QR Codes Only
+                </h6>
+                <p class="mb-2">
+                    This page shows only dynamic QR codes that can be edited after creation:
+                </p>
+                <ul class="mb-0 small">
+                    <li><strong>Dynamic URLs</strong> - Click the pencil icon to change the destination URL</li>
+                    <li><strong>Voting Campaigns</strong> - Click "Edit Items" to manage vote-in/vote-out items</li>
+                    <li><strong>Vending Machine</strong> - URL-based codes for specific machines</li>
+                </ul>
+                <p class="mb-0 mt-2 small text-muted">
+                    Static QR codes are managed separately as they cannot be changed after generation.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="card-title mb-0 text-dark">
                         <i class="bi bi-qr-code me-2 text-primary"></i>Your QR Codes
                         <span class="badge bg-primary ms-2"><?php echo count($qr_codes); ?></span>
                     </h5>
                 </div>
-                <div class="card-body bg-white">
+                <div class="card-body">
                     <?php if (empty($qr_codes)): ?>
                         <div class="text-center py-5">
-                            <i class="bi bi-qr-code display-1 text-muted"></i>
-                            <h4 class="mt-3">No QR Codes Found</h4>
-                            <p class="text-muted">Create your first QR code to get started.</p>
+                            <i class="bi bi-arrow-clockwise display-1 text-muted"></i>
+                            <h4 class="mt-3">No Dynamic QR Codes Found</h4>
+                            <p class="text-muted">
+                                You don't have any dynamic QR codes yet. Dynamic QR codes can be updated after creation.<br>
+                                Create dynamic URL, voting, or vending QR codes to manage them here.
+                            </p>
                             <a href="qr-generator-enhanced.php" class="btn btn-primary">
-                                <i class="bi bi-plus-circle me-2"></i>Generate QR Code
+                                <i class="bi bi-plus-circle me-2"></i>Generate Dynamic QR Code
                             </a>
                         </div>
                     <?php else: ?>
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead class="table-light">
+                            <table class="table table-hover">
+                                <thead>
                                     <tr>
                                         <th>Preview</th>
                                         <th>Type</th>
                                         <th>Machine/Campaign</th>
-                                        <th>Current URL</th>
+                                        <th>Content/Actions</th>
                                         <th>Scans</th>
                                         <th>Status</th>
                                         <th>Actions</th>
@@ -394,15 +421,28 @@ require_once __DIR__ . '/core/includes/header.php';
                                                 <?php echo htmlspecialchars($qr['machine_name'] ?: 'N/A'); ?>
                                             </td>
                                             <td>
-                                                <div class="d-flex align-items-center">
-                                                    <small class="text-muted me-2" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
-                                                        <?php echo htmlspecialchars($qr['current_url'] ?: 'No URL'); ?>
-                                                    </small>
-                                                    <button class="btn btn-sm btn-outline-primary" 
-                                                            onclick="editUrl(<?php echo $qr['id']; ?>, '<?php echo htmlspecialchars($qr['current_url'], ENT_QUOTES); ?>')">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </button>
-                                                </div>
+                                                <?php if ($qr['qr_type'] === 'dynamic_voting'): ?>
+                                                    <div class="d-flex align-items-center">
+                                                        <small class="text-info me-2">
+                                                            <i class="bi bi-ballot-check me-1"></i>Voting Campaign
+                                                        </small>
+                                                        <a href="edit-items.php" 
+                                                           class="btn btn-sm btn-outline-success" 
+                                                           title="Manage Voting Items">
+                                                            <i class="bi bi-list-ul"></i> Edit Items
+                                                        </a>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="d-flex align-items-center">
+                                                        <small class="text-muted me-2" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                                                            <?php echo htmlspecialchars($qr['current_url'] ?: 'No URL'); ?>
+                                                        </small>
+                                                        <button class="btn btn-sm btn-outline-primary" 
+                                                                onclick="editUrl(<?php echo $qr['id']; ?>, '<?php echo htmlspecialchars($qr['current_url'], ENT_QUOTES); ?>')">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                    </div>
+                                                <?php endif; ?>
                                             </td>
                                             <td>
                                                 <span class="badge bg-secondary">

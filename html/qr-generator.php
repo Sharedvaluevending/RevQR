@@ -171,11 +171,35 @@ require_once __DIR__ . '/core/includes/header.php';
     <div class="row">
         <!-- Configuration Panel -->
         <div class="col-lg-8">
+<<<<<<< Updated upstream
             <form id="qrForm" class="needs-validation" novalidate>
                 <!-- Basic Settings -->
                 <div class="card mb-4">
                     <div class="card-header bg-gradient-primary text-white">
                         <h5 class="card-title mb-0"><i class="bi bi-gear"></i> Basic Settings</h5>
+=======
+            <div class="form-controls">
+                <form id="qrGeneratorForm">
+                    <div class="form-group">
+                        <label for="qrType" class="form-label">
+                            <i class="bi bi-tag"></i>
+                            QR Code Type
+                        </label>
+                        <select class="form-select" id="qrType" name="qrType" required>
+                            <option value="">Select QR Code Type</option>
+                            <option value="static">Static QR Code</option>
+                            <option value="dynamic">Dynamic QR Code</option>
+                            <option value="dynamic_voting">Dynamic Voting QR Code</option>
+                                                    <option value="promotion">Promotion QR Code</option>
+                        <option value="vending_discount_store">Vending Machine Discount Store QR Code</option>
+                        <option value="machine_sales">Vending Machine Sales QR Code</option>
+                            <option value="spin_wheel">Spin Wheel QR Code</option>
+                            <option value="pizza_tracker">Pizza Tracker QR Code</option>
+                            <option value="promotion" disabled>Dynamic Promotion QR Code (Coming Soon)</option>
+                            <option value="cross_promo" disabled>Cross-Promotion QR Code (Coming Soon)</option>
+                            <option value="stackable" disabled>Stackable QR Code (Coming Soon)</option>
+                        </select>
+>>>>>>> Stashed changes
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -1193,6 +1217,7 @@ require_once __DIR__ . '/core/includes/header.php';
 </div>
 
 <script>
+<<<<<<< Updated upstream
 // Enhanced QR Generator JavaScript
 class EnhancedQRGenerator {
     constructor() {
@@ -1202,6 +1227,92 @@ class EnhancedQRGenerator {
         this.setupEventListeners();
         this.setupRangeUpdaters();
         this.setupPresetHandlers();
+=======
+// Handle QR type selection and show/hide appropriate fields
+document.getElementById('qrType').addEventListener('change', function() {
+    const type = this.value;
+    const typeText = this.options[this.selectedIndex].text;
+    
+    // Hide all dynamic fields first and disable required validation
+    document.getElementById('urlFields').style.display = 'none';
+    // Hide all type-specific fields
+    const fieldSets = ['urlFields', 'campaignFields', 'machineFields', 'promotionFields', 'machinePromotionFields', 'spinWheelFields', 'pizzaTrackerFields'];
+    fieldSets.forEach(fieldSet => {
+        const element = document.getElementById(fieldSet);
+        if (element) {
+            element.style.display = 'none';
+            // Remove required attributes from hidden fields
+            const inputs = element.querySelectorAll('input, select');
+            inputs.forEach(input => input.removeAttribute('required'));
+        }
+    });
+    
+    // Disable required validation for hidden fields
+    document.getElementById('pizzaTrackerSelect').removeAttribute('required');
+    
+    // Show fields based on selected type and add required validation
+    switch(type) {
+        case 'static':
+        case 'dynamic':
+            const urlField = document.getElementById('urlFields');
+            if (urlField) {
+                urlField.style.display = 'block';
+                const urlInput = urlField.querySelector('#url');
+                if (urlInput) urlInput.setAttribute('required', 'required');
+            }
+            break;
+        case 'dynamic_voting':
+            const campaignField = document.getElementById('campaignFields');
+            if (campaignField) {
+                campaignField.style.display = 'block';
+                const campaignSelect = campaignField.querySelector('#campaignId, #campaignSelect');
+                if (campaignSelect) campaignSelect.setAttribute('required', 'required');
+            }
+            break;
+        case 'promotion':
+            const machineField = document.getElementById('machineFields');
+            if (machineField) {
+                machineField.style.display = 'block';
+                const machineInput = machineField.querySelector('#machineName');
+                if (machineInput) machineInput.setAttribute('required', 'required');
+            }
+            break;
+        case 'vending_discount_store':
+            // No additional fields needed - auto-links to business store
+            break;
+        case 'machine_sales':
+            const salesField = document.getElementById('promotionFields');
+            if (salesField) {
+                salesField.style.display = 'block';
+                const salesInput = salesField.querySelector('#machineName');
+                if (salesInput) salesInput.setAttribute('required', 'required');
+            }
+            break;
+        case 'promotion':
+            const promoField = document.getElementById('machinePromotionFields');
+            if (promoField) {
+                promoField.style.display = 'block';
+                const promoInput = promoField.querySelector('#machineName');
+                if (promoInput) promoInput.setAttribute('required', 'required');
+            }
+            break;
+        case 'spin_wheel':
+            const spinField = document.getElementById('spinWheelFields');
+            if (spinField) {
+                spinField.style.display = 'block';
+                const spinSelect = spinField.querySelector('#spinWheelId, #spinWheelSelect');
+                if (spinSelect) spinSelect.setAttribute('required', 'required');
+            }
+            break;
+        case 'pizza_tracker':
+            const pizzaField = document.getElementById('pizzaTrackerFields');
+            if (pizzaField) {
+                pizzaField.style.display = 'block';
+                const pizzaSelect = pizzaField.querySelector('#pizzaTrackerSelect');
+                if (pizzaSelect) pizzaSelect.setAttribute('required', 'required');
+            }
+            break;
+>>>>>>> Stashed changes
     }
 
     setupEventListeners() {
@@ -2115,6 +2226,7 @@ function resetForm() {
     document.getElementById('qrInfo').style.display = 'none';
 }
 
+<<<<<<< Updated upstream
 // Global Prize Management Functions
 function addDefaultPrizes() {
     const generator = window.qrGenerator;
@@ -2128,6 +2240,33 @@ function openPrizeModal() {
     const generator = window.qrGenerator;
     if (generator) {
         generator.updatePrizeTable();
+=======
+// Helper function to get content based on QR type
+function getContentForQRType(qrType) {
+    switch(qrType) {
+        case 'static':
+        case 'dynamic':
+            return document.getElementById('url')?.value || 'https://example.com';
+        case 'dynamic_voting':
+            const campaignId = document.getElementById('campaignId')?.value;
+            return `https://revenueqr.sharedvaluevending.com/vote.php?campaign_id=${campaignId || '1'}`;
+        case 'promotion':
+            const machineName = document.getElementById('machineName')?.value;
+            return `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineName || 'default')}&view=vending`;
+        case 'vending_discount_store':
+            return `https://revenueqr.sharedvaluevending.com/business/store.php?business_id=1&source=qr`;
+        case 'machine_sales':
+            const promotionId = document.getElementById('promotionId')?.value;
+            return `https://revenueqr.sharedvaluevending.com/promotion.php?id=${promotionId || '1'}`;
+        case 'spin_wheel':
+            const spinId = document.getElementById('spinWheelId')?.value;
+            return `https://revenueqr.sharedvaluevending.com/spin.php?id=${spinId || '1'}`;
+        case 'pizza_tracker':
+            const pizzaId = document.getElementById('pizzaTrackerSelect')?.value;
+            return `https://revenueqr.sharedvaluevending.com/pizza.php?id=${pizzaId || '1'}`;
+        default:
+            return 'https://example.com';
+>>>>>>> Stashed changes
     }
     modal.show();
 }

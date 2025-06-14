@@ -185,14 +185,15 @@ require_once __DIR__ . '/core/includes/header.php';
                                     <option value="static">Static QR Code</option>
                                     <option value="dynamic">Dynamic QR Code</option>
                                     <option value="dynamic_voting">Dynamic Voting QR Code</option>
-                                    <option value="dynamic_vending">Dynamic Voting Vending Machine QR Code</option>
+                                    <option value="promotion">Promotion QR Code</option>
                                     <option value="machine_sales">Vending Machine Promotions QR Code</option>
+                                    <option value="vending_discount_store">Vending Machine Discount Store QR Code</option>
                                     <option value="spin_wheel">Spin Wheel QR Code</option>
                                     <option value="pizza_tracker">Pizza Tracker QR Code</option>
-                                    <option value="promotion" disabled>Dynamic Promotion QR Code (Coming Soon)</option>
                                     <option value="cross_promo" disabled>Cross-Promotion QR Code (Coming Soon)</option>
                                     <option value="stackable" disabled>Stackable QR Code (Coming Soon)</option>
                                 </select>
+                                <div id="qrTypeDescription" class="form-text mt-2"></div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Size (px)</label>
@@ -1337,12 +1338,14 @@ class EnhancedQRGenerator {
             case 'dynamic_voting':
                 document.getElementById('campaignFields').style.display = 'block';
                 break;
-            case 'dynamic_vending':
-                document.getElementById('campaignFields').style.display = 'block';
+            case 'promotion':
                 document.getElementById('machineFields').style.display = 'block';
                 break;
             case 'machine_sales':
-                document.getElementById('machinePromotionFields').style.display = 'block';
+                document.getElementById('promotionFields').style.display = 'block';
+                break;
+            case 'vending_discount_store':
+                // No additional fields needed - auto-links to business store
                 break;
             case 'spin_wheel':
                 document.getElementById('spinWheelFields').style.display = 'block';
@@ -1352,9 +1355,28 @@ class EnhancedQRGenerator {
                 const pizzaTrackerSelect = document.getElementById('pizzaTrackerSelect');
                 if (pizzaTrackerSelect) pizzaTrackerSelect.setAttribute('required', 'required');
                 break;
-            case 'promotion':
-                document.getElementById('machinePromotionFields').style.display = 'block';
-                break;
+        }
+        
+        // Update QR type description
+        this.updateQRTypeDescription(type);
+    }
+    
+    updateQRTypeDescription(type) {
+        const descriptions = {
+            'static': 'Creates a QR code that links directly to a fixed URL.',
+            'dynamic': 'Creates a QR code with a URL that can be changed later.',
+            'dynamic_voting': 'Creates a QR code that links to a voting campaign.',
+            'promotion': 'Creates a QR code that shows promotions for a specific vending machine.',
+            'machine_sales': 'Creates a QR code that shows current promotions and sales for a vending machine.',
+            'vending_discount_store': 'Creates a QR code that links directly to your business discount store.',
+            'spin_wheel': 'Creates a QR code that links to an interactive spin wheel game.',
+            'pizza_tracker': 'Creates a QR code that links to a pizza order tracking page.'
+        };
+        
+        const descriptionEl = document.getElementById('qrTypeDescription');
+        if (descriptionEl && descriptions[type]) {
+            descriptionEl.textContent = descriptions[type];
+            descriptionEl.style.color = '#6c757d';
         }
     }
 
@@ -1580,11 +1602,14 @@ class EnhancedQRGenerator {
                     // Don't block preview for testing
                 }
                 break;
-            case 'dynamic_vending':
+            case 'promotion':
                 const machineVendingEl = document.querySelector('[name="machine_name"]');
                 if (machineVendingEl && !machineVendingEl.value) {
                     machineVendingEl.value = 'Test Machine';
                 }
+                break;
+            case 'vending_discount_store':
+                // No validation needed - auto-links to business store
                 break;
             case 'machine_sales':
                 const machineSalesEl = document.querySelector('[name="machine_name_sales"]') || 
@@ -2024,6 +2049,25 @@ class EnhancedQRGenerator {
             successMsg.innerHTML = '<i class="bi bi-check"></i> Default prizes added!';
             prizeList.appendChild(successMsg);
             setTimeout(() => successMsg.remove(), 3000);
+        }
+    }
+    
+    updateQRTypeDescription(type) {
+        const descriptions = {
+            'static': 'Creates a QR code that links directly to a fixed URL.',
+            'dynamic': 'Creates a QR code with a URL that can be changed later.',
+            'dynamic_voting': 'Creates a QR code that links to a voting campaign.',
+            'promotion': 'Creates a QR code that shows promotions for a specific vending machine.',
+            'machine_sales': 'Creates a QR code that shows current promotions and sales for a vending machine.',
+            'vending_discount_store': 'Creates a QR code that links directly to your business discount store.',
+            'spin_wheel': 'Creates a QR code that links to an interactive spin wheel game.',
+            'pizza_tracker': 'Creates a QR code that links to a pizza order tracking page.'
+        };
+        
+        const descriptionEl = document.getElementById('qrTypeDescription');
+        if (descriptionEl && descriptions[type]) {
+            descriptionEl.textContent = descriptions[type];
+            descriptionEl.style.color = '#6c757d';
         }
     }
 }

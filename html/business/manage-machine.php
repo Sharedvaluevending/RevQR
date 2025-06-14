@@ -221,14 +221,14 @@ require_once __DIR__ . '/../core/includes/header.php';
                                                     $badge_class = 'bg-success';
                                                     $qr_type_display = 'Machine Sales';
                                                     break;
-                                                case 'promotion':
-                                                    $badge_class = 'bg-warning text-dark';
-                                                    $qr_type_display = 'Promotion';
-                                                    break;
-                                                case 'dynamic_vending':
-                                                    $badge_class = 'bg-info';
-                                                    $qr_type_display = 'Dynamic Vending';
-                                                    break;
+                                                                                case 'promotion':
+                                    $badge_class = 'bg-warning text-dark';
+                                    $qr_type_display = 'Promotion';
+                                    break;
+                                case 'vending_discount_store':
+                                    $badge_class = 'bg-success';
+                                    $qr_type_display = 'Discount Store';
+                                    break;
                                                 case 'dynamic_voting':
                                                     $badge_class = 'bg-primary';
                                                     $qr_type_display = 'Dynamic Voting';
@@ -268,7 +268,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                                                    title="View QR Code">
                                                     <i class="bi bi-qr-code"></i>
                                                 </a>
-                                                <?php if (in_array($machine['qr_type'], ['dynamic_voting', 'dynamic_vending'])): ?>
+                                                <?php if (in_array($machine['qr_type'], ['dynamic_voting', 'promotion'])): ?>
                                                     <a href="view-votes.php?machine_name=<?php echo urlencode($machine['machine_name']); ?>" 
                                                        class="btn btn-outline-success" 
                                                        title="View Votes">

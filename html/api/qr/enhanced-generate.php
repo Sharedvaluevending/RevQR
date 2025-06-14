@@ -39,7 +39,7 @@ try {
     }
     
     // CRITICAL FIX: Add machine validation for machine-related QR types
-    $machine_requiring_types = ['dynamic_vending', 'machine_sales', 'promotion'];
+    $machine_requiring_types = ['promotion', 'machine_sales']; // vending_discount_store doesn't need machine validation
     if (in_array($data['qr_type'], $machine_requiring_types)) {
         // Extract machine name from various possible fields
         $machine_name = !empty($data['machine_name_sales']) ? $data['machine_name_sales'] : 
@@ -126,8 +126,8 @@ try {
             $content = APP_URL . '/vote.php?code=' . $qr_code;
             break;
             
-        case 'dynamic_vending':
-            // Machine already validated above
+        case 'promotion':
+            // Machine already validated above (renamed from dynamic_vending)
             $content = APP_URL . '/public/promotions.php?machine=' . urlencode($validated_machine_name) . '&view=vending';
             break;
             
@@ -136,9 +136,9 @@ try {
             $content = APP_URL . '/public/promotions.php?machine=' . urlencode($validated_machine_name);
             break;
             
-        case 'promotion':
-            // Machine already validated above
-            $content = APP_URL . '/public/promotions.php?machine=' . urlencode($validated_machine_name) . '&view=promotions';
+        case 'vending_discount_store':
+            // NEW: Auto-link to business store
+            $content = APP_URL . '/business/store.php?business_id=' . intval($business_id) . '&source=qr';
             break;
             
         case 'spin_wheel':

@@ -10,9 +10,9 @@
                     <option value="static">Static QR Code</option>
                     <option value="dynamic">Dynamic QR Code</option>
                     <option value="dynamic_voting">Dynamic Voting QR Code</option>
-                    <option value="dynamic_vending">Dynamic Voting Vending Machine QR Code</option>
-                    <option value="machine_sales">Vending Machine Promotions QR Code</option>
-                    <option value="promotion" disabled>Dynamic Promotion QR Code (Coming Soon)</option>
+                            <option value="promotion">Promotion QR Code</option>
+        <option value="vending_discount_store">Vending Machine Discount Store QR Code</option>
+        <option value="machine_sales">Vending Machine Sales QR Code</option>
                     <option value="cross_promo" disabled>Cross-Promotion QR Code (Coming Soon)</option>
                     <option value="stackable" disabled>Stackable QR Code (Coming Soon)</option>
                 </select>
