@@ -33,9 +33,14 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <!-- Force CSS reload with timestamp -->
+    <!-- AGGRESSIVE CACHE BUSTING -->
     <style id="cache-buster">
-        /* Cache buster: <?php echo time(); ?> */
+        /* FORCE RELOAD: <?php echo time(); ?> */
+        /* Green theme disabled - pure blue only */
+        body { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important; }
+        .navbar { background: rgba(30, 60, 114, 0.95) !important; }
+        /* Kill any green */
+        * { --green: blue !important; --success: blue !important; }
     </style>
     
     <!-- Favicon -->
