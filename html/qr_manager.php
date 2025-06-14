@@ -93,20 +93,22 @@ try {
 require_once __DIR__ . '/core/includes/header.php';
 ?>
 
-<div class="container-fluid mt-4">
+<div class="container-fluid py-4" style="background-color: #f8f9fa;">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1><i class="bi bi-qr-code me-2"></i>QR Code Manager</h1>
+                <h1 class="text-dark">
+                    <i class="bi bi-qr-code me-2 text-primary"></i>QR Code Manager
+                </h1>
                 <div>
-                    <a href="business/dashboard.php" class="btn btn-outline-secondary me-2">
+                    <a href="business/dashboard.php" class="btn btn-outline-secondary me-2 shadow-sm">
                         <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
                     </a>
-                    <a href="qr_dynamic_manager.php" class="btn btn-outline-info me-2" 
+                    <a href="qr_dynamic_manager.php" class="btn btn-outline-info me-2 shadow-sm" 
                        title="Manage dynamic QR codes - change URLs without reprinting">
                         <i class="bi bi-arrow-clockwise me-1"></i>Dynamic Manager
                     </a>
-                    <a href="qr-generator.php" class="btn btn-primary">
+                    <a href="qr-generator.php" class="btn btn-primary shadow-sm">
                         <i class="bi bi-plus-circle me-1"></i>Generate New QR
                     </a>
                 </div>
@@ -164,25 +166,27 @@ require_once __DIR__ . '/core/includes/header.php';
             </div>
 
             <!-- QR Codes Table -->
-            <div class="card bg-dark border-secondary">
-                <div class="card-header bg-gradient text-white">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-qr-code me-2"></i>Your QR Codes</h5>
+                        <h5 class="mb-0 text-dark">
+                            <i class="bi bi-qr-code me-2 text-primary"></i>Your QR Codes
+                        </h5>
                         <div class="btn-group btn-group-sm">
-                            <a href="qr_dynamic_manager.php" class="btn btn-outline-light">
+                            <a href="qr_dynamic_manager.php" class="btn btn-outline-primary">
                                 <i class="bi bi-arrow-clockwise me-1"></i>Dynamic Manager
                             </a>
-                            <a href="print-shop.php" class="btn btn-outline-light">
+                            <a href="print-shop.php" class="btn btn-outline-secondary">
                                 <i class="bi bi-printer me-1"></i>Print Shop
                             </a>
                         </div>
                     </div>
                 </div>
-                <div class="card-body bg-dark text-white">
+                <div class="card-body bg-white">
                     <?php if (!empty($qr_codes)): ?>
                         <div class="table-responsive">
-                            <table class="table table-dark table-hover border-secondary">
-                                <thead class="table-secondary">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
                                     <tr>
                                         <th><i class="bi bi-hash me-1"></i>ID</th>
                                         <th><i class="bi bi-code-square me-1"></i>Code</th>

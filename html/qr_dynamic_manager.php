@@ -142,19 +142,21 @@ try {
 require_once __DIR__ . '/core/includes/header.php';
 ?>
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4" style="background-color: #f8f9fa;">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h1 class="h3 mb-1">🔄 Dynamic QR Manager</h1>
+                    <h1 class="h3 mb-1 text-dark">
+                        <i class="bi bi-arrow-clockwise me-2 text-primary"></i>Dynamic QR Manager
+                    </h1>
                     <p class="text-muted mb-0">Update QR code destinations without regenerating them</p>
                 </div>
                 <div class="btn-group">
-                    <a href="qr-generator-enhanced.php" class="btn btn-primary">
+                    <a href="qr-generator-enhanced.php" class="btn btn-primary shadow-sm">
                         <i class="bi bi-plus-circle me-2"></i>Generate New QR
                     </a>
-                    <a href="qr_manager.php" class="btn btn-outline-secondary">
+                    <a href="qr_manager.php" class="btn btn-outline-secondary shadow-sm">
                         <i class="bi bi-arrow-left me-2"></i>Back to QR Manager
                     </a>
                 </div>
@@ -190,8 +192,8 @@ require_once __DIR__ . '/core/includes/header.php';
                         </div>
                     <?php else: ?>
                         <div class="table-responsive">
-                            <table class="table table-dark table-hover border-secondary">
-                                <thead class="table-secondary">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
                                     <tr>
                                         <th>Preview</th>
                                         <th>Type</th>
@@ -230,9 +232,9 @@ require_once __DIR__ . '/core/includes/header.php';
                                                          class="img-thumbnail" 
                                                          style="width: 60px; height: 60px;">
                                                 <?php else: ?>
-                                                    <div class="bg-secondary d-flex align-items-center justify-content-center" 
-                                                         style="width: 60px; height: 60px;">
-                                                        <i class="bi bi-qr-code text-light"></i>
+                                                    <div class="bg-light border d-flex align-items-center justify-content-center" 
+                                                         style="width: 60px; height: 60px; border-radius: 4px;">
+                                                        <i class="bi bi-qr-code text-muted"></i>
                                                     </div>
                                                 <?php endif; ?>
                                             </td>
@@ -331,10 +333,12 @@ require_once __DIR__ . '/core/includes/header.php';
 <!-- URL Edit Modal -->
 <div class="modal fade" id="editUrlModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content bg-dark text-white border-secondary">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title">Update QR Code URL</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title text-dark">
+                    <i class="bi bi-pencil-square me-2 text-primary"></i>Update QR Code URL
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
                 <div class="modal-body">
