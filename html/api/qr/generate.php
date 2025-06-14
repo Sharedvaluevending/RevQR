@@ -45,7 +45,7 @@ try {
         'foreground_color' => $data['foreground_color'] ?? '#000000',
         'background_color' => $data['background_color'] ?? '#FFFFFF',
         'error_correction_level' => $data['error_correction_level'] ?? 'H',
-        'preview' => false
+        'preview' => isset($data['preview']) ? $data['preview'] : false
     ];
 
     // Add logo if specified

@@ -49,6 +49,7 @@ require_once __DIR__ . '/core/includes/header.php';
 
 <!-- QR Code Generation Library -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</script>
 
 <style>
 /* Advanced QR Generator Styles */
@@ -838,6 +839,7 @@ require_once __DIR__ . '/core/includes/header.php';
                         </div>
                     </div>
 
+                    <button type="button" onclick="generatePreview()" class="btn btn-outline-primary me-2"><i class="bi bi-eye"></i> Preview</button>
                     <button type="button" onclick="generateQRCode()" class="btn-generate-download">
                         <i class="bi bi-download"></i>
                         Generate & Download QR Code
@@ -1140,291 +1142,157 @@ function showToast(message, type = 'success') {
     });
 }
 
-// Generate QR code preview
-function generatePreview() {
-    const qrType = document.getElementById('qrType').value;
-    const size = parseInt(document.getElementById('sizeRange').value);
-    const foregroundColor = document.getElementById('foregroundColor').value;
-    const backgroundColor = document.getElementById('backgroundColor').value;
-    
-    if (!qrType) {
-        showPlaceholder();
-        return;
-    }
-    
-    let content = '';
-    
-    // Generate content based on QR type
+// Helper function to get content based on QR type
+function getContentForQRType(qrType) {
     switch(qrType) {
         case 'static':
-            const url = document.getElementById('url').value;
-            content = url || 'https://example.com';
-            break;
         case 'dynamic':
-            const dynamicUrl = document.getElementById('url').value;
-            content = dynamicUrl || 'https://example.com';
-            break;
+            return document.getElementById('url')?.value || 'https://example.com';
         case 'dynamic_voting':
-            content = 'https://revenueqr.sharedvaluevending.com/vote.php?campaign_id=1';
-            break;
+            const campaignId = document.getElementById('campaignId')?.value;
+            return `https://revenueqr.sharedvaluevending.com/vote.php?campaign_id=${campaignId || '1'}`;
         case 'dynamic_vending':
-            const machineName = document.getElementById('machineName').value;
-            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineName || 'Sample Machine')}&view=vending`;
-            break;
+            const machineName = document.getElementById('machineName')?.value;
+            return `https://revenueqr.sharedvaluevending.com/vending.php?machine=${encodeURIComponent(machineName || 'default')}`;
         case 'machine_sales':
-            content = 'https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=Sample Machine';
-            break;
+            const promotionId = document.getElementById('promotionId')?.value;
+            return `https://revenueqr.sharedvaluevending.com/promotion.php?id=${promotionId || '1'}`;
         case 'spin_wheel':
-            content = 'https://revenueqr.sharedvaluevending.com/public/spin-wheel.php?wheel_id=1';
-            break;
+            const spinId = document.getElementById('spinWheelId')?.value;
+            return `https://revenueqr.sharedvaluevending.com/spin.php?id=${spinId || '1'}`;
         case 'pizza_tracker':
-            content = 'https://revenueqr.sharedvaluevending.com/public/pizza-tracker.php?tracker_id=1';
-            break;
+            const pizzaId = document.getElementById('pizzaTrackerSelect')?.value;
+            return `https://revenueqr.sharedvaluevending.com/pizza.php?id=${pizzaId || '1'}`;
         default:
-            content = 'https://example.com';
+            return 'https://example.com';
     }
-    
-    // Generate QR code
-    const qrPreview = document.getElementById('qrPreview');
-    const placeholder = document.getElementById('previewPlaceholder');
-    
-    QRCode.toCanvas(content, {
-        width: Math.min(size, 300), // Limit preview size
-        height: Math.min(size, 300),
-        color: {
-            dark: foregroundColor,
-            light: backgroundColor
-        },
-        margin: 2,
-        errorCorrectionLevel: 'H'
-    }, function (error, canvas) {
-        if (error) {
-            console.error('QR generation error:', error);
-            showPlaceholder();
-            return;
-        }
-        
-        // Clear previous content
-        qrPreview.innerHTML = '';
-        qrPreview.appendChild(canvas);
-        
-        // Show preview, hide placeholder
-        qrPreview.style.display = 'block';
-        placeholder.style.display = 'none';
-    });
 }
 
-function showPlaceholder() {
-    const qrPreview = document.getElementById('qrPreview');
-    const placeholder = document.getElementById('previewPlaceholder');
+// Generate QR code preview - REAL VERSION
+function generatePreview() {
+    console.log('🖼️ Preview button clicked');
     
-    qrPreview.style.display = 'none';
-    placeholder.style.display = 'block';
-}
-
-// Add event listeners for real-time preview updates
-document.addEventListener('DOMContentLoaded', function() {
-    // Color changes
-    document.getElementById('foregroundColor').addEventListener('input', generatePreview);
-    document.getElementById('backgroundColor').addEventListener('input', generatePreview);
-    document.getElementById('foregroundHex').addEventListener('input', generatePreview);
-    document.getElementById('backgroundHex').addEventListener('input', generatePreview);
-    
-    // URL changes
-    document.getElementById('url').addEventListener('input', generatePreview);
-    
-    // Machine name changes
-    const machineNameField = document.getElementById('machineName');
-    if (machineNameField) {
-        machineNameField.addEventListener('input', generatePreview);
-    }
-});
-
-// MISSING FUNCTIONALITY: QR Code Generation and Download
-function generateQRCode() {
-    const form = document.getElementById('qrGeneratorForm');
-    const formData = new FormData(form);
-    
-    // Validate required fields
     const qrType = document.getElementById('qrType').value;
+    const qrPreview = document.getElementById('qrPreview');
+    const placeholder = document.getElementById('previewPlaceholder');
+    
     if (!qrType) {
-        showToast('Please select a QR code type', 'danger');
+        showToast('Please select a QR code type first', 'warning');
         return;
     }
     
-    // Type-specific validation
-    if (qrType === 'static' || qrType === 'dynamic') {
-        const url = document.getElementById('url').value;
-        if (!url) {
-            showToast('Please enter a URL', 'danger');
-            return;
-        }
-    } else if (qrType === 'dynamic_voting') {
-        const campaignId = document.getElementById('campaignId').value;
-        if (!campaignId) {
-            showToast('Please select a campaign', 'danger');
-            return;
-        }
-    } else if (qrType === 'dynamic_vending') {
-        const machineName = document.getElementById('machineName').value;
-        if (!machineName) {
-            showToast('Please enter a machine name', 'danger');
-            return;
-        }
-    } else if (qrType === 'machine_sales') {
-        const machineNameSales = document.getElementById('machineName').value;
-        if (!machineNameSales) {
-            showToast('Please enter a machine name', 'danger');
-            return;
-        }
-    } else if (qrType === 'promotion') {
-        const machineNamePromotion = document.getElementById('machineName').value;
-        if (!machineNamePromotion) {
-            showToast('Please enter a machine name', 'danger');
-            return;
-        }
-    } else if (qrType === 'spin_wheel') {
-        const spinWheelId = document.getElementById('spinWheelId').value;
-        if (!spinWheelId) {
-            showToast('Please select a spin wheel', 'danger');
-            return;
-        }
-    } else if (qrType === 'pizza_tracker') {
-        const pizzaTrackerId = document.getElementById('pizzaTrackerSelect').value;
-        if (!pizzaTrackerId) {
-            showToast('Please select a pizza tracker', 'danger');
-            return;
-        }
-    }
+    // Show loading
+    qrPreview.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div><p>Generating real QR preview...</p></div>';
+    qrPreview.style.display = 'block';
+    placeholder.style.display = 'none';
     
-    // Show loading state
-    const generateBtn = document.querySelector('button[type="submit"]');
-    const originalText = generateBtn.innerHTML;
-    generateBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Generating...';
-    generateBtn.disabled = true;
+    // Get form data
+    const formData = {
+        qr_type: qrType,
+        content: getContentForQRType(qrType),
+        size: parseInt(document.getElementById('sizeRange')?.value || 300),
+        foreground_color: document.getElementById('foregroundColor')?.value || '#000000',
+        background_color: document.getElementById('backgroundColor')?.value || '#FFFFFF'
+    };
     
-    // Submit to the working enhanced API
-    fetch('/api/qr/enhanced-generate.php', {
+    console.log('📤 Calling preview API with:', formData);
+    
+    // Call preview API
+    fetch('/api/qr/preview.php', {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        return response.blob();
+        console.log('📥 API Response Status:', response.status);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
     })
-    .then(blob => {
-        // Create download link
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `qr-code-${qrType}-${Date.now()}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        
-        // Show success modal
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-        successModal.show();
-        
-        showToast('QR code generated and downloaded successfully!', 'success');
+    .then(data => {
+        console.log('✅ Preview API Response:', data);
+        if (data.success) {
+            qrPreview.innerHTML = `
+                <div class="text-center">
+                    <img src="data:image/png;base64,${data.preview_data}" alt="QR Preview" style="max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #00a000;">
+                    <p class="mt-2 text-success"><strong>✅ Real QR Code Generated!</strong></p>
+                    <p><small>Content: ${data.content}</small></p>
+                </div>
+            `;
+            showToast('Real QR preview generated!', 'success');
+        } else {
+            throw new Error(data.error || 'Preview generation failed');
+        }
     })
     .catch(error => {
-        console.error('QR generation error:', error);
-        showToast(`Error generating QR code: ${error.message}`, 'danger');
-    })
-    .finally(() => {
-        // Reset button
-        generateBtn.innerHTML = originalText;
-        generateBtn.disabled = false;
+        console.error('❌ Preview error:', error);
+        qrPreview.innerHTML = `<div class="text-center text-danger"><i class="bi bi-exclamation-triangle" style="font-size: 3rem;"></i><p class="mt-2">Error: ${error.message}</p><p><small>Check console for details</small></p></div>`;
+        showToast('Preview failed: ' + error.message, 'danger');
     });
 }
 
-// Preview-only generation (different from download generation)
-function generatePreviewOnly() {
-    const qrType = document.getElementById('qrType').value;
-    const size = parseInt(document.getElementById('sizeRange').value);
-    const foregroundColor = document.getElementById('foregroundColor').value;
-    const backgroundColor = document.getElementById('backgroundColor').value;
+// Generate and download QR code - REAL VERSION
+function generateQRCode() {
+    console.log('⬇️ Download button clicked');
     
+    const qrType = document.getElementById('qrType').value;
     if (!qrType) {
-        showPlaceholder();
+        showToast('Please select a QR code type first', 'warning');
         return;
     }
     
-    let content = '';
+    // Show loading
+    showToast('Generating QR code for download...', 'info');
     
-    // Generate content based on QR type
-    switch(qrType) {
-        case 'static':
-            const url = document.getElementById('url').value;
-            content = url || 'https://example.com';
-            break;
-        case 'dynamic':
-            const dynamicUrl = document.getElementById('url').value;
-            content = dynamicUrl || 'https://example.com';
-            break;
-        case 'dynamic_voting':
-            content = 'https://revenueqr.sharedvaluevending.com/vote.php?campaign_id=1';
-            break;
-        case 'dynamic_vending':
-            const machineName = document.getElementById('machineName').value;
-            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineName || 'Sample Machine')}&view=vending`;
-            break;
-        case 'machine_sales':
-            const machineNameSales = document.getElementById('machineName').value;
-            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineNameSales || 'Sample Machine')}`;
-            break;
-        case 'promotion':
-            const machineNamePromotion = document.getElementById('machineName').value;
-            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineNamePromotion || 'Sample Machine')}&view=promotions`;
-            break;
-        case 'spin_wheel':
-            content = 'https://revenueqr.sharedvaluevending.com/public/spin-wheel.php?wheel_id=1';
-            break;
-        case 'pizza_tracker':
-            content = 'https://revenueqr.sharedvaluevending.com/public/pizza-tracker.php?tracker_id=1';
-            break;
-        default:
-            content = 'https://example.com';
-    }
+    // Get form data
+    const formData = {
+        qr_type: qrType,
+        content: getContentForQRType(qrType),
+        size: parseInt(document.getElementById('sizeRange')?.value || 400),
+        foreground_color: document.getElementById('foregroundColor')?.value || '#000000',
+        background_color: document.getElementById('backgroundColor')?.value || '#FFFFFF'
+    };
     
-    // Generate QR code
-    const qrPreview = document.getElementById('qrPreview');
-    const placeholder = document.getElementById('previewPlaceholder');
+    console.log('📤 Calling generate API with:', formData);
     
-    QRCode.toCanvas(content, {
-        width: Math.min(size, 300), // Limit preview size
-        height: Math.min(size, 300),
-        color: {
-            dark: foregroundColor,
-            light: backgroundColor
-        },
-        margin: 2,
-        errorCorrectionLevel: 'H'
-    }, function (error, canvas) {
-        if (error) {
-            console.error('QR generation error:', error);
-            showPlaceholder();
-            return;
+    // Call generate API
+    fetch('/api/qr/generate.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        console.log('📥 Generate API Response Status:', response.status);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Generate API Response:', data);
+        if (data.success && data.data && data.data.qr_code_url) {
+            // Trigger download
+            const link = document.createElement('a');
+            link.href = data.data.qr_code_url;
+            link.download = `qr_${qrType}_${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('QR code downloaded successfully!', 'success');
+            
+            // Also show in results area if it exists
+            const successCard = document.getElementById('successCard');
+            if (successCard) {
+                successCard.style.display = 'block';
+            }
+        } else {
+            throw new Error(data.message || 'No download URL returned');
         }
-        
-        // Clear previous content
-        qrPreview.innerHTML = '';
-        qrPreview.appendChild(canvas);
-        
-        // Show preview, hide placeholder
-        qrPreview.style.display = 'block';
-        placeholder.style.display = 'none';
+    })
+    .catch(error => {
+        console.error('❌ Generate error:', error);
+        showToast('Download failed: ' + error.message, 'danger');
     });
-}
-
-// Fix the generatePreview function name conflict
-function generatePreview() {
-    generatePreviewOnly();
 }
 </script>
 
-<?php require_once __DIR__ . '/core/includes/footer.php'; ?> 
+<?php require_once __DIR__ . "/core/includes/footer.php"; ?>
+

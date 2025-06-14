@@ -202,16 +202,31 @@ class VotingService {
             // Get current vote status
             $vote_status = self::getUserVoteStatus($user_id, $voter_ip);
             
-            // Check if user has already voted for this item
-            $stmt = self::$pdo->prepare("
-                SELECT COUNT(*) 
-                FROM votes 
-                WHERE item_id = ? 
-                AND voter_ip = ?
-                AND DATE(created_at) = CURDATE()
-            ");
-            $stmt->execute([$vote_data['item_id'], $voter_ip]);
-            $has_voted_today = $stmt->fetchColumn() > 0;
+            // Check if user has already voted for this item today (SECURITY FIX)
+            if ($user_id) {
+                // For logged-in users: Check by user_id + item_id (prevents multiple votes per item)
+                $stmt = self::$pdo->prepare("
+                    SELECT COUNT(*) 
+                    FROM votes 
+                    WHERE item_id = ? 
+                    AND user_id = ?
+                    AND DATE(created_at) = CURDATE()
+                ");
+                $stmt->execute([$vote_data['item_id'], $user_id]);
+                $has_voted_today = $stmt->fetchColumn() > 0;
+            } else {
+                // For guest users: Check by IP + item_id
+                $stmt = self::$pdo->prepare("
+                    SELECT COUNT(*) 
+                    FROM votes 
+                    WHERE item_id = ? 
+                    AND voter_ip = ?
+                    AND user_id IS NULL
+                    AND DATE(created_at) = CURDATE()
+                ");
+                $stmt->execute([$vote_data['item_id'], $voter_ip]);
+                $has_voted_today = $stmt->fetchColumn() > 0;
+            }
             
             if ($has_voted_today) {
                 return [

@@ -142,19 +142,168 @@ try {
 require_once __DIR__ . '/core/includes/header.php';
 ?>
 
+<!-- Match Dashboard Green Theme -->
+<style>
+    /* MATCH THE GREEN DASHBOARD THEME */
+    html, body {
+        background: linear-gradient(135deg, #00a000 0%, #00b000 25%, #00c000 75%, #00d000 100%) !important;
+        background-attachment: fixed !important;
+        color: #ffffff !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    }
+    
+    /* White text on green theme */
+    .text-dark, h1, h2, h3, h4, h5, h6, p, div, span, td, th {
+        color: #ffffff !important;
+    }
+    
+    .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    .text-primary {
+        color: #64b5f6 !important;
+    }
+    
+    /* Glass morphism cards like dashboard */
+    .bg-white, .card, .card-body, .card-header {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+    
+    .card {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 16px !important;
+    }
+    
+    .card-header {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* Table styling for green theme */
+    .table {
+        color: #ffffff !important;
+        background: transparent !important;
+    }
+    
+    .table thead th {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #ffffff !important;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .table tbody tr {
+        background: transparent !important;
+        color: #ffffff !important;
+    }
+    
+    .table tbody tr:hover {
+        background: transparent !important;
+    }
+    
+    .table-striped > tbody > tr:nth-of-type(odd) > td,
+    .table-striped > tbody > tr:nth-of-type(odd) > th {
+        background-color: transparent !important;
+    }
+    
+    /* Reset alerts */
+    .alert {
+        color: inherit !important;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1 !important;
+        border-color: #bee5eb !important;
+        color: #0c5460 !important;
+    }
+    
+    .alert-success {
+        background-color: #d1e7dd !important;
+        border-color: #badbcc !important;
+        color: #0f5132 !important;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da !important;
+        border-color: #f5c2c7 !important;
+        color: #842029 !important;
+    }
+    
+    /* Reset buttons */
+    .btn-primary {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #ffffff !important;
+    }
+    
+    .btn-outline-primary {
+        color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d !important;
+        border-color: #6c757d !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-info {
+        color: #0dcaf0 !important;
+        border-color: #0dcaf0 !important;
+        background-color: transparent !important;
+    }
+    
+    /* Reset forms */
+    .form-control {
+        background: #ffffff !important;
+        border: 1px solid #ced4da !important;
+        color: #212529 !important;
+    }
+    
+    .form-control:focus {
+        background: #ffffff !important;
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        color: #212529 !important;
+    }
+    
+    /* Keep standard dark navbar like rest of app */
+    .navbar {
+        background: #212529 !important;
+    }
+    
+    .navbar-brand, .nav-link {
+        color: #ffffff !important;
+    }
+    
+    .nav-link:hover {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    /* Container background - transparent to show green gradient */
+    .container-fluid {
+        background: transparent !important;
+    }
+</style>
+
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h1 class="h3 mb-1">🔄 Dynamic QR Manager</h1>
+                    <h1 class="h3 mb-1 text-dark">
+                        <i class="bi bi-arrow-clockwise me-2 text-primary"></i>Dynamic QR Manager
+                    </h1>
                     <p class="text-muted mb-0">Update QR code destinations without regenerating them</p>
                 </div>
                 <div class="btn-group">
-                    <a href="qr-generator-enhanced.php" class="btn btn-primary">
+                    <a href="qr-generator-enhanced.php" class="btn btn-primary shadow-sm">
                         <i class="bi bi-plus-circle me-2"></i>Generate New QR
                     </a>
-                    <a href="qr_manager.php" class="btn btn-outline-secondary">
+                    <a href="qr_manager.php" class="btn btn-outline-secondary shadow-sm">
                         <i class="bi bi-arrow-left me-2"></i>Back to QR Manager
                     </a>
                 </div>
@@ -171,14 +320,14 @@ require_once __DIR__ . '/core/includes/header.php';
 
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-qr-code me-2"></i>Your QR Codes
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="card-title mb-0 text-dark">
+                        <i class="bi bi-qr-code me-2 text-primary"></i>Your QR Codes
                         <span class="badge bg-primary ms-2"><?php echo count($qr_codes); ?></span>
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body bg-white">
                     <?php if (empty($qr_codes)): ?>
                         <div class="text-center py-5">
                             <i class="bi bi-qr-code display-1 text-muted"></i>
@@ -190,8 +339,8 @@ require_once __DIR__ . '/core/includes/header.php';
                         </div>
                     <?php else: ?>
                         <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
                                     <tr>
                                         <th>Preview</th>
                                         <th>Type</th>
@@ -230,8 +379,8 @@ require_once __DIR__ . '/core/includes/header.php';
                                                          class="img-thumbnail" 
                                                          style="width: 60px; height: 60px;">
                                                 <?php else: ?>
-                                                    <div class="bg-light d-flex align-items-center justify-content-center" 
-                                                         style="width: 60px; height: 60px;">
+                                                    <div class="bg-light border d-flex align-items-center justify-content-center" 
+                                                         style="width: 60px; height: 60px; border-radius: 4px;">
                                                         <i class="bi bi-qr-code text-muted"></i>
                                                     </div>
                                                 <?php endif; ?>
@@ -331,9 +480,11 @@ require_once __DIR__ . '/core/includes/header.php';
 <!-- URL Edit Modal -->
 <div class="modal fade" id="editUrlModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update QR Code URL</h5>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title text-dark">
+                    <i class="bi bi-pencil-square me-2 text-primary"></i>Update QR Code URL
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">

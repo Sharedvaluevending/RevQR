@@ -196,8 +196,8 @@ if (isset($_GET['code'])) {
 }
 
 // Get campaign data by campaign parameter (new system)
-if (isset($_GET['campaign']) && !$qr_data) {
-    $campaign_id = (int)$_GET['campaign'];
+if ((isset($_GET['campaign']) || isset($_GET['campaign_id'])) && !$qr_data) {
+    $campaign_id = (int)($_GET['campaign'] ?? $_GET['campaign_id']);
     
     $stmt = $pdo->prepare("
         SELECT c.*, b.name as business_name

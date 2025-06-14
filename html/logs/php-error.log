@@ -179,3 +179,56 @@
 [13-Jun-2025 12:45:26 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
 [13-Jun-2025 15:42:58 America/Toronto] PHP Warning:  Undefined array key "user_id" in /var/www/html/user/dashboard.php on line 12
 [13-Jun-2025 15:42:58 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 17:23:19 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
+[13-Jun-2025 17:23:19 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[13-Jun-2025 17:23:19 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[13-Jun-2025 17:38:19 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
+[13-Jun-2025 17:38:19 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[13-Jun-2025 17:38:19 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[13-Jun-2025 17:38:19 America/Toronto] PHP Warning:  preg_match(): Unknown modifier 'a' in /var/www/qr_system_analysis.php on line 109
+[13-Jun-2025 17:38:19 America/Toronto] PHP Warning:  preg_match(): Unknown modifier 'a' in /var/www/qr_system_analysis.php on line 109
+[13-Jun-2025 17:41:04 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
+[13-Jun-2025 17:41:04 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[13-Jun-2025 17:41:04 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[13-Jun-2025 17:41:29 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 17:41:33 America/Toronto] Login attempt - Username: sharedvaluevending, Role: business
+[13-Jun-2025 17:41:33 America/Toronto] Attempting authentication for username: sharedvaluevending
+[13-Jun-2025 17:41:33 America/Toronto] Found user: Array
+(
+    [id] => 1
+    [username] => sharedvaluevending
+    [role] => business
+    [business_id] => 1
+)
+
+[13-Jun-2025 17:41:34 America/Toronto] Authentication successful for user: sharedvaluevending
+[13-Jun-2025 17:41:34 America/Toronto] Authentication successful, checking role match
+[13-Jun-2025 17:41:34 America/Toronto] Role match successful, setting session data
+[13-Jun-2025 17:41:34 America/Toronto] Session data set, redirecting to dashboard
+[13-Jun-2025 17:41:34 America/Toronto] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /var/www/html/business/includes/cards/promotional_ads.php on line 218
+[13-Jun-2025 17:43:24 America/Toronto] Error loading pizza trackers: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tracker_name' in 'field list'
+[13-Jun-2025 17:43:35 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 17:43:35 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 17:43:52 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 17:48:20 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
+[13-Jun-2025 17:48:20 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[13-Jun-2025 17:48:20 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[13-Jun-2025 17:48:20 America/Toronto] PHP Warning:  session_name(): Session name cannot be changed after headers have already been sent in /var/www/html/core/session.php on line 5
+[13-Jun-2025 17:48:20 America/Toronto] PHP Warning:  session_set_cookie_params(): Session cookie parameters cannot be changed after headers have already been sent in /var/www/html/core/session.php on line 6
+[13-Jun-2025 17:48:20 America/Toronto] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /var/www/html/core/session.php on line 14
+[13-Jun-2025 17:48:20 America/Toronto] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /var/www/debug_qr_issues.php on line 13
+[13-Jun-2025 17:51:05 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 17:51:05 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 17:51:37 America/Toronto] Error loading pizza trackers: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tracker_name' in 'field list'
+[13-Jun-2025 17:51:53 America/Toronto] Login required: No valid session found. Session data: []
+[13-Jun-2025 17:52:07 America/Toronto] Enhanced QR: Attempting to save to database
+[13-Jun-2025 17:52:07 America/Toronto] Enhanced QR: Business ID: 1
+[13-Jun-2025 17:52:07 America/Toronto] Enhanced QR: QR Code URL: /uploads/qr/qr_684c9d87302cd3.79563147.png
+[13-Jun-2025 17:52:07 America/Toronto] Enhanced QR: Metadata: {"business_id":1,"content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/promotions.php?machine=Test+Machine&view=vending","file_path":"\/uploads\/qr\/qr_684c9d87302cd3.79563147.png","location":"Test Location","options":{"type":"dynamic_vending","content":"https:\/\/revenueqr.sharedvaluevending.com\/public\/promotions.php?machine=Test+Machine&view=vending","size":400,"foreground_color":"#000000","background_color":"#ffffff","error_correction_level":"H","output_format":"svg","location":"Test Location","machine_name":"Test Machine","campaign_id":"15","spin_wheel_id":null,"pizza_tracker_id":null,"enable_background_gradient":true,"bg_gradient_type":"linear","bg_gradient_start":"#ff7e5f","bg_gradient_middle":"#feb47b","bg_gradient_end":"#ff6b6b","bg_gradient_angle":135,"bg_gradient_opacity":1,"bg_blend_mode":"normal","bg_gradient_animation":"none"},"validated_machine_id":230,"validated_machine_name":"Test Machine","spin_wheel_id":null}
+[13-Jun-2025 17:52:07 America/Toronto] Enhanced QR: Database error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`revenueqr`.`qr_codes`, CONSTRAINT `qr_codes_machine_fk` FOREIGN KEY (`machine_id`) REFERENCES `machines` (`id`) ON DELETE SET NULL)
+[13-Jun-2025 17:52:08 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
+[13-Jun-2025 17:52:08 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[13-Jun-2025 17:52:08 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
+[13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[13-Jun-2025 20:03:46 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78

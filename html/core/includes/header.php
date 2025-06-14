@@ -33,6 +33,16 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
+    <!-- AGGRESSIVE CACHE BUSTING -->
+    <style id="cache-buster">
+        /* FORCE RELOAD: <?php echo time(); ?> */
+        /* Green theme disabled - pure blue only */
+        body { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important; }
+        .navbar { background: rgba(30, 60, 114, 0.95) !important; }
+        /* Kill any green */
+        * { --green: blue !important; --success: blue !important; }
+    </style>
+    
     <!-- Favicon -->
     <link rel="ihttps://revenueqr.sharedvaluevending.com/qr-generator.phpcon" type="image/png" href="<?php echo APP_URL; ?>/img/logoRQ.png">
     
@@ -92,7 +102,7 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
     <style type="text/css">
         /* Critical CSS - Masculine Dark Blue/Steel Theme */
         html, body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #34495e 75%, #2c3e50 100%) !important;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important;
             background-attachment: fixed !important;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
             min-height: 100vh !important;
@@ -521,7 +531,7 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
         
         /* Gradient card styling for level card */
         .gradient-card-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #34495e 75%, #2c3e50 100%) !important;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important;
             backdrop-filter: blur(20px) !important;
             border: 1px solid rgba(255, 255, 255, 0.25) !important;
             border-radius: 16px !important;

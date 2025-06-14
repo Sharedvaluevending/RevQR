@@ -93,16 +93,155 @@ try {
 require_once __DIR__ . '/core/includes/header.php';
 ?>
 
-<div class="container-fluid mt-4">
+<!-- Match Dashboard Green Theme -->
+<style>
+    /* MATCH THE GREEN DASHBOARD THEME */
+    html, body {
+        background: linear-gradient(135deg, #00a000 0%, #00b000 25%, #00c000 75%, #00d000 100%) !important;
+        background-attachment: fixed !important;
+        color: #ffffff !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    }
+    
+    /* White text on green theme */
+    .text-dark, h1, h2, h3, h4, h5, h6, p, div, span, td, th {
+        color: #ffffff !important;
+    }
+    
+    .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    .text-primary {
+        color: #64b5f6 !important;
+    }
+    
+    /* Glass morphism cards like dashboard */
+    .bg-white, .card, .card-body, .card-header {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+    
+    .card {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 16px !important;
+    }
+    
+    .card-header {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* Table styling for green theme */
+    .table {
+        color: #ffffff !important;
+        background: transparent !important;
+    }
+    
+    .table thead th {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #ffffff !important;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .table tbody tr {
+        background: transparent !important;
+        color: #ffffff !important;
+    }
+    
+    .table tbody tr:hover {
+        background: transparent !important;
+    }
+    
+    .table-striped > tbody > tr:nth-of-type(odd) > td,
+    .table-striped > tbody > tr:nth-of-type(odd) > th {
+        background-color: transparent !important;
+    }
+    
+    /* Reset alerts */
+    .alert {
+        color: inherit !important;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1 !important;
+        border-color: #bee5eb !important;
+        color: #0c5460 !important;
+    }
+    
+    .alert-success {
+        background-color: #d1e7dd !important;
+        border-color: #badbcc !important;
+        color: #0f5132 !important;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da !important;
+        border-color: #f5c2c7 !important;
+        color: #842029 !important;
+    }
+    
+    /* Reset buttons */
+    .btn-primary {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #ffffff !important;
+    }
+    
+    .btn-outline-primary {
+        color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d !important;
+        border-color: #6c757d !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-info {
+        color: #0dcaf0 !important;
+        border-color: #0dcaf0 !important;
+        background-color: transparent !important;
+    }
+    
+    /* Keep standard dark navbar like rest of app */
+    .navbar {
+        background: #212529 !important;
+    }
+    
+    .navbar-brand, .nav-link {
+        color: #ffffff !important;
+    }
+    
+    .nav-link:hover {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    /* Container background - transparent to show green gradient */
+    .container-fluid {
+        background: transparent !important;
+    }
+</style>
+
+<div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1><i class="bi bi-qr-code me-2"></i>QR Code Manager</h1>
+                <h1 class="text-dark">
+                    <i class="bi bi-qr-code me-2 text-primary"></i>QR Code Manager
+                </h1>
                 <div>
-                    <a href="business/dashboard.php" class="btn btn-outline-secondary me-2">
+                    <a href="business/dashboard.php" class="btn btn-outline-secondary me-2 shadow-sm">
                         <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
                     </a>
-                    <a href="qr-generator.php" class="btn btn-primary">
+                    <a href="qr_dynamic_manager.php" class="btn btn-outline-info me-2 shadow-sm" 
+                       title="Manage dynamic QR codes - change URLs without reprinting">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Dynamic Manager
+                    </a>
+                    <a href="qr-generator.php" class="btn btn-primary shadow-sm">
                         <i class="bi bi-plus-circle me-1"></i>Generate New QR
                     </a>
                 </div>
@@ -146,21 +285,30 @@ require_once __DIR__ . '/core/includes/header.php';
                 </div>
             <?php endif; ?>
 
+
+
             <!-- QR Codes Table -->
-            <div class="card bg-dark border-secondary">
-                <div class="card-header bg-gradient text-white">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-qr-code me-2"></i>Your QR Codes</h5>
-                        <a href="print-shop.php" class="btn btn-outline-light btn-sm">
-                            <i class="bi bi-printer me-1"></i>Print Shop
-                        </a>
+                        <h5 class="mb-0 text-dark">
+                            <i class="bi bi-qr-code me-2 text-primary"></i>Your QR Codes
+                        </h5>
+                        <div class="btn-group btn-group-sm">
+                            <a href="qr_dynamic_manager.php" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Dynamic Manager
+                            </a>
+                            <a href="print-shop.php" class="btn btn-outline-secondary">
+                                <i class="bi bi-printer me-1"></i>Print Shop
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body bg-dark text-white">
+                <div class="card-body bg-white">
                     <?php if (!empty($qr_codes)): ?>
                         <div class="table-responsive">
-                            <table class="table table-dark table-hover border-secondary">
-                                <thead class="table-secondary">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
                                     <tr>
                                         <th><i class="bi bi-hash me-1"></i>ID</th>
                                         <th><i class="bi bi-code-square me-1"></i>Code</th>
@@ -401,6 +549,65 @@ function deleteQR(qrId) {
     }
 }
 
+function printQR(qrId, qrCode, imagePath) {
+    const imageUrl = imagePath && imagePath.trim() !== '' ? imagePath : `/uploads/qr/${qrCode}.png`;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print QR Code - ${qrCode}</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    text-align: center; 
+                    margin: 20px;
+                }
+                .qr-container {
+                    display: inline-block;
+                    padding: 20px;
+                    border: 2px solid #000;
+                    margin: 20px;
+                }
+                .qr-code {
+                    width: 200px;
+                    height: 200px;
+                    margin: 10px auto;
+                }
+                .qr-label {
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin-top: 10px;
+                }
+                @media print {
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="no-print">
+                <button onclick="window.print()">Print</button>
+                <button onclick="window.close()">Close</button>
+            </div>
+            
+            <div class="qr-container">
+                <img src="${imageUrl}" alt="QR Code" class="qr-code" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display:none;">
+                    <div style="width:200px;height:200px;border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;margin:10px auto;">
+                        QR Code<br>Image Missing
+                    </div>
+                </div>
+                <div class="qr-label">${qrCode}</div>
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
+}
+
 function previewQR(qrId, qrCode, imagePath) {
     currentQRId = qrId;
     currentQRCode = qrCode;
@@ -414,85 +621,106 @@ function previewQR(qrId, qrCode, imagePath) {
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
+        <p class="mt-2">Loading QR code preview...</p>
     `;
     
     modal.show();
     
-    // If we have a direct image path, try that first
-    if (imagePath && imagePath.trim() !== '') {
+    // Try multiple image paths
+    const possiblePaths = [
+        imagePath,
+        `/uploads/qr/${qrCode}.png`,
+        `/uploads/qr/1/${qrCode}.png`,
+        `/uploads/qr/business/${qrCode}.png`,
+        `/assets/img/qr/${qrCode}.png`
+    ].filter(path => path && path.trim() !== '');
+    
+    let imageFound = false;
+    let currentPathIndex = 0;
+    
+    function tryNextImage() {
+        if (currentPathIndex >= possiblePaths.length) {
+            // No image found, try API generation
+            generatePreviewViaAPI();
+            return;
+        }
+        
         const img = new Image();
         img.onload = function() {
+            imageFound = true;
             content.innerHTML = `
-                <div class="mb-3">
-                    <img src="${imagePath}" alt="QR Code" class="img-fluid" style="max-width: 300px; border: 1px solid #ddd; border-radius: 8px;">
+                <div class="text-center">
+                    <img src="${possiblePaths[currentPathIndex]}" alt="QR Code" 
+                         style="max-width: 100%; max-height: 400px;" class="img-fluid border">
+                    <div class="mt-3">
+                        <p><strong>Code:</strong> ${qrCode}</p>
+                        <p><strong>Path:</strong> ${possiblePaths[currentPathIndex]}</p>
+                    </div>
                 </div>
-                <h6>QR Code: ${qrCode}</h6>
-                <p class="text-muted">Scan this code with your phone to test</p>
-                <small class="text-success">Image loaded from: ${imagePath}</small>
             `;
         };
+        
         img.onerror = function() {
-            // If direct path fails, try fallback paths
-            tryFallbackPaths();
+            currentPathIndex++;
+            tryNextImage();
         };
-        img.src = imagePath;
-        return;
+        
+        img.src = possiblePaths[currentPathIndex];
     }
     
-    // Fallback to trying multiple paths
-    tryFallbackPaths();
-    
-    function tryFallbackPaths() {
-        const possiblePaths = [
-            `/uploads/qr/${qrCode}.png`,
-            `/uploads/qr/1/${qrCode}.png`,
-            `/uploads/qr/business/${qrCode}.png`,
-            `/assets/img/qr/${qrCode}.png`
-        ];
-        
-        let pathIndex = 0;
-        
-        function tryLoadImage() {
-            if (pathIndex >= possiblePaths.length) {
-                // No image found, show error
+    function generatePreviewViaAPI() {
+        // Try to generate preview via API
+        fetch('/api/qr/basic-preview.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `qr_id=${qrId}&action=regenerate`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.preview_data) {
                 content.innerHTML = `
-                    <div class="mb-3">
-                        <div class="alert alert-warning">
-                            <i class="bi bi-exclamation-triangle me-2"></i>
-                            QR code image not found. The QR code may need to be regenerated.
-                        </div>
-                        <div class="bg-light p-4 rounded">
-                            <i class="bi bi-qr-code display-4 text-muted"></i>
+                    <div class="text-center">
+                        <img src="data:image/png;base64,${data.preview_data}" alt="QR Code" 
+                             style="max-width: 100%; max-height: 400px;" class="img-fluid border">
+                        <div class="mt-3">
+                            <p><strong>Code:</strong> ${qrCode}</p>
+                            <p><strong>Status:</strong> Generated via API</p>
                         </div>
                     </div>
-                    <h6>QR Code: ${qrCode}</h6>
-                    <p class="text-muted">Image file missing - please regenerate this QR code</p>
+                `;
+            } else {
+                showPreviewError();
+            }
+        })
+        .catch(error => {
+            console.error('API Error:', error);
+            showPreviewError();
+        });
+    }
+    
+    function showPreviewError() {
+        content.innerHTML = `
+            <div class="alert alert-warning text-center">
+                <i class="bi bi-exclamation-triangle fs-1 mb-3"></i>
+                <h5>QR Code Image Not Found</h5>
+                <p>The QR code image file could not be located.</p>
+                <p><strong>Code:</strong> ${qrCode}</p>
+                <p><strong>ID:</strong> ${qrId}</p>
+                <div class="mt-3">
                     <button class="btn btn-primary" onclick="regenerateQR(${qrId}, '${qrCode}')">
                         <i class="bi bi-arrow-clockwise me-1"></i>Regenerate QR Code
                     </button>
-                `;
-                return;
-            }
-            
-            const img = new Image();
-            img.onload = function() {
-                content.innerHTML = `
-                    <div class="mb-3">
-                        <img src="${possiblePaths[pathIndex]}" alt="QR Code" class="img-fluid" style="max-width: 300px; border: 1px solid #ddd; border-radius: 8px;">
-                    </div>
-                    <h6>QR Code: ${qrCode}</h6>
-                    <p class="text-muted">Scan this code with your phone to test</p>
-                    <small class="text-success">Image loaded from: ${possiblePaths[pathIndex]}</small>
-                `;
-            };
-            img.onerror = function() {
-            pathIndex++;
-            tryLoadImage();
-        };
-        img.src = possiblePaths[pathIndex];
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">Searched paths:</small><br>
+                    ${possiblePaths.map(path => `<small class="text-muted">${path}</small>`).join('<br>')}
+                </div>
+            </div>
+        `;
     }
     
-    setTimeout(tryLoadImage, 500);
+    // Start trying images
+    tryNextImage();
 }
 
 function printQR(qrId, qrCode, imagePath) {

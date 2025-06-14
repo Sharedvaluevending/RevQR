@@ -24,11 +24,12 @@ if (is_logged_in() && has_role('business')) {
     }
 }
 ?>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark py-1 fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark py-1 fixed-top" style="background: rgba(30, 60, 114, 0.95) !important; backdrop-filter: blur(20px) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;">
     <div class="container">
         <div class="navbar-brand d-flex align-items-center">
             <img src="<?php echo APP_URL; ?>/img/logoRQ.png" alt="RevenueQR Logo" height="32" class="me-2">
             <span class="d-none d-sm-inline">Revenue QR</span>
+            
         </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
