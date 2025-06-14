@@ -93,6 +93,145 @@ try {
 require_once __DIR__ . '/core/includes/header.php';
 ?>
 
+<!-- Complete CSS Reset - Match Live Site Clean Design -->
+<style>
+    /* COMPLETE OVERRIDE - Reset to clean Bootstrap defaults like live site */
+    html, body {
+        background: #ffffff !important;
+        background-image: none !important;
+        background-attachment: initial !important;
+        color: #212529 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    }
+    
+    /* Reset all text colors to Bootstrap defaults */
+    .text-dark, h1, h2, h3, h4, h5, h6, p, div, span, td, th {
+        color: #212529 !important;
+    }
+    
+    .text-muted {
+        color: #6c757d !important;
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    /* Reset all backgrounds to clean white */
+    .bg-white, .card, .card-body, .card-header {
+        background: #ffffff !important;
+        background-image: none !important;
+        backdrop-filter: none !important;
+        border: 1px solid #dee2e6 !important;
+    }
+    
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border-radius: 0.375rem !important;
+    }
+    
+    .card-header {
+        background-color: rgba(0, 0, 0, 0.03) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+    }
+    
+    /* Reset table styling */
+    .table {
+        color: #212529 !important;
+        background: #ffffff !important;
+    }
+    
+    .table thead th {
+        background: #f8f9fa !important;
+        color: #212529 !important;
+        border-bottom: 2px solid #dee2e6 !important;
+    }
+    
+    .table tbody tr {
+        background: #ffffff !important;
+        color: #212529 !important;
+    }
+    
+    .table tbody tr:hover {
+        background: rgba(0, 0, 0, 0.075) !important;
+    }
+    
+    .table-striped > tbody > tr:nth-of-type(odd) > td,
+    .table-striped > tbody > tr:nth-of-type(odd) > th {
+        background-color: rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    /* Reset alerts */
+    .alert {
+        color: inherit !important;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1 !important;
+        border-color: #bee5eb !important;
+        color: #0c5460 !important;
+    }
+    
+    .alert-success {
+        background-color: #d1e7dd !important;
+        border-color: #badbcc !important;
+        color: #0f5132 !important;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da !important;
+        border-color: #f5c2c7 !important;
+        color: #842029 !important;
+    }
+    
+    /* Reset buttons */
+    .btn-primary {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #ffffff !important;
+    }
+    
+    .btn-outline-primary {
+        color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d !important;
+        border-color: #6c757d !important;
+        background-color: transparent !important;
+    }
+    
+    .btn-outline-info {
+        color: #0dcaf0 !important;
+        border-color: #0dcaf0 !important;
+        background-color: transparent !important;
+    }
+    
+    /* Reset navbar if present */
+    .navbar {
+        background: #ffffff !important;
+        background-image: none !important;
+        backdrop-filter: none !important;
+        border-bottom: 1px solid #dee2e6 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
+    
+    .navbar-brand, .nav-link {
+        color: #212529 !important;
+    }
+    
+    .nav-link:hover {
+        color: #0d6efd !important;
+    }
+    
+    /* Container background */
+    .container-fluid {
+        background: #f8f9fa !important;
+    }
+</style>
+
 <div class="container-fluid py-4" style="background-color: #f8f9fa;">
     <div class="row">
         <div class="col-12">
