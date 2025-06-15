@@ -1409,7 +1409,8 @@ function generatePreviewOnly() {
             content = 'https://revenueqr.sharedvaluevending.com/public/spin-wheel.php?wheel_id=1';
             break;
         case 'pizza_tracker':
-            content = 'https://revenueqr.sharedvaluevending.com/public/pizza-tracker.php?tracker_id=1';
+            const pizzaTrackerId = document.getElementById('pizzaTrackerSelect').value;
+            content = `https://revenueqr.sharedvaluevending.com/public/pizza-tracker.php?tracker_id=${pizzaTrackerId || '1'}`;
             break;
         default:
             content = 'https://example.com';
@@ -1470,6 +1471,22 @@ function generatePreview() {
         case "dynamic_vending":
             const machineName = document.getElementById("machineName")?.value;
             content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineName || "Sample Machine")}&view=vending`;
+            break;
+        case "machine_sales":
+            const machineNameSales = document.getElementById("machineName")?.value;
+            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineNameSales || "Sample Machine")}`;
+            break;
+        case "promotion":
+            const machineNamePromotion = document.getElementById("machineName")?.value;
+            content = `https://revenueqr.sharedvaluevending.com/public/promotions.php?machine=${encodeURIComponent(machineNamePromotion || "Sample Machine")}&view=promotions`;
+            break;
+        case "spin_wheel":
+            const spinWheelId = document.getElementById("spinWheelId")?.value;
+            content = `https://revenueqr.sharedvaluevending.com/public/spin-wheel.php?wheel_id=${spinWheelId || "1"}`;
+            break;
+        case "pizza_tracker":
+            const pizzaTrackerIdAlt = document.getElementById("pizzaTrackerSelect")?.value;
+            content = `https://revenueqr.sharedvaluevending.com/public/pizza-tracker.php?tracker_id=${pizzaTrackerIdAlt || "1"}`;
             break;
         default:
             content = "https://example.com";

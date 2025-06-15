@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../core/config.php';
 require_once __DIR__ . '/../../core/session.php';
 require_once __DIR__ . '/../../core/auth.php';
 require_once __DIR__ . '/../../core/functions.php';
+require_once __DIR__ . '/../../core/business_utils.php';
 require_once __DIR__ . '/../../includes/QRGenerator.php';
 
 // Check authentication without redirecting
@@ -28,10 +29,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    $business_id = get_business_id();
+    $business_id = getOrCreateBusinessId($pdo, $_SESSION['user_id']);
     
-    // Get form data
-    $data = $_POST;
+    // Get form data - handle both JSON and FormData
+    $data = [];
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+    
+    if (strpos($contentType, 'application/json') !== false) {
+        // Handle JSON data (like regular QR generator)
+        $input = json_decode(file_get_contents('php://input'), true);
+        if ($input) {
+            $data = $input;
+        }
+    } else {
+        // Handle FormData/POST data (from enhanced form)
+        $data = $_POST;
+    }
     
     // Validate required fields
     if (empty($data['qr_type'])) {

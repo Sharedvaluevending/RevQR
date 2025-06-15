@@ -283,11 +283,6 @@ class QRGenerator {
         $qrX = (int)(($canvasWidth - $width) / 2);
         $qrY = (int)(($canvasHeight - $height) / 2);
 
-        // Apply background gradient if enabled (but preserve QR area)
-        if (!empty($options['enable_background_gradient'])) {
-            $canvas = $this->applyBackgroundGradient($canvas, $options, $qrX, $qrY, $width, $height);
-        }
-
         // Apply QR code gradient if enabled
         if (!empty($options['enable_qr_gradient'])) {
             $gradientOptions = [
@@ -304,11 +299,6 @@ class QRGenerator {
         // Apply custom eye finder patterns if enabled
         if (!empty($options['enable_custom_eyes'])) {
             $qrImage = $this->applyCustomEyePatterns($qrImage, $options);
-        }
-
-        // Apply enhanced borders if enabled
-        if (!empty($options['enable_enhanced_border'])) {
-            $canvas = $this->applyEnhancedBorder($canvas, $qrX, $qrY, $width, $height, $options);
         }
 
         // Apply module shape if enabled
@@ -339,6 +329,16 @@ class QRGenerator {
         
         // Copy QR code with proper blending to ensure background is preserved
         imagecopy($canvas, $qrImage, $qrX, $qrY, 0, 0, $width, $height);
+
+        // Apply background gradient AFTER placing QR code so it can detect QR background pixels
+        if (!empty($options['enable_background_gradient'])) {
+            $canvas = $this->applyBackgroundGradient($canvas, $options, $qrX, $qrY, $width, $height);
+        }
+
+        // Apply enhanced borders if enabled
+        if (!empty($options['enable_enhanced_border'])) {
+            $canvas = $this->applyEnhancedBorder($canvas, $qrX, $qrY, $width, $height, $options);
+        }
 
         // Add label text (above QR) if enabled
         if (!empty($options['enable_label']) && !empty($options['label_text'])) {
@@ -420,8 +420,9 @@ class QRGenerator {
                 $pixel = imagecolorat($image, $x, $y);
                 $pixelRgb = imagecolorsforindex($image, $pixel);
                 
-                // Only apply gradient to dark pixels (foreground)
-                if ($pixelRgb['red'] < 128) {
+                // Only apply gradient to dark pixels (foreground) - use proper brightness calculation
+                $brightness = ($pixelRgb['red'] * 0.299) + ($pixelRgb['green'] * 0.587) + ($pixelRgb['blue'] * 0.114);
+                if ($brightness < 128) {
                     // Calculate gradient position based on angle
                     $normalizedX = $x / $width;
                     $normalizedY = $y / $height;
@@ -466,30 +467,15 @@ class QRGenerator {
                 $pixel = imagecolorat($image, $x, $y);
                 $pixelRgb = imagecolorsforindex($image, $pixel);
                 
-                // Only apply gradient to dark pixels (foreground)
-                if ($pixelRgb['red'] < 128) {
+                // Only apply gradient to dark pixels (foreground) - use proper brightness calculation
+                $brightness = ($pixelRgb['red'] * 0.299) + ($pixelRgb['green'] * 0.587) + ($pixelRgb['blue'] * 0.114);
+                if ($brightness < 128) {
                     $distance = sqrt(($x - $centerX) ** 2 + ($y - $centerY) ** 2);
                     $position = min(1, $distance / $maxDistance);
                     
-                    // Calculate color based on position and middle color
-                    if ($middleRgb && $position <= 0.5) {
-                        // First half: start to middle
-                        $localPosition = $position * 2; // Scale to 0-1
-                        $r = (int)($startRgb[0] + ($middleRgb[0] - $startRgb[0]) * $localPosition);
-                        $g = (int)($startRgb[1] + ($middleRgb[1] - $startRgb[1]) * $localPosition);
-                        $b = (int)($startRgb[2] + ($middleRgb[2] - $startRgb[2]) * $localPosition);
-                    } else if ($middleRgb) {
-                        // Second half: middle to end
-                        $localPosition = ($position - 0.5) * 2; // Scale to 0-1
-                        $r = (int)($middleRgb[0] + ($endRgb[0] - $middleRgb[0]) * $localPosition);
-                        $g = (int)($middleRgb[1] + ($endRgb[1] - $middleRgb[1]) * $localPosition);
-                        $b = (int)($middleRgb[2] + ($endRgb[2] - $middleRgb[2]) * $localPosition);
-                    } else {
-                        // No middle color: direct start to end
-                        $r = (int)($startRgb[0] + ($endRgb[0] - $startRgb[0]) * $position);
-                        $g = (int)($startRgb[1] + ($endRgb[1] - $startRgb[1]) * $position);
-                        $b = (int)($startRgb[2] + ($endRgb[2] - $startRgb[2]) * $position);
-                    }
+                    $r = (int)($startRgb[0] + ($endRgb[0] - $startRgb[0]) * $position);
+                    $g = (int)($startRgb[1] + ($endRgb[1] - $startRgb[1]) * $position);
+                    $b = (int)($startRgb[2] + ($endRgb[2] - $startRgb[2]) * $position);
                     
                     $gradientColor = imagecolorallocate($image, $r, $g, $b);
                     imagesetpixel($image, $x, $y, $gradientColor);
@@ -504,22 +490,22 @@ class QRGenerator {
         
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
-                // Skip QR code area if coordinates are provided
-                if ($qrX !== null && $qrY !== null && $qrWidth !== null && $qrHeight !== null) {
-                    if ($x >= $qrX && $x < ($qrX + $qrWidth) && $y >= $qrY && $y < ($qrY + $qrHeight)) {
-                        continue; // Skip this pixel - it's in the QR code area
-                    }
+                $pixel = imagecolorat($image, $x, $y);
+                $pixelRgb = imagecolorsforindex($image, $pixel);
+                
+                // Only apply gradient to dark pixels (foreground) - use proper brightness calculation
+                $brightness = ($pixelRgb['red'] * 0.299) + ($pixelRgb['green'] * 0.587) + ($pixelRgb['blue'] * 0.114);
+                if ($brightness < 128) {
+                    $angle = atan2($y - $centerY, $x - $centerX);
+                    $position = ($angle + M_PI) / (2 * M_PI); // Normalize to 0-1
+                    
+                    $r = (int)($startRgb[0] + ($endRgb[0] - $startRgb[0]) * $position);
+                    $g = (int)($startRgb[1] + ($endRgb[1] - $startRgb[1]) * $position);
+                    $b = (int)($startRgb[2] + ($endRgb[2] - $startRgb[2]) * $position);
+                    
+                    $gradientColor = imagecolorallocate($image, $r, $g, $b);
+                    imagesetpixel($image, $x, $y, $gradientColor);
                 }
-                
-                $angle = atan2($y - $centerY, $x - $centerX);
-                $position = ($angle + M_PI) / (2 * M_PI); // Normalize to 0-1
-                
-                $r = (int)($startRgb[0] + ($endRgb[0] - $startRgb[0]) * $position);
-                $g = (int)($startRgb[1] + ($endRgb[1] - $startRgb[1]) * $position);
-                $b = (int)($startRgb[2] + ($endRgb[2] - $startRgb[2]) * $position);
-                
-                $gradientColor = imagecolorallocate($canvas, $r, $g, $b);
-                imagesetpixel($canvas, $x, $y, $gradientColor);
             }
         }
     }
@@ -1435,35 +1421,57 @@ class QRGenerator {
         
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
-                // Skip QR code area if coordinates are provided
+                $shouldApplyGradient = false;
+                
+                // If QR coordinates are provided, only apply gradient to QR background pixels
                 if ($qrX !== null && $qrY !== null && $qrWidth !== null && $qrHeight !== null) {
+                    // Check if pixel is within QR code area
                     if ($x >= $qrX && $x < ($qrX + $qrWidth) && $y >= $qrY && $y < ($qrY + $qrHeight)) {
-                        continue; // Skip this pixel - it's in the QR code area
+                        // Get the current pixel color to determine if it's background (light) or foreground (dark)
+                        $currentPixel = imagecolorat($canvas, $x, $y);
+                        $currentRgb = imagecolorsforindex($canvas, $currentPixel);
+                        
+                        // Calculate brightness (0-255, where 255 is brightest)
+                        $brightness = ($currentRgb['red'] * 0.299) + ($currentRgb['green'] * 0.587) + ($currentRgb['blue'] * 0.114);
+                        
+                        // Only apply gradient to light pixels (background pixels of QR code)
+                        // Using threshold of 128 to distinguish between dark QR modules and light background
+                        if ($brightness > 128) {
+                            $shouldApplyGradient = true;
+                        }
+                    } else {
+                        // Don't apply gradient to areas outside QR code (canvas background)
+                        $shouldApplyGradient = false;
                     }
-                }
-                
-                // Calculate gradient position based on angle
-                $normalizedX = $x / $width;
-                $normalizedY = $y / $height;
-                
-                $position = ($normalizedX * cos($angleRad) + $normalizedY * sin($angleRad));
-                $position = max(0, min(1, $position));
-                
-                // Use three-color gradient
-                if ($position <= 0.5) {
-                    $localPos = $position * 2;
-                    $r = (int)($startRgb[0] + ($middleRgb[0] - $startRgb[0]) * $localPos);
-                    $g = (int)($startRgb[1] + ($middleRgb[1] - $startRgb[1]) * $localPos);
-                    $b = (int)($startRgb[2] + ($middleRgb[2] - $startRgb[2]) * $localPos);
                 } else {
-                    $localPos = ($position - 0.5) * 2;
-                    $r = (int)($middleRgb[0] + ($endRgb[0] - $middleRgb[0]) * $localPos);
-                    $g = (int)($middleRgb[1] + ($endRgb[1] - $middleRgb[1]) * $localPos);
-                    $b = (int)($middleRgb[2] + ($endRgb[2] - $middleRgb[2]) * $localPos);
+                    // No QR coordinates provided, apply to entire canvas
+                    $shouldApplyGradient = true;
                 }
                 
-                $gradientColor = imagecolorallocate($canvas, $r, $g, $b);
-                imagesetpixel($canvas, $x, $y, $gradientColor);
+                if ($shouldApplyGradient) {
+                    // Calculate gradient position based on angle
+                    $normalizedX = $x / $width;
+                    $normalizedY = $y / $height;
+                    
+                    $position = ($normalizedX * cos($angleRad) + $normalizedY * sin($angleRad));
+                    $position = max(0, min(1, $position));
+                    
+                    // Use three-color gradient
+                    if ($position <= 0.5) {
+                        $localPos = $position * 2;
+                        $r = (int)($startRgb[0] + ($middleRgb[0] - $startRgb[0]) * $localPos);
+                        $g = (int)($startRgb[1] + ($middleRgb[1] - $startRgb[1]) * $localPos);
+                        $b = (int)($startRgb[2] + ($middleRgb[2] - $startRgb[2]) * $localPos);
+                    } else {
+                        $localPos = ($position - 0.5) * 2;
+                        $r = (int)($middleRgb[0] + ($endRgb[0] - $middleRgb[0]) * $localPos);
+                        $g = (int)($middleRgb[1] + ($endRgb[1] - $middleRgb[1]) * $localPos);
+                        $b = (int)($middleRgb[2] + ($endRgb[2] - $middleRgb[2]) * $localPos);
+                    }
+                    
+                    $gradientColor = imagecolorallocate($canvas, $r, $g, $b);
+                    imagesetpixel($canvas, $x, $y, $gradientColor);
+                }
             }
         }
     }
@@ -1475,22 +1483,43 @@ class QRGenerator {
         
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
-                // Skip QR code area if coordinates are provided
+                $shouldApplyGradient = false;
+                
+                // If QR coordinates are provided, only apply gradient to QR background pixels
                 if ($qrX !== null && $qrY !== null && $qrWidth !== null && $qrHeight !== null) {
+                    // Check if pixel is within QR code area
                     if ($x >= $qrX && $x < ($qrX + $qrWidth) && $y >= $qrY && $y < ($qrY + $qrHeight)) {
-                        continue; // Skip this pixel - it's in the QR code area
+                        // Get the current pixel color to determine if it's background (light) or foreground (dark)
+                        $currentPixel = imagecolorat($canvas, $x, $y);
+                        $currentRgb = imagecolorsforindex($canvas, $currentPixel);
+                        
+                        // Calculate brightness (0-255, where 255 is brightest)
+                        $brightness = ($currentRgb['red'] * 0.299) + ($currentRgb['green'] * 0.587) + ($currentRgb['blue'] * 0.114);
+                        
+                        // Only apply gradient to light pixels (background pixels of QR code)
+                        if ($brightness > 128) {
+                            $shouldApplyGradient = true;
+                        }
+                    } else {
+                        // Don't apply gradient to areas outside QR code (canvas background)
+                        $shouldApplyGradient = false;
                     }
+                } else {
+                    // No QR coordinates provided, apply to entire canvas
+                    $shouldApplyGradient = true;
                 }
                 
-                $distance = sqrt(($x - $centerX) ** 2 + ($y - $centerY) ** 2);
-                $position = min(1, $distance / $maxDistance);
-                
-                $r = (int)($startRgb[0] + ($endRgb[0] - $startRgb[0]) * $position);
-                $g = (int)($startRgb[1] + ($endRgb[1] - $startRgb[1]) * $position);
-                $b = (int)($startRgb[2] + ($endRgb[2] - $startRgb[2]) * $position);
-                
-                $gradientColor = imagecolorallocate($canvas, $r, $g, $b);
-                imagesetpixel($canvas, $x, $y, $gradientColor);
+                if ($shouldApplyGradient) {
+                    $distance = sqrt(($x - $centerX) ** 2 + ($y - $centerY) ** 2);
+                    $position = min(1, $distance / $maxDistance);
+                    
+                    $r = (int)($startRgb[0] + ($endRgb[0] - $startRgb[0]) * $position);
+                    $g = (int)($startRgb[1] + ($endRgb[1] - $startRgb[1]) * $position);
+                    $b = (int)($startRgb[2] + ($endRgb[2] - $startRgb[2]) * $position);
+                    
+                    $gradientColor = imagecolorallocate($canvas, $r, $g, $b);
+                    imagesetpixel($canvas, $x, $y, $gradientColor);
+                }
             }
         }
     }
@@ -1501,22 +1530,43 @@ class QRGenerator {
         
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
-                // Skip QR code area if coordinates are provided
+                $shouldApplyGradient = false;
+                
+                // If QR coordinates are provided, only apply gradient to QR background pixels
                 if ($qrX !== null && $qrY !== null && $qrWidth !== null && $qrHeight !== null) {
+                    // Check if pixel is within QR code area
                     if ($x >= $qrX && $x < ($qrX + $qrWidth) && $y >= $qrY && $y < ($qrY + $qrHeight)) {
-                        continue; // Skip this pixel - it's in the QR code area
+                        // Get the current pixel color to determine if it's background (light) or foreground (dark)
+                        $currentPixel = imagecolorat($canvas, $x, $y);
+                        $currentRgb = imagecolorsforindex($canvas, $currentPixel);
+                        
+                        // Calculate brightness (0-255, where 255 is brightest)
+                        $brightness = ($currentRgb['red'] * 0.299) + ($currentRgb['green'] * 0.587) + ($currentRgb['blue'] * 0.114);
+                        
+                        // Only apply gradient to light pixels (background pixels of QR code)
+                        if ($brightness > 128) {
+                            $shouldApplyGradient = true;
+                        }
+                    } else {
+                        // Don't apply gradient to areas outside QR code (canvas background)
+                        $shouldApplyGradient = false;
                     }
+                } else {
+                    // No QR coordinates provided, apply to entire canvas
+                    $shouldApplyGradient = true;
                 }
                 
-                $angle = atan2($y - $centerY, $x - $centerX);
-                $position = ($angle + M_PI) / (2 * M_PI); // Normalize to 0-1
-                
-                $r = (int)($startRgb[0] + ($endRgb[0] - $startRgb[0]) * $position);
-                $g = (int)($startRgb[1] + ($endRgb[1] - $startRgb[1]) * $position);
-                $b = (int)($startRgb[2] + ($endRgb[2] - $startRgb[2]) * $position);
-                
-                $gradientColor = imagecolorallocate($canvas, $r, $g, $b);
-                imagesetpixel($canvas, $x, $y, $gradientColor);
+                if ($shouldApplyGradient) {
+                    $angle = atan2($y - $centerY, $x - $centerX);
+                    $position = ($angle + M_PI) / (2 * M_PI); // Normalize to 0-1
+                    
+                    $r = (int)($startRgb[0] + ($endRgb[0] - $startRgb[0]) * $position);
+                    $g = (int)($startRgb[1] + ($endRgb[1] - $startRgb[1]) * $position);
+                    $b = (int)($startRgb[2] + ($endRgb[2] - $startRgb[2]) * $position);
+                    
+                    $gradientColor = imagecolorallocate($canvas, $r, $g, $b);
+                    imagesetpixel($canvas, $x, $y, $gradientColor);
+                }
             }
         }
     }

@@ -1,0 +1,179 @@
+# Advanced Image & QR Code Optimization for Uploads
+# Optimized caching and WebP serving
+
+# Enable rewrite engine
+RewriteEngine On
+
+# ========================================
+# WEBP AUTOMATIC SERVING
+# ========================================
+
+# Serve WebP images if available and browser supports it
+<IfModule mod_rewrite.c>
+    # Check if browser accepts WebP
+    RewriteCond %{HTTP_ACCEPT} image/webp
+    
+    # Check if original file is JPG or PNG
+    RewriteCond %{REQUEST_FILENAME} \.(jpe?g|png)$
+    
+    # Check if WebP version exists
+    RewriteCond %{REQUEST_FILENAME}\.webp -f
+    
+    # Serve WebP version
+    RewriteRule ^(.+)\.(jpe?g|png)$ $1.$2.webp [T=image/webp,E=webp:1,L]
+</IfModule>
+
+# ========================================
+# COMPRESSION
+# ========================================
+
+<IfModule mod_deflate.c>
+    # Compress images (though binary compression is limited)
+    AddOutputFilterByType DEFLATE image/svg+xml
+    
+    # Compress any JSON/XML metadata files
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE text/xml
+</IfModule>
+
+# ========================================
+# OPTIMIZED CACHE HEADERS
+# ========================================
+
+<IfModule mod_headers.c>
+    # QR Code specific caching (30 days)
+    <FilesMatch "qr_.*\.(png|webp)$">
+        Header set Cache-Control "public, max-age=2592000"
+        Header append Vary "Accept"
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+    
+    # Business logos (90 days - less frequently changed)
+    <FilesMatch "^(logo|business).*\.(jpg|jpeg|png|webp)$">
+        Header set Cache-Control "public, max-age=7776000"
+        Header append Vary "Accept"
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+    
+    # Thumbnail images (1 year - immutable)
+    <FilesMatch "-thumb-\d+\.(jpg|jpeg|png|webp)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+        Header append Vary "Accept"
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+    
+    # WebP images specific headers
+    <FilesMatch "\.webp$">
+        Header set Content-Type "image/webp"
+        Header set Cache-Control "public, max-age=7776000"
+        Header append Vary "Accept"
+    </FilesMatch>
+    
+    # AVIF images (future-proofing)
+    <FilesMatch "\.avif$">
+        Header set Content-Type "image/avif"
+        Header set Cache-Control "public, max-age=7776000"
+        Header append Vary "Accept"
+    </FilesMatch>
+    
+    # Add WebP indicator to response
+    Header append Vary Accept env=webp
+</IfModule>
+
+# ========================================
+# EXPIRES HEADERS
+# ========================================
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # QR codes - 30 days
+    ExpiresByType image/png "access plus 30 days"
+    
+    # Photos and graphics - 90 days  
+    ExpiresByType image/jpeg "access plus 90 days"
+    ExpiresByType image/jpg "access plus 90 days"
+    
+    # WebP - 90 days
+    ExpiresByType image/webp "access plus 90 days"
+    
+    # AVIF - 90 days
+    ExpiresByType image/avif "access plus 90 days"
+    
+    # SVG - 1 year (vector graphics)
+    ExpiresByType image/svg+xml "access plus 1 year"
+</IfModule>
+
+# ========================================
+# SECURITY HEADERS
+# ========================================
+
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Prevent hotlinking (optional - uncomment if needed)
+    # <IfModule mod_rewrite.c>
+    #     RewriteCond %{HTTP_REFERER} !^$
+    #     RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourdomain\.com [NC]
+    #     RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F]
+    # </IfModule>
+</IfModule>
+
+# ========================================
+# FILE OPTIMIZATION
+# ========================================
+
+# Disable ETags (we use Last-Modified)
+FileETag None
+
+# Remove server signature
+ServerSignature Off
+
+# Block access to optimization flag files
+<Files "*.optimized">
+    Require all denied
+</Files>
+
+# Block access to source image files when WebP is available
+# (This is handled by rewrite rules above)
+
+# ========================================
+# RESPONSIVE IMAGES SUPPORT
+# ========================================
+
+# Allow CORS for responsive images from different subdomains
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+</IfModule>
+
+# ========================================
+# ERROR HANDLING
+# ========================================
+
+# Custom 404 for missing images (optional)
+# ErrorDocument 404 /assets/img/placeholder.png
+
+# ========================================
+# PERFORMANCE OPTIMIZATIONS
+# ========================================
+
+# Force UTF-8 encoding for SVG
+AddCharset utf-8 .svg
+
+# Enable Keep-Alive for better performance
+<IfModule mod_headers.c>
+    Header always set Connection "Keep-Alive"
+</IfModule>
+
+# Optimize image serving
+<IfModule mod_headers.c>
+    # Add image dimensions hint (if you want to implement this)
+    # Header always set Image-Dimensions "auto"
+    
+    # Add loading hint
+    Header always set Image-Loading "lazy"
+</IfModule> 

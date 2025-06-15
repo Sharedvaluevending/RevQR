@@ -333,18 +333,24 @@ require_once __DIR__ . '/core/includes/header.php';
                                 if (isset($business_id)) {
                                     try {
                                         $stmt = $pdo->prepare("
-                                            SELECT id, tracker_name, progress_percent, stage_count 
+                                            SELECT id, name, description, 
+                                                   ROUND((current_revenue / NULLIF(revenue_goal, 0)) * 100, 1) as progress_percent,
+                                                   current_revenue, revenue_goal, completion_count
                                             FROM pizza_trackers 
                                             WHERE business_id = ? AND is_active = 1 
-                                            ORDER BY tracker_name
+                                            ORDER BY name
                                         ");
                                         $stmt->execute([$business_id]);
                                         $pizza_trackers = $stmt->fetchAll();
                                         
                                         foreach ($pizza_trackers as $tracker): ?>
                                             <option value="<?php echo $tracker['id']; ?>">
-                                                <?php echo htmlspecialchars($tracker['tracker_name']); ?>
-                                                (<?php echo $tracker['progress_percent']; ?>% complete - <?php echo $tracker['stage_count']; ?> stages)
+                                                <?php echo htmlspecialchars($tracker['name']); ?>
+                                                <?php if ($tracker['progress_percent']): ?>
+                                                    (<?php echo $tracker['progress_percent']; ?>% complete - $<?php echo number_format($tracker['current_revenue'], 2); ?>/$<?php echo number_format($tracker['revenue_goal'], 2); ?>)
+                                                <?php else: ?>
+                                                    (Just started - $0.00/$<?php echo number_format($tracker['revenue_goal'], 2); ?>)
+                                                <?php endif; ?>
                                             </option>
                                         <?php endforeach;
                                     } catch (Exception $e) {
@@ -1597,6 +1603,18 @@ class EnhancedQRGenerator {
             case 'spin_wheel':
                 // No additional validation needed for spin_wheel
                 break;
+            case 'spin_wheel':
+                const spinWheelEl = document.querySelector('[name="spin_wheel_id"]');
+                if (spinWheelEl && !spinWheelEl.value) {
+                    console.warn('Spin wheel not selected, but allowing preview generation');
+                }
+                break;
+            case 'pizza_tracker':
+                const pizzaTrackerEl = document.querySelector('[name="pizza_tracker_id"]');
+                if (pizzaTrackerEl && !pizzaTrackerEl.value) {
+                    console.warn('Pizza tracker not selected, but allowing preview generation');
+                }
+                break;
         }
 
         if (!location.trim()) {
@@ -2085,11 +2103,44 @@ function generateQR() {
     const formData = new FormData(document.getElementById('qrForm'));
     formData.append('generate', '1');
 
+    // Validate spin wheel and pizza tracker selection based on QR type
+    const qrType = document.querySelector('[name="qr_type"]').value;
+    if (qrType === 'spin_wheel') {
+        const spinWheel = document.querySelector('[name="spin_wheel_id"]').value;
+        if (!spinWheel) {
+            alert('Please select a spin wheel before generating the QR code.');
+            return;
+        }
+    } else if (qrType === 'pizza_tracker') {
+        const pizzaTracker = document.querySelector('[name="pizza_tracker_id"]').value;
+        if (!pizzaTracker) {
+            alert('Please select a pizza tracker before generating the QR code.');
+            return;
+        }
+    }
+
     fetch('/api/qr/enhanced-generate.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.blob())
+    .then(response => {
+        // Check if response is successful
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // Check content type to determine if it's an error response or file
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            // It's an error response
+            return response.json().then(data => {
+                throw new Error(data.error || 'Unknown error occurred');
+            });
+        } else {
+            // It's a file response
+            return response.blob();
+        }
+    })
     .then(blob => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -2100,7 +2151,7 @@ function generateQR() {
     })
     .catch(error => {
         console.error('Generation error:', error);
-        alert('Failed to generate QR code. Please try again.');
+        alert('Failed to generate QR code: ' + error.message);
     });
 }
 

@@ -976,19 +976,48 @@ foreach ($promotional_ads as $ad) {
     <?php endif; ?>
 
     <!-- Pizza Tracker -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card bg-gradient-success text-white">
-                <div class="card-body text-center">
-                    <h6 class="text-white mb-2">🍕 Pizza Tracker</h6>
-                    <p class="small mb-3">Track your pizza order in real-time</p>
-                    <a href="<?php echo APP_URL; ?>/public/pizza-tracker.php" class="btn btn-info btn-sm">
-                        <i class="bi bi-geo-alt me-1"></i>Track Order
-                    </a>
+    <?php if ($pizza_tracker): ?>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-gradient-success text-white">
+                    <div class="card-body text-center">
+                        <h6 class="text-white mb-2">🍕 Pizza Tracker</h6>
+                        <p class="small mb-3">
+                            <strong><?php echo htmlspecialchars($pizza_tracker['name']); ?></strong><br>
+                            <?php echo $pizza_tracker['progress_percent']; ?>% Complete - 
+                            $<?php echo number_format($pizza_tracker['current_revenue'], 2); ?> / $<?php echo number_format($pizza_tracker['revenue_goal'], 2); ?>
+                        </p>
+                        <div class="progress mb-3" style="height: 20px;">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="width: <?php echo $pizza_tracker['progress_percent']; ?>%;" 
+                                 aria-valuenow="<?php echo $pizza_tracker['progress_percent']; ?>" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                                <?php echo $pizza_tracker['progress_percent']; ?>%
+                            </div>
+                        </div>
+                        <a href="<?php echo APP_URL; ?>/public/pizza-tracker.php?tracker_id=<?php echo $pizza_tracker['id']; ?>&source=voting" 
+                           class="btn btn-info btn-sm">
+                            <i class="bi bi-pizza me-1"></i>View Pizza Progress
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    <?php else: ?>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-gradient-success text-white">
+                    <div class="card-body text-center">
+                        <h6 class="text-white mb-2">🍕 Pizza Tracker</h6>
+                        <p class="small mb-3">Track your pizza order in real-time</p>
+                        <a href="<?php echo APP_URL; ?>/public/pizza-tracker.php" class="btn btn-info btn-sm">
+                            <i class="bi bi-geo-alt me-1"></i>Track Order
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <?php if ($qr_data || $campaign): ?>
         <!-- Quick Vote Status Alert -->

@@ -426,11 +426,31 @@ require_once __DIR__ . '/core/includes/header.php';
                                                         <small class="text-info me-2">
                                                             <i class="bi bi-ballot-check me-1"></i>Voting Campaign
                                                         </small>
-                                                        <a href="edit-items.php" 
-                                                           class="btn btn-sm btn-outline-success" 
-                                                           title="Manage Voting Items">
-                                                            <i class="bi bi-list-ul"></i> Edit Items
-                                                        </a>
+                                                                                                <?php
+                                        // Get the voting list or machine ID for this QR code
+                                        $machine_id = $qr['machine_id'] ?? null;
+                                        $voting_list_id = null;
+                                        
+                                        // Try to get voting list ID if machine_id exists
+                                        if ($machine_id) {
+                                            try {
+                                                $stmt_list = $pdo->prepare("SELECT id FROM voting_lists WHERE machine_id = ? AND business_id = ? LIMIT 1");
+                                                $stmt_list->execute([$machine_id, $business_id]);
+                                                $voting_list = $stmt_list->fetch();
+                                                $voting_list_id = $voting_list['id'] ?? null;
+                                            } catch (Exception $e) {
+                                                // Fallback to machine_id if voting_lists table doesn't exist
+                                            }
+                                        }
+                                        
+                                        // Determine the correct parameter to pass
+                                        $edit_param = $voting_list_id ? "voting_list_id={$voting_list_id}" : "machine_id={$machine_id}";
+                                        ?>
+                                        <a href="edit-items.php<?php echo $edit_param ? "?{$edit_param}" : ''; ?>" 
+                                           class="btn btn-sm btn-outline-success" 
+                                           title="Manage Voting Items - Vote In/Out, Showcase & Add Items">
+                                            <i class="bi bi-list-ul"></i> Edit Items
+                                        </a>
                                                     </div>
                                                 <?php else: ?>
                                                     <div class="d-flex align-items-center">

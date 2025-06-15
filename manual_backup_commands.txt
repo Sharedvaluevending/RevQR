@@ -1,0 +1,45 @@
+MANUAL BACKUP COMMANDS - RUN THESE IN ORDER
+============================================
+
+1. First, check your current status:
+   git status
+
+2. Stage all your changes:
+   git add -A
+
+3. Create a commit with all your work:
+   git commit -m "BACKUP: Complete work backup - $(date +%Y_%m_%d_%H_%M_%S)
+
+   This commit contains all current work including:
+   - QR system enhancements
+   - Casino system improvements  
+   - Business dashboard updates
+   - All modified files and assets
+   - Database schema changes
+   - API enhancements
+   "
+
+4. Create a backup branch:
+   git branch work-backup-$(date +%Y_%m_%d_%H_%M_%S)
+
+5. Check all your branches:
+   git branch -a
+
+6. Push to remote (if you have one):
+   git push origin main
+   git push origin work-backup-$(date +%Y_%m_%d_%H_%M_%S)
+
+7. Create a file system backup:
+   cp -r /var/www /var/www-backup-$(date +%Y_%m_%d_%H_%M_%S)
+
+ALTERNATIVE SIMPLE BACKUP:
+=========================
+
+If the above doesn't work, run these simple commands:
+
+git add .
+git commit -m "Backup all work $(date)"
+git branch my-safe-backup-$(date +%Y%m%d)
+git push origin main
+
+YOUR WORK WILL BE SAFE WITH THESE COMMANDS! 

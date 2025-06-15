@@ -1,0 +1,51 @@
+{
+    "timestamp": "2025-06-15 08:17:06",
+    "statistics": {
+        "qr_codes_optimized": 165,
+        "images_optimized": 74,
+        "webp_created": 12,
+        "avif_created": 0,
+        "thumbnails_created": 6,
+        "bytes_saved": 0,
+        "cache_files_created": 2
+    },
+    "configuration": {
+        "qr": {
+            "default_size": 300,
+            "max_size": 800,
+            "compression_level": 6,
+            "error_correction": "M",
+            "cache_duration": 2592000
+        },
+        "images": {
+            "webp_quality": 85,
+            "avif_quality": 80,
+            "jpeg_quality": 88,
+            "png_compression": 6,
+            "max_width": 1920,
+            "max_height": 1080,
+            "thumbnail_sizes": [
+                150,
+                300,
+                600,
+                1200
+            ]
+        },
+        "cdn": {
+            "enable_cloudflare": false,
+            "cache_headers": {
+                "qr_codes": "public, max-age=2592000",
+                "images": "public, max-age=7776000",
+                "thumbnails": "public, max-age=31536000"
+            }
+        }
+    },
+    "recommendations": [
+        "Implement automatic WebP serving in your application",
+        "Use responsive thumbnails in your HTML with srcset attributes",
+        "Consider implementing QR code caching with 30-day expiration",
+        "Set up a cron job to run this optimization weekly",
+        "Monitor Core Web Vitals for image loading performance",
+        "Consider implementing lazy loading for below-the-fold images"
+    ]
+}

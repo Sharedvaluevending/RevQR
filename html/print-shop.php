@@ -419,24 +419,38 @@ require_once __DIR__ . '/core/includes/header.php';
                         <div class="mb-3">
                             <label class="form-label"><i class="bi bi-arrows-angle-expand me-1"></i>QR Code Size</label>
                             <select class="form-select" id="qrSize" onchange="updatePreview()">
-                                <option value="small">Small (0.75")</option>
-                                <option value="medium" selected>Medium (1")</option>
-                                <option value="large">Large (1.5")</option>
-                                <option value="xlarge">Extra Large (2")</option>
-                                <option value="fill">Fill Label</option>
+                                <option value="auto" selected>Auto Fit (Recommended)</option>
+                                <option value="small">Small (50%)</option>
+                                <option value="medium">Medium (70%)</option>
+                                <option value="large">Large (85%)</option>
+                                <option value="fill">Fill Label (90%)</option>
                             </select>
+                            <small class="text-muted">Auto Fit ensures QR codes fit perfectly in each label</small>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label"><i class="bi bi-border-all me-1"></i>Padding</label>
+                            <label class="form-label"><i class="bi bi-border-all me-1"></i>Label Padding</label>
                             <div class="row g-2">
-                                <div class="col-6">
-                                    <input type="range" class="form-range" id="paddingX" min="0" max="20" value="5" onchange="updatePreview()">
-                                    <small>Horizontal: <span id="paddingXValue">5</span>px</small>
+                                <div class="col-12">
+                                    <input type="range" class="form-range" id="labelPadding" min="2" max="15" value="8" onchange="updatePreview(); updatePaddingDisplay()">
+                                    <div class="d-flex justify-content-between">
+                                        <small>Tight</small>
+                                        <small id="paddingDisplay">Medium (8px)</small>
+                                        <small>Loose</small>
+                                    </div>
                                 </div>
-                                <div class="col-6">
-                                    <input type="range" class="form-range" id="paddingY" min="0" max="20" value="5" onchange="updatePreview()">
-                                    <small>Vertical: <span id="paddingYValue">5</span>px</small>
+                            </div>
+                        </div>
+
+                        <!-- Fill Options -->
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-grid-fill me-1"></i>Fill Options</label>
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-outline-success btn-sm w-100 mb-2" onclick="fillPageWithSelected()" id="fillPageBtn" disabled>
+                                        <i class="bi bi-grid-3x3-gap-fill me-1"></i>Fill All Labels with Selected QR
+                                    </button>
+                                    <small class="text-muted">Select one QR code to fill entire page with copies</small>
                                 </div>
                             </div>
                         </div>
@@ -604,6 +618,7 @@ function toggleQRSelection(element) {
     }
     
     updateStats();
+    updateFillPageButton();
     updatePreview();
 }
 
@@ -635,6 +650,7 @@ function selectAll() {
         }
     });
     updateStats();
+    updateFillPageButton();
     updatePreview();
 }
 
@@ -645,6 +661,7 @@ function selectNone() {
     });
     selectedQRs = [];
     updateStats();
+    updateFillPageButton();
     updatePreview();
 }
 
@@ -728,15 +745,10 @@ async function updatePreview() {
     }
     
     const qrSize = document.getElementById('qrSize').value;
-    const paddingX = document.getElementById('paddingX').value;
-    const paddingY = document.getElementById('paddingY').value;
+    const labelPadding = document.getElementById('labelPadding').value;
     const includeText = document.getElementById('includeText').checked;
     const includeBorder = document.getElementById('includeBorder').checked;
     const includeDate = document.getElementById('includeDate').checked;
-    
-    // Update padding value displays
-    document.getElementById('paddingXValue').textContent = paddingX;
-    document.getElementById('paddingYValue').textContent = paddingY;
     
     totalPages = Math.ceil(selectedQRs.length / config.labelsPerSheet);
     
@@ -751,12 +763,12 @@ async function updatePreview() {
     }
     
     // Show only current page to prevent overflow
-    const previewHTML = generateSheetPreview(currentPage, config, qrSize, paddingX, paddingY, includeText, includeBorder, includeDate);
+    const previewHTML = generateSheetPreview(currentPage, config, qrSize, labelPadding, includeText, includeBorder, includeDate);
     document.getElementById('printPreview').innerHTML = previewHTML;
     updateStats();
 }
 
-function generateSheetPreview(sheetIndex, config, qrSize, paddingX, paddingY, includeText, includeBorder, includeDate) {
+function generateSheetPreview(sheetIndex, config, qrSize, labelPadding, includeText, includeBorder, includeDate) {
     const startIndex = sheetIndex * config.labelsPerSheet;
     const endIndex = Math.min(startIndex + config.labelsPerSheet, selectedQRs.length);
     
@@ -778,26 +790,36 @@ function generateSheetPreview(sheetIndex, config, qrSize, paddingX, paddingY, in
             const qrId = selectedQRs[qrIndex];
             const qrCode = getQRCodeById(qrId);
             
-            let qrImageSize = '60px';
-            if (qrSize === 'small') qrImageSize = '40px';
-            else if (qrSize === 'large') qrImageSize = '80px';
-            else if (qrSize === 'xlarge') qrImageSize = '100px';
-            else if (qrSize === 'fill') qrImageSize = '90%';
+            // Calculate QR size based on label dimensions and padding
+            let qrSizePercent = '70%'; // Default auto fit
+            if (qrSize === 'auto') {
+                // Calculate optimal size based on label content
+                const availableSpace = includeText ? '75%' : '85%';
+                qrSizePercent = availableSpace;
+            } else if (qrSize === 'small') qrSizePercent = '50%';
+            else if (qrSize === 'medium') qrSizePercent = '70%';
+            else if (qrSize === 'large') qrSizePercent = '85%';
+            else if (qrSize === 'fill') qrSizePercent = '90%';
             
             labelContent = `
-                <img src="${qrCode.imagePath}" 
-                     style="width: ${qrImageSize}; height: ${qrImageSize}; object-fit: contain;" 
-                     alt="QR Code"
-                     onerror="this.src='/uploads/qr/${qrCode.code}.png'; this.onerror=null;">
-                ${includeText ? `<div style="font-size: 8px; margin-top: 2px; word-break: break-all;">${qrCode.code}</div>` : ''}
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%;">
+                    <img src="${qrCode.imagePath}" 
+                         style="width: ${qrSizePercent}; height: auto; max-height: ${includeText ? '70%' : '90%'}; object-fit: contain;" 
+                         alt="QR Code"
+                         onerror="this.src='/uploads/qr/${qrCode.code}.png'; this.onerror=null;">
+                    ${includeText ? `<div style="font-size: ${Math.max(6, Math.min(10, parseInt(labelPadding) - 2))}px; margin-top: 2px; word-break: break-all; text-align: center; flex-shrink: 0;">${qrCode.code}</div>` : ''}
+                </div>
             `;
         }
         
         sheetHTML += `
             <div class="qr-label" style="
-                padding: ${paddingY}px ${paddingX}px;
+                padding: ${labelPadding}px;
                 ${includeBorder ? 'border: 1px solid #000;' : 'border: 1px dashed #ccc;'}
                 ${hasQR ? 'background: white;' : 'background: #f8f9fa;'}
+                box-sizing: border-box;
+                min-height: ${config.labelHeight * 72}px;
+                position: relative;
             ">
                 ${labelContent}
             </div>
@@ -900,8 +922,7 @@ function printAll() {
     }
     
     const qrSize = document.getElementById('qrSize').value;
-    const paddingX = document.getElementById('paddingX').value;
-    const paddingY = document.getElementById('paddingY').value;
+    const labelPadding = document.getElementById('labelPadding').value;
     const includeText = document.getElementById('includeText').checked;
     const includeBorder = document.getElementById('includeBorder').checked;
     const includeDate = document.getElementById('includeDate').checked;
@@ -910,7 +931,7 @@ function printAll() {
     let allPagesHTML = '';
     
     for (let sheet = 0; sheet < sheetsNeeded; sheet++) {
-        allPagesHTML += generateSheetPreview(sheet, config, qrSize, paddingX, paddingY, includeText, includeBorder, includeDate);
+        allPagesHTML += generateSheetPreview(sheet, config, qrSize, labelPadding, includeText, includeBorder, includeDate);
     }
     
     // Generate print-optimized version
@@ -972,6 +993,68 @@ function printAll() {
     }, 500);
 }
 
+// New helper functions
+function updatePaddingDisplay() {
+    const padding = document.getElementById('labelPadding').value;
+    const display = document.getElementById('paddingDisplay');
+    
+    let label = 'Medium';
+    if (padding <= 4) label = 'Tight';
+    else if (padding <= 6) label = 'Snug';
+    else if (padding <= 10) label = 'Medium';
+    else if (padding <= 12) label = 'Loose';
+    else label = 'Very Loose';
+    
+    display.textContent = `${label} (${padding}px)`;
+}
+
+function updateFillPageButton() {
+    const fillBtn = document.getElementById('fillPageBtn');
+    if (selectedQRs.length === 1) {
+        fillBtn.disabled = false;
+        fillBtn.classList.remove('btn-outline-success');
+        fillBtn.classList.add('btn-success');
+        fillBtn.innerHTML = '<i class="bi bi-grid-3x3-gap-fill me-1"></i>Fill All Labels with This QR';
+    } else {
+        fillBtn.disabled = true;
+        fillBtn.classList.remove('btn-success');
+        fillBtn.classList.add('btn-outline-success');
+        fillBtn.innerHTML = '<i class="bi bi-grid-3x3-gap-fill me-1"></i>Fill All Labels with Selected QR';
+    }
+}
+
+function fillPageWithSelected() {
+    if (selectedQRs.length !== 1) {
+        alert('Please select exactly one QR code to fill the page.');
+        return;
+    }
+    
+    const config = templateConfigs[currentTemplate];
+    
+    // Update custom grid if needed
+    if (currentTemplate === 'custom_sheet') {
+        const cols = parseInt(document.getElementById('gridCols').value);
+        const rows = parseInt(document.getElementById('gridRows').value);
+        config.cols = cols;
+        config.rows = rows;
+        config.labelsPerSheet = cols * rows;
+    }
+    
+    const selectedQRId = selectedQRs[0];
+    const labelsPerSheet = config.labelsPerSheet;
+    
+    // Fill selectedQRs array with copies of the selected QR
+    selectedQRs = Array(labelsPerSheet).fill(selectedQRId);
+    
+    // Update the UI to reflect the change
+    updateStats();
+    updatePreview();
+    
+    // Show success message
+    const qrCode = getQRCodeById(selectedQRId);
+    alert(`Page filled with ${labelsPerSheet} copies of "${qrCode.code}"`);
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     // Select first template by default
@@ -981,6 +1064,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     updateStats();
+    updatePaddingDisplay();
+    updateFillPageButton();
 });
 </script>
 
