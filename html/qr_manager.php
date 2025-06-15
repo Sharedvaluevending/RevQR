@@ -93,11 +93,11 @@ try {
 require_once __DIR__ . '/core/includes/header.php';
 ?>
 
-<!-- Match Dashboard Green Theme -->
-<style>
-    /* MATCH THE GREEN DASHBOARD THEME */
+<!-- FORCE GLASS EFFECT - Cache Bust: <?php echo time(); ?> -->
+<style id="qr-manager-glass-fix-<?php echo time(); ?>">
+    /* MATCH THE BLUE PLATFORM THEME */
     html, body {
-        background: linear-gradient(135deg, #00a000 0%, #00b000 25%, #00c000 75%, #00d000 100%) !important;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important;
         background-attachment: fixed !important;
         color: #ffffff !important;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
@@ -154,10 +154,7 @@ require_once __DIR__ . '/core/includes/header.php';
         background: transparent !important;
     }
     
-    .table-striped > tbody > tr:nth-of-type(odd) > td,
-    .table-striped > tbody > tr:nth-of-type(odd) > th {
-        background-color: transparent !important;
-    }
+
     
     /* Reset alerts */
     .alert {
@@ -224,6 +221,47 @@ require_once __DIR__ . '/core/includes/header.php';
     .container-fluid {
         background: transparent !important;
     }
+    
+    /* AGGRESSIVE TABLE GLASS EFFECT OVERRIDE */
+    .table,
+    table.table,
+    .table thead,
+    .table tbody,
+    .table thead th,
+    .table tbody td,
+    .table-responsive .table,
+    .card-body .table,
+    .table-hover,
+    .table-light {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+    
+    .table thead th {
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(15px) !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .table tbody td {
+        background: transparent !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    
+    /* Force card to use glass effect */
+    .card,
+    .card-header,
+    .card-body {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
 </style>
 
 <div class="container-fluid py-4">
@@ -289,9 +327,9 @@ require_once __DIR__ . '/core/includes/header.php';
 
             <!-- QR Codes Table -->
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-dark">
+                        <h5 class="mb-0">
                             <i class="bi bi-qr-code me-2 text-primary"></i>Your QR Codes
                         </h5>
                         <div class="btn-group btn-group-sm">
@@ -304,11 +342,11 @@ require_once __DIR__ . '/core/includes/header.php';
                         </div>
                     </div>
                 </div>
-                <div class="card-body bg-white">
+                <div class="card-body">
                     <?php if (!empty($qr_codes)): ?>
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead class="table-light">
+                            <table class="table table-hover">
+                                <thead>
                                     <tr>
                                         <th><i class="bi bi-hash me-1"></i>ID</th>
                                         <th><i class="bi bi-code-square me-1"></i>Code</th>

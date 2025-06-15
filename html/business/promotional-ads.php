@@ -145,6 +145,110 @@ $ad_stats = $adsManager->getBusinessAdStats($business_id, 30);
 require_once __DIR__ . '/../core/includes/header.php';
 ?>
 
+<!-- FORCE GLASS EFFECT - Cache Bust: <?php echo time(); ?> -->
+<style id="promotional-ads-glass-fix-<?php echo time(); ?>">
+    /* MATCH THE BLUE PLATFORM THEME */
+    html, body {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important;
+        background-attachment: fixed !important;
+        color: #ffffff !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    }
+    
+    /* White text on blue theme */
+    .text-dark, h1, h2, h3, h4, h5, h6, p, div, span, td, th {
+        color: #ffffff !important;
+    }
+    
+    .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    .text-primary {
+        color: #64b5f6 !important;
+    }
+    
+    /* Glass morphism cards */
+    .card, .card-body, .card-header {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .card-header {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* AGGRESSIVE TABLE GLASS EFFECT OVERRIDE */
+    .table,
+    table.table,
+    .table thead,
+    .table tbody,
+    .table thead th,
+    .table tbody td,
+    .table-responsive .table,
+    .card-body .table,
+    .table-hover,
+    .table-light {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+    
+    .table thead th {
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(15px) !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .table tbody td {
+        background: transparent !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    
+    /* Modal styling */
+    .modal-content {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+    
+    .modal-header {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* Form controls */
+    .form-control, .form-select {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: #64b5f6 !important;
+        box-shadow: 0 0 0 0.25rem rgba(100, 181, 246, 0.25) !important;
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    /* Container background - transparent to show blue gradient */
+    .container-fluid {
+        background: transparent !important;
+    }
+</style>
+
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">

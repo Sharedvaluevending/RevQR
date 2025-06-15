@@ -4,28 +4,43 @@
  * Very specific targeting to avoid affecting navbar, dropdowns, or other components
  */
 
+/* FORCE OVERRIDE bg-white class for table containers */
+.card-body.bg-white,
+.card-header.bg-white,
+.bg-white .table,
+.bg-white table {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* FORCE CLEAR GLASS EFFECT FOR ALL TABLE ELEMENTS */
+.table thead th,
+thead th,
+.table-light th,
+.table-light thead th {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    backdrop-filter: blur(15px) !important;
+}
+
+.table tbody td,
+tbody td,
+.table td {
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
 /* Only apply to actual HTML table elements with Bootstrap table class */
 table.table:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    color: #ffffff;
-}
-
-/* Headers for non-custom tables - must be inside actual table elements */
-table.table:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) th {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: #ffffff;
-    font-weight: 600;
-}
-
-/* Cells for non-custom tables - must be inside actual table elements */
-table.table:not([class*="custom-"]):not([class*="vote-"]):not([class*="qr-"]):not([class*="business-"]):not([class*="jockey-"]):not([class*="horse-"]):not([class*="casino-"]):not([class*="admin-"]) td {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
 }
 
 /* Override Bootstrap table-striped for actual table elements only */
