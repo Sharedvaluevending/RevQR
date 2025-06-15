@@ -5,11 +5,43 @@ require_once __DIR__ . '/../core/auth.php';
 require_once __DIR__ . '/../core/functions.php';
 require_once __DIR__ . '/../core/qr_coin_manager.php';
 require_once __DIR__ . '/../core/promotional_ads_manager.php';
-require_once __DIR__ . '/../core/services/VotingService.php';
+// Simple weekly vote limit system (2 votes per week)
+$user_id = $_SESSION['user_id'] ?? null;
+$voter_ip = $_SERVER['REMOTE_ADDR'];
 
-// Initialize voting service and get vote status
-VotingService::init($pdo);
-$vote_status = VotingService::getUserVoteStatus($_SESSION['user_id'], $_SERVER['REMOTE_ADDR']);
+// Get user's weekly vote count
+$weekly_votes_used = 0;
+$weekly_vote_limit = 2;
+
+if ($user_id) {
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) as weekly_votes
+        FROM votes 
+        WHERE user_id = ? 
+        AND YEARWEEK(created_at, 1) = YEARWEEK(NOW(), 1)
+    ");
+    $stmt->execute([$user_id]);
+    $weekly_votes_used = (int) $stmt->fetchColumn();
+} else {
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) as weekly_votes
+        FROM votes 
+        WHERE voter_ip = ? 
+        AND user_id IS NULL
+        AND YEARWEEK(created_at, 1) = YEARWEEK(NOW(), 1)
+    ");
+    $stmt->execute([$voter_ip]);
+    $weekly_votes_used = (int) $stmt->fetchColumn();
+}
+
+$votes_remaining = max(0, $weekly_vote_limit - $weekly_votes_used);
+
+// Simple vote status for display
+$vote_status = [
+    'votes_used' => $weekly_votes_used,
+    'votes_remaining' => $votes_remaining,
+    'weekly_limit' => $weekly_vote_limit
+];
 
 // Require user role
 require_role('user');
@@ -1079,27 +1111,27 @@ require_once __DIR__ . '/../core/includes/header.php';
                 <h3>Start Voting Now!</h3>
                 <p class="mb-4">Scan QR codes at vending machines to cast your votes and improve these statistics!</p>
                 
-                <!-- Voting Power Summary -->
+                <!-- Simple Voting Status -->
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <div class="bg-white bg-opacity-15 rounded p-3">
-                            <i class="bi bi-gift-fill text-warning mb-2" style="font-size: 2rem;"></i>
-                            <h5 class="text-white"><?php echo $vote_status['daily_free_remaining']; ?></h5>
-                            <small class="text-white-50">Free votes left today</small>
+                            <i class="bi bi-check-circle-fill text-success mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="text-white"><?php echo $vote_status['votes_used']; ?></h5>
+                            <small class="text-white-50">Votes used this week</small>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="bg-white bg-opacity-15 rounded p-3">
                             <i class="bi bi-star-fill text-info mb-2" style="font-size: 2rem;"></i>
-                            <h5 class="text-white"><?php echo $vote_status['weekly_bonus_remaining']; ?></h5>
-                            <small class="text-white-50">Bonus votes this week</small>
+                            <h5 class="text-white"><?php echo $vote_status['votes_remaining']; ?></h5>
+                            <small class="text-white-50">Votes remaining</small>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="bg-white bg-opacity-15 rounded p-3">
-                            <i class="bi bi-lightning-bolt-fill text-warning mb-2" style="font-size: 2rem;"></i>
-                            <h5 class="text-white"><?php echo $vote_status['premium_votes_available']; ?></h5>
-                            <small class="text-white-50">Premium votes available</small>
+                            <i class="bi bi-calendar-week text-warning mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="text-white"><?php echo $vote_status['weekly_limit']; ?></h5>
+                            <small class="text-white-50">Weekly limit</small>
                         </div>
                     </div>
                 </div>

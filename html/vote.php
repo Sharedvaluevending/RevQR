@@ -3,10 +3,48 @@ require_once __DIR__ . '/core/config.php';
 require_once __DIR__ . '/core/session.php';
 require_once __DIR__ . '/core/functions.php';
 require_once __DIR__ . '/core/auto_login.php';
-require_once __DIR__ . '/core/services/VotingService.php';
+// VotingService disabled - using simple 2 votes per week system
+// require_once __DIR__ . '/core/services/VotingService.php';
 
-// Initialize voting service
-VotingService::init($pdo);
+// Simple weekly vote limit system (2 votes per week)
+$user_id = $_SESSION['user_id'] ?? null;
+$voter_ip = $_SERVER['REMOTE_ADDR'];
+
+// Get user's weekly vote count
+$weekly_votes_used = 0;
+$weekly_vote_limit = 2;
+
+if ($user_id) {
+    // For logged-in users: Count by user_id
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) as weekly_votes
+        FROM votes 
+        WHERE user_id = ? 
+        AND YEARWEEK(created_at, 1) = YEARWEEK(NOW(), 1)
+    ");
+    $stmt->execute([$user_id]);
+    $weekly_votes_used = (int) $stmt->fetchColumn();
+} else {
+    // For guest users: Count by IP
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) as weekly_votes
+        FROM votes 
+        WHERE voter_ip = ? 
+        AND user_id IS NULL
+        AND YEARWEEK(created_at, 1) = YEARWEEK(NOW(), 1)
+    ");
+    $stmt->execute([$voter_ip]);
+    $weekly_votes_used = (int) $stmt->fetchColumn();
+}
+
+$votes_remaining = max(0, $weekly_vote_limit - $weekly_votes_used);
+
+// Simple vote status for display
+$vote_status = [
+    'votes_used' => $weekly_votes_used,
+    'votes_remaining' => $votes_remaining,
+    'weekly_limit' => $weekly_vote_limit
+];
 
 $message = '';
 $message_type = '';
@@ -16,13 +54,9 @@ $items = [];
 $campaign = null;
 $spin_wheel = null;
 
-// Get current user's vote status
-$user_id = $_SESSION['user_id'] ?? null;
-$voter_ip = $_SERVER['REMOTE_ADDR'];
-$vote_status = VotingService::getUserVoteStatus($user_id, $voter_ip);
-
 // Get QR code data by code parameter (legacy)
 if (isset($_GET['code'])) {
+    try {
     $stmt = $pdo->prepare("
         SELECT qr.*, vl.name as list_name, vl.description as list_description,
                b.name as business_name, c.name as campaign_name
@@ -30,10 +64,14 @@ if (isset($_GET['code'])) {
         LEFT JOIN voting_lists vl ON qr.machine_id = vl.id
         LEFT JOIN campaigns c ON qr.campaign_id = c.id
         LEFT JOIN businesses b ON COALESCE(vl.business_id, c.business_id) = b.id
-        WHERE qr.code = ?
+            WHERE qr.code = ? AND qr.status = 'active'
     ");
     $stmt->execute([$_GET['code']]);
     $qr_data = $stmt->fetch();
+    } catch (Exception $e) {
+        error_log("QR Code lookup error: " . $e->getMessage());
+        $qr_data = null;
+    }
     
     if ($qr_data) {
         // QR code found and validated
@@ -137,14 +175,23 @@ if (isset($_GET['code'])) {
                 $spin_wheel = $stmt->fetch();
                 
                 // Get pizza tracker for this campaign
+                $pizza_tracker = null;
+                try {
+                    if (file_exists(__DIR__ . '/core/pizza_tracker_utils.php')) {
                 require_once __DIR__ . '/core/pizza_tracker_utils.php';
+                        if (class_exists('PizzaTracker')) {
                 $pizzaTracker = new PizzaTracker($pdo);
                 $stmt = $pdo->prepare("SELECT id FROM pizza_trackers WHERE campaign_id = ? AND is_active = 1 LIMIT 1");
                 $stmt->execute([$campaign['id']]);
                 $tracker_row = $stmt->fetch();
-                $pizza_tracker = null;
                 if ($tracker_row) {
                     $pizza_tracker = $pizzaTracker->getTrackerDetails($tracker_row['id']);
+                            }
+                        }
+                    }
+                } catch (Exception $e) {
+                    error_log("Pizza tracker error: " . $e->getMessage());
+                    $pizza_tracker = null;
                 }
             }
         } else if ($qr_data['machine_id']) {
@@ -159,6 +206,7 @@ if (isset($_GET['code'])) {
         
         if ($list) {
             // Get items for voting with CAMPAIGN-SPECIFIC vote counts (SECURITY FIX)
+            try {
             if ($qr_data && isset($qr_data['campaign_id']) && $qr_data['campaign_id']) {
                 // Campaign-specific vote counting
                 $stmt = $pdo->prepare("
@@ -191,6 +239,10 @@ if (isset($_GET['code'])) {
                 $stmt->execute([$list['id'], $list['id'], $list['id']]);
             }
             $items = $stmt->fetchAll();
+            } catch (Exception $e) {
+                error_log("Error loading voting items: " . $e->getMessage());
+                $items = [];
+            }
         }
     }
 }
@@ -369,51 +421,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vote'])) {
             'vote_method' => $vote_method
         ];
         
-        $vote_result = VotingService::recordVote($vote_data);
-        
-        if ($vote_result['success']) {
-            $message = $vote_result['message'];
-            $message_type = "success";
-            
-            // Update vote status after successful vote
-            $vote_status = VotingService::getUserVoteStatus($user_id, $voter_ip);
-            
-            // If spin wheel is available, show spin opportunity
-            if ($spin_wheel && !empty($spin_rewards)) {
-                $message .= " You've earned a spin on the wheel!";
+        // Simple weekly vote limit system (2 votes per week)
+        if ($vote_status['votes_remaining'] <= 0) {
+            $message = "You have used all your votes for this week. You get 2 votes per week total.";
+            $message_type = "warning";
+        } else {
+            // Check if already voted for this item this week
+            $already_voted = false;
+            if ($user_id) {
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) 
+                    FROM votes 
+                    WHERE item_id = ? AND user_id = ?
+                    AND YEARWEEK(created_at, 1) = YEARWEEK(NOW(), 1)
+                ");
+                $stmt->execute([$item_id, $user_id]);
+                $already_voted = $stmt->fetchColumn() > 0;
+            } else {
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) 
+                    FROM votes 
+                    WHERE item_id = ? AND voter_ip = ? AND user_id IS NULL
+                    AND YEARWEEK(created_at, 1) = YEARWEEK(NOW(), 1)
+                ");
+                $stmt->execute([$item_id, $voter_ip]);
+                $already_voted = $stmt->fetchColumn() > 0;
             }
             
-            // Refresh items list with updated counts using enhanced service
-            if ($campaign_id) {
-                $items_result = VotingService::getItemsWithVotes($list_id, $campaign_id);
-                if ($items_result['success']) {
-                    $items = $items_result['items'];
-                }
+            if ($already_voted) {
+                $message = "You have already voted for this item this week.";
+                $message_type = "warning";
             } else {
-                // Legacy refresh for machine-based voting
-                if ($list) {
+                // Record the vote
+                try {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO votes (item_id, vote_type, voter_ip, user_id, campaign_id, machine_id, user_agent, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    $stmt->execute([
+                        $item_id,
+                        $vote_type,
+                        $voter_ip,
+                        $user_id,
+                        $campaign_id,
+                        $list['id'] ?? 0,
+                        $_SERVER['HTTP_USER_AGENT'] ?? ''
+                    ]);
+                    
+                    // Award QR coins for voting (30 coins per vote)
+                    if ($user_id) {
+                        require_once __DIR__ . '/core/qr_coin_manager.php';
+                        QRCoinManager::addTransaction($user_id, 30, 'Vote cast for item', 'vote');
+                    }
+                    
+                    $message = "Vote successfully recorded! You earned 30 QR coins.";
+                    $message_type = "success";
+                    
+                    // Update vote status
+                    $weekly_votes_used++;
+                    $votes_remaining--;
+                    $vote_status = [
+                        'votes_used' => $weekly_votes_used,
+                        'votes_remaining' => $votes_remaining,
+                        'weekly_limit' => $weekly_vote_limit
+                    ];
+            
+                    // Refresh items list with updated counts
+                    if ($list) {
+                        try {
+            if ($campaign_id) {
+                                // Campaign-specific vote counting
+                                $stmt = $pdo->prepare("
+                                    SELECT i.*, 
+                                           COUNT(CASE WHEN v.vote_type = 'vote_in' AND v.campaign_id = ? THEN 1 END) as votes_in,
+                                           COUNT(CASE WHEN v.vote_type = 'vote_out' AND v.campaign_id = ? THEN 1 END) as votes_out
+                                    FROM voting_list_items i
+                                    LEFT JOIN votes v ON i.id = v.item_id
+                                    WHERE i.voting_list_id = ?
+                                    GROUP BY i.id
+                                    ORDER BY i.item_name ASC
+                                ");
+                                $stmt->execute([$campaign_id, $campaign_id, $list['id']]);
+            } else {
+                                // All-time vote counting
                     $stmt = $pdo->prepare("
                         SELECT i.*, 
-                               COUNT(CASE WHEN v.vote_type = 'vote_in' AND v.machine_id = ? THEN 1 END) as votes_in,
-                               COUNT(CASE WHEN v.vote_type = 'vote_out' AND v.machine_id = ? THEN 1 END) as votes_out
+                                           COUNT(CASE WHEN v.vote_type = 'vote_in' THEN 1 END) as votes_in,
+                                           COUNT(CASE WHEN v.vote_type = 'vote_out' THEN 1 END) as votes_out
                         FROM voting_list_items i
                         LEFT JOIN votes v ON i.id = v.item_id
                         WHERE i.voting_list_id = ?
                         GROUP BY i.id
                         ORDER BY i.item_name ASC
                     ");
-                    $stmt->execute([$list['id'], $list['id'], $list['id']]);
+                                $stmt->execute([$list['id']]);
+                            }
                     $items = $stmt->fetchAll();
-                }
-            }
-        } else {
-            $message = $vote_result['message'];
-            if ($vote_result['error_code'] === 'NO_FREE_VOTES') {
-                $message_type = "info";
-            } elseif ($vote_result['error_code'] === 'INSUFFICIENT_COINS') {
-                $message_type = "warning";
-            } else {
+                        } catch (Exception $e) {
+                            error_log("Error refreshing items: " . $e->getMessage());
+                        }
+                    }
+                    
+                } catch (Exception $e) {
+                    error_log("Vote recording error: " . $e->getMessage());
+                    $message = "Error recording vote. Please try again.";
                 $message_type = "danger";
+                }
             }
         }
     } else {
@@ -452,6 +565,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['spin_wheel']) && $spi
             $message_type = "success";
         }
     }
+}
+
+// Add error messages for debugging
+if (!$qr_data && isset($_GET['code'])) {
+    $message = "QR code not found or inactive. Please check your QR code.";
+    $message_type = "warning";
+} elseif (!$list && $qr_data) {
+    $message = "No voting list found for this QR code.";
+    $message_type = "warning";
+} elseif (empty($items) && $list) {
+    $message = "No items available for voting in this list.";
+    $message_type = "info";
 }
 
 require_once __DIR__ . '/core/includes/header.php';
@@ -619,7 +744,6 @@ foreach ($promotional_ads as $ad) {
 
     .btn-vote-in:hover {
         background: linear-gradient(135deg, #388e3c, #4caf50) !important;
-        transform: translateY(-1px) !important;
         box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4) !important;
     }
 
@@ -632,8 +756,13 @@ foreach ($promotional_ads as $ad) {
 
     .btn-vote-out:hover {
         background: linear-gradient(135deg, #d32f2f, #f44336) !important;
-        transform: translateY(-1px) !important;
         box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4) !important;
+    }
+
+    /* FIXED: Remove transform animations that cause button movement */
+    .btn-vote-in, .btn-vote-out {
+        min-height: 38px !important; /* Fixed height to prevent layout shift */
+        position: relative !important;
     }
 
     /* Item card styling */
@@ -864,24 +993,19 @@ foreach ($promotional_ads as $ad) {
     <?php if ($qr_data || $campaign): ?>
         <!-- Quick Vote Status Alert -->
         <?php 
-        $total_free_votes = $vote_status['daily_free_remaining'] + $vote_status['weekly_bonus_remaining'];
-        $status_class = $total_free_votes > 0 ? 'success' : ($vote_status['premium_votes_available'] > 0 ? 'warning' : 'danger');
-        $status_icon = $total_free_votes > 0 ? 'check-circle' : ($vote_status['premium_votes_available'] > 0 ? 'exclamation-triangle' : 'x-circle');
+        $total_free_votes = $vote_status['votes_remaining'];
+        $status_class = $total_free_votes > 0 ? 'success' : 'danger';
+        $status_icon = $total_free_votes > 0 ? 'check-circle' : 'x-circle';
         ?>
         <div class="alert alert-<?php echo $status_class; ?> alert-dismissible fade show text-center mb-3" role="alert">
             <i class="bi bi-<?php echo $status_icon; ?> me-2"></i>
             <strong>
                 <?php if ($total_free_votes > 0): ?>
                     🎉 You have <?php echo $total_free_votes; ?> FREE vote<?php echo $total_free_votes != 1 ? 's' : ''; ?> remaining!
-                <?php elseif ($vote_status['premium_votes_available'] > 0): ?>
-                    ⚡ <?php echo $vote_status['premium_votes_available']; ?> premium vote<?php echo $vote_status['premium_votes_available'] != 1 ? 's' : ''; ?> available (45 coins each)
                 <?php else: ?>
                     😴 No votes remaining - Come back tomorrow for daily free votes!
                 <?php endif; ?>
             </strong>
-            <?php if ($vote_status['qr_balance'] > 0 && $total_free_votes == 0): ?>
-                <br><small>💰 You have <?php echo number_format($vote_status['qr_balance']); ?> QR coins - enough for <?php echo floor($vote_status['qr_balance'] / 45); ?> premium votes!</small>
-            <?php endif; ?>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
@@ -909,11 +1033,11 @@ foreach ($promotional_ads as $ad) {
                     <div class="card vote-status-card bg-gradient-success text-white h-100">
                         <div class="card-body text-center">
                             <div class="position-relative">
-                                <h2 class="h2 mb-1"><?php echo $vote_status['daily_free_remaining']; ?></h2>
-                                <small class="opacity-75">Daily Free Votes</small>
+                                <h2 class="h2 mb-1"><?php echo $vote_status['votes_used']; ?></h2>
+                                <small class="opacity-75">Votes Used</small>
                                 <div class="position-absolute top-0 start-50 translate-middle">
                                     <span class="badge bg-light text-success rounded-pill px-2 py-1">
-                                        <i class="bi bi-gift"></i> FREE
+                                        <i class="bi bi-gift"></i> USED
                                     </span>
                                 </div>
                             </div>
@@ -925,11 +1049,11 @@ foreach ($promotional_ads as $ad) {
                     <div class="card vote-status-card bg-gradient-info text-white h-100">
                         <div class="card-body text-center">
                             <div class="position-relative">
-                                <h2 class="h2 mb-1"><?php echo $vote_status['weekly_bonus_remaining']; ?></h2>
-                                <small class="opacity-75">Weekly Bonus Votes</small>
+                                <h2 class="h2 mb-1"><?php echo $vote_status['votes_remaining']; ?></h2>
+                                <small class="opacity-75">Votes Remaining</small>
                                 <div class="position-absolute top-0 start-50 translate-middle">
                                     <span class="badge bg-light text-info rounded-pill px-2 py-1">
-                                        <i class="bi bi-star"></i> BONUS
+                                        <i class="bi bi-star"></i> REMAINING
                                     </span>
                                 </div>
                             </div>
@@ -941,11 +1065,11 @@ foreach ($promotional_ads as $ad) {
                     <div class="card vote-status-card bg-gradient-warning text-white h-100">
                         <div class="card-body text-center">
                             <div class="position-relative">
-                                <h2 class="h2 mb-1"><?php echo $vote_status['premium_votes_available']; ?></h2>
-                                <small class="opacity-75">Premium Votes Available</small>
+                                <h2 class="h2 mb-1"><?php echo $vote_status['weekly_limit']; ?></h2>
+                                <small class="opacity-75">Weekly Limit</small>
                                 <div class="position-absolute top-0 start-50 translate-middle">
                                     <span class="badge bg-light text-warning rounded-pill px-2 py-1">
-                                        <i class="bi bi-coin"></i> COINS
+                                        <i class="bi bi-coin"></i> LIMIT
                                     </span>
                                 </div>
                             </div>
@@ -1093,7 +1217,7 @@ foreach ($promotional_ads as $ad) {
                                 <!-- Enhanced Voting Options -->
                                 <div class="voting-options">
                                     <!-- Smart Vote (Auto-Select Best Option) -->
-                                    <?php if ($vote_status['daily_free_remaining'] > 0 || $vote_status['weekly_bonus_remaining'] > 0): ?>
+                                    <?php if ($vote_status['votes_remaining'] > 0): ?>
                                         <div class="row mb-2">
                                             <div class="col-6">
                                                 <form method="post" class="d-inline w-100">
@@ -1109,11 +1233,7 @@ foreach ($promotional_ads as $ad) {
                                                     <?php endif; ?>
                                                     <button type="submit" name="vote" class="btn btn-vote-in w-100">
                                                         <i class="bi bi-hand-thumbs-up me-2"></i>Vote In
-                                                        <?php if ($vote_status['daily_free_remaining'] > 0): ?>
                                                             <span class="small">(+30 coins)</span>
-                                                        <?php else: ?>
-                                                            <span class="small">(+5 coins)</span>
-                                                        <?php endif; ?>
                                                     </button>
                                                 </form>
                                             </div>
@@ -1131,61 +1251,7 @@ foreach ($promotional_ads as $ad) {
                                                     <?php endif; ?>
                                                     <button type="submit" name="vote" class="btn btn-vote-out w-100">
                                                         <i class="bi bi-hand-thumbs-down me-2"></i>Vote Out
-                                                        <?php if ($vote_status['daily_free_remaining'] > 0): ?>
                                                             <span class="small">(+30 coins)</span>
-                                                        <?php else: ?>
-                                                            <span class="small">(+5 coins)</span>
-                                                        <?php endif; ?>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <!-- Premium Vote Option -->
-                                    <?php if ($user_id && $vote_status['premium_votes_available'] > 0 && ($vote_status['daily_free_remaining'] == 0 && $vote_status['weekly_bonus_remaining'] == 0)): ?>
-                                        <div class="row mb-2">
-                                            <div class="col-12">
-                                                <div class="text-center mb-2">
-                                                    <small class="text-warning">
-                                                        <i class="bi bi-lightning-fill me-1"></i>
-                                                        Premium votes available!
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <form method="post" class="d-inline w-100">
-                                                    <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
-                                                    <input type="hidden" name="vote_type" value="in">
-                                                    <input type="hidden" name="vote_method" value="premium">
-                                                    <input type="hidden" name="list_id" value="<?php echo $list['id'] ?? 0; ?>">
-                                                    <?php if ($campaign): ?>
-                                                        <input type="hidden" name="campaign_id" value="<?php echo $campaign['id']; ?>">
-                                                    <?php endif; ?>
-                                                    <?php if (isset($_GET['code'])): ?>
-                                                        <input type="hidden" name="code" value="<?php echo htmlspecialchars($_GET['code']); ?>">
-                                                    <?php endif; ?>
-                                                    <button type="submit" name="vote" class="btn btn-warning w-100">
-                                                        <i class="bi bi-hand-thumbs-up me-2"></i>Vote In
-                                                        <span class="small">(-45 coins)</span>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            <div class="col-6">
-                                                <form method="post" class="d-inline w-100">
-                                                    <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
-                                                    <input type="hidden" name="vote_type" value="out">
-                                                    <input type="hidden" name="vote_method" value="premium">
-                                                    <input type="hidden" name="list_id" value="<?php echo $list['id'] ?? 0; ?>">
-                                                    <?php if ($campaign): ?>
-                                                        <input type="hidden" name="campaign_id" value="<?php echo $campaign['id']; ?>">
-                                                    <?php endif; ?>
-                                                    <?php if (isset($_GET['code'])): ?>
-                                                        <input type="hidden" name="code" value="<?php echo htmlspecialchars($_GET['code']); ?>">
-                                                    <?php endif; ?>
-                                                    <button type="submit" name="vote" class="btn btn-warning w-100">
-                                                        <i class="bi bi-hand-thumbs-down me-2"></i>Vote Out
-                                                        <span class="small">(-45 coins)</span>
                                                     </button>
                                                 </form>
                                             </div>
@@ -1193,7 +1259,7 @@ foreach ($promotional_ads as $ad) {
                                     <?php endif; ?>
 
                                     <!-- No Votes Available -->
-                                    <?php if ($vote_status['daily_free_remaining'] == 0 && $vote_status['weekly_bonus_remaining'] == 0 && $vote_status['premium_votes_available'] == 0): ?>
+                                    <?php if ($vote_status['votes_remaining'] == 0): ?>
                                         <div class="text-center">
                                             <div class="alert alert-warning py-2 mb-2">
                                                 <i class="bi bi-clock me-2"></i>
@@ -1365,9 +1431,11 @@ foreach ($promotional_ads as $ad) {
                 showVoteToast(alertText, alertType);
                 
                 if (alertType === 'success') {
-                    // Update vote counts and status immediately
-                    await updateAllVoteCounts();
-                    await updateVoteStatus();
+                    // FIXED: Reload page to ensure proper vote count and status updates
+                    // The AJAX system was causing inconsistent updates
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500); // Give user time to see the success message
                     
                     // Add success animation to the voted item
                     const itemCard = form.closest('.item-card');
