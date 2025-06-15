@@ -15,7 +15,7 @@ if (!$wheel_id) {
 // Get spin wheel details
 try {
     $stmt = $pdo->prepare("
-        SELECT sw.*, b.name as business_name, b.logo_url as business_logo
+        SELECT sw.*, b.name as business_name, b.logo_path as business_logo
         FROM spin_wheels sw
         JOIN businesses b ON sw.business_id = b.id
         WHERE sw.id = ? AND sw.is_active = 1

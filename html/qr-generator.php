@@ -1050,10 +1050,10 @@ document.getElementById('uploadLogoBtn').addEventListener('click', function() {
     const formData = new FormData();
     formData.append('logo', file);
     
-    fetch('/api/upload-logo.php', {
-        method: 'POST',
-        body: formData
-    })
+                        fetch('/api/qr/logo.php', {
+                        method: 'POST',
+                        body: formData
+                    })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
@@ -1090,8 +1090,8 @@ document.getElementById('deleteLogoBtn').addEventListener('click', function() {
     const selectedOption = logoSelect.options[logoSelect.selectedIndex];
     
     if (selectedOption && selectedOption.value) {
-        fetch('/api/delete-logo.php', {
-            method: 'POST',
+        fetch('/api/qr/logo.php', {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1186,13 +1186,17 @@ function generatePreview() {
     qrPreview.style.display = 'block';
     placeholder.style.display = 'none';
     
-    // Get form data
+    // Get form data including logo
+    const logoSelect = document.getElementById('logoSelect');
+    const selectedLogo = logoSelect ? logoSelect.value : '';
+    
     const formData = {
         qr_type: qrType,
         content: getContentForQRType(qrType),
         size: parseInt(document.getElementById('sizeRange')?.value || 300),
         foreground_color: document.getElementById('foregroundColor')?.value || '#000000',
-        background_color: document.getElementById('backgroundColor')?.value || '#FFFFFF'
+        background_color: document.getElementById('backgroundColor')?.value || '#FFFFFF',
+        logo: selectedLogo
     };
     
     console.log('📤 Calling preview API with:', formData);
@@ -1243,13 +1247,17 @@ function generateQRCode() {
     // Show loading
     showToast('Generating QR code for download...', 'info');
     
-    // Get form data
+    // Get form data including logo
+    const logoSelect = document.getElementById('logoSelect');
+    const selectedLogo = logoSelect ? logoSelect.value : '';
+    
     const formData = {
         qr_type: qrType,
         content: getContentForQRType(qrType),
         size: parseInt(document.getElementById('sizeRange')?.value || 400),
         foreground_color: document.getElementById('foregroundColor')?.value || '#000000',
-        background_color: document.getElementById('backgroundColor')?.value || '#FFFFFF'
+        background_color: document.getElementById('backgroundColor')?.value || '#FFFFFF',
+        logo: selectedLogo
     };
     
     console.log('📤 Calling generate API with:', formData);

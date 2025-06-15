@@ -446,7 +446,7 @@ require_once __DIR__ . '/core/includes/header.php';
                                         // Determine the correct parameter to pass
                                         $edit_param = $voting_list_id ? "voting_list_id={$voting_list_id}" : "machine_id={$machine_id}";
                                         ?>
-                                        <a href="edit-items.php<?php echo $edit_param ? "?{$edit_param}" : ''; ?>" 
+                                        <a href="business/edit-items.php<?php echo $edit_param ? "?{$edit_param}" : ''; ?>" 
                                            class="btn btn-sm btn-outline-success" 
                                            title="Manage Voting Items - Vote In/Out, Showcase & Add Items">
                                             <i class="bi bi-list-ul"></i> Edit Items

@@ -1048,10 +1048,10 @@ document.getElementById('uploadLogoBtn').addEventListener('click', function() {
     const formData = new FormData();
     formData.append('logo', file);
     
-    fetch('/api/upload-logo.php', {
-        method: 'POST',
-        body: formData
-    })
+                        fetch('/api/qr/logo.php', {
+                        method: 'POST',
+                        body: formData
+                    })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
@@ -1088,8 +1088,8 @@ document.getElementById('deleteLogoBtn').addEventListener('click', function() {
     const selectedOption = logoSelect.options[logoSelect.selectedIndex];
     
     if (selectedOption && selectedOption.value) {
-        fetch('/api/delete-logo.php', {
-            method: 'POST',
+        fetch('/api/qr/logo.php', {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },

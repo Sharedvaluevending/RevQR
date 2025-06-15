@@ -867,7 +867,7 @@ function loadMasterItems() {
         return;
     }
     
-    fetch('/business/get_master_items.php')
+    fetch('get_master_items.php')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -929,7 +929,7 @@ function loadCatalogItems() {
         return;
     }
     
-    fetch('/business/get_catalog_items.php')
+    fetch('get_catalog_items.php')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -1122,7 +1122,7 @@ function enableSpinWheel() {
 }
 
 function configureSpinWheel() {
-    window.location.href = 'configure_spin_wheel.php';
+    window.location.href = 'spin-wheel.php';
 }
 
 function disableSpinWheel() {
@@ -1174,7 +1174,7 @@ function enablePizzaTracker() {
 }
 
 function configurePizzaTracker() {
-    window.location.href = 'configure_pizza_tracker.php';
+    window.location.href = 'pizza-tracker.php';
 }
 
 function disablePizzaTracker() {

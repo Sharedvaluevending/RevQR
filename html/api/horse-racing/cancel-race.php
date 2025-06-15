@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../core/config/database.php';
-require_once __DIR__ . '/../../core/includes/auth.php';
+require_once __DIR__ . '/../../core/auth.php';
 
 header('Content-Type: application/json');
 

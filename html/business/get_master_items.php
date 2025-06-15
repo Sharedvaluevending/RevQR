@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 
 try {
     // Get business details
-    $stmt = $pdo->prepare("SELECT b.id FROM businesses b JOIN users u ON b.id = u.business_id WHERE u.id = ?");
+    $stmt = $pdo->prepare("SELECT id FROM businesses WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $business = $stmt->fetch();
     $business_id = $business ? $business['id'] : 0;

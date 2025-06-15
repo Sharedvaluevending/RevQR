@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../core/config.php';
-require_once __DIR__ . '/../core/includes/auth.php';
+require_once __DIR__ . '/../core/auth.php';
 
 // Ensure user is logged in and is a business user
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'business') {

@@ -323,25 +323,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $can_spin) {
                     error_log("Weekly vote limits not implemented for Extra Vote: " . $e->getMessage());
                 }
             } elseif ($selected_reward['name'] === 'Lose All Votes') {
-                // Reset weekly voting allowance (don't delete voting history!)
-                // This removes the user's ability to vote for the current week, but preserves their voting history and stats
-                try {
-                    // Insert or update weekly vote limit to max for current week (blocks further voting)
-                    $current_week = date('Y-W');
-                    $stmt_limit = $pdo->prepare("
-                        INSERT INTO user_weekly_vote_limits (user_id, week_year, votes_used, vote_limit) 
-                        VALUES (?, ?, 999, 2) 
-                        ON DUPLICATE KEY UPDATE votes_used = 999
-                    ");
-                    $stmt_limit->execute([$user_id, $current_week]);
+                // CHECK FOR VOTE PROTECTION FIRST
+                $has_vote_protection = false;
+                
+                // Check if user has QR James (ID 2) or QR Terry (ID 7) equipped - both have vote protection
+                if ($equipped_avatar_id == 2 || $equipped_avatar_id == 7) {
+                    $has_vote_protection = true;
+                }
+                
+                if ($has_vote_protection) {
+                    // PROTECTED! Convert penalty to bonus
+                    $avatar_name = ($equipped_avatar_id == 2) ? "QR James" : "QR Terry";
+                    $message = "🛡️ PROTECTED! Your {$avatar_name} avatar saved you from losing all votes! You get -20 coins instead as compensation!";
+                    $message_type = "success";
                     
-                    $message = "💀 OH NO! You lost your weekly voting privileges! Your voting history is safe, but you can't vote again until next week.";
-                    $message_type = "danger";
-                } catch (Exception $e) {
-                    // Fallback: If weekly limits table doesn't exist, just show message without blocking
-                    $message = "💀 You got the 'Lose All Votes' penalty! Better luck next time.";
-                    $message_type = "warning";
-                    error_log("Weekly vote limits not implemented: " . $e->getMessage());
+                    // Don't reset votes, but still give the -20 coin "prize" as intended
+                    // This maintains the prize structure while providing protection
+                } else {
+                    // NO PROTECTION - Apply full penalty
+                    try {
+                        // Insert or update weekly vote limit to max for current week (blocks further voting)
+                        $current_week = date('Y-W');
+                        $stmt_limit = $pdo->prepare("
+                            INSERT INTO user_weekly_vote_limits (user_id, week_year, votes_used, vote_limit) 
+                            VALUES (?, ?, 999, 2) 
+                            ON DUPLICATE KEY UPDATE votes_used = 999
+                        ");
+                        $stmt_limit->execute([$user_id, $current_week]);
+                        
+                        $message = "💀 OH NO! You lost your weekly voting privileges! Your voting history is safe, but you can't vote again until next week.";
+                        $message_type = "danger";
+                    } catch (Exception $e) {
+                        // Fallback: If weekly limits table doesn't exist, just show message without blocking
+                        $message = "💀 You got the 'Lose All Votes' penalty! Better luck next time.";
+                        $message_type = "warning";
+                        error_log("Weekly vote limits not implemented: " . $e->getMessage());
+                    }
                 }
             } else {
                 if ($is_super_spin) {

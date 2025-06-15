@@ -69,10 +69,27 @@ function addStoreItem($data) {
             100 // Default user base size
         );
         
+        // Handle time-based fields
+        $sale_start_date = !empty($data['sale_start_date']) ? $data['sale_start_date'] : null;
+        $sale_end_date = !empty($data['sale_end_date']) ? $data['sale_end_date'] : null;
+        $is_flash_sale = isset($data['is_flash_sale']) ? (bool)$data['is_flash_sale'] : false;
+        $countdown_display = isset($data['countdown_display']) ? (bool)$data['countdown_display'] : false;
+        $sale_discount_boost = isset($data['sale_discount_boost']) ? (float)$data['sale_discount_boost'] : 0.00;
+        $purchase_expiry_hours = isset($data['purchase_expiry_hours']) ? (int)$data['purchase_expiry_hours'] : 720;
+        $require_use_by_expiry = isset($data['require_use_by_expiry']) ? (bool)$data['require_use_by_expiry'] : false;
+        $auto_expire_purchases = isset($data['auto_expire_purchases']) ? (bool)$data['auto_expire_purchases'] : true;
+        
+        // Validate sale dates
+        if ($sale_start_date && $sale_end_date && strtotime($sale_start_date) >= strtotime($sale_end_date)) {
+            return ['success' => false, 'message' => 'Sale start date must be before end date'];
+        }
+        
         $stmt = $pdo->prepare("
             INSERT INTO business_store_items 
-            (business_id, item_name, item_description, regular_price_cents, discount_percentage, qr_coin_cost, category, max_per_user)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (business_id, item_name, item_description, regular_price_cents, discount_percentage, qr_coin_cost, category, max_per_user,
+             sale_start_date, sale_end_date, is_flash_sale, countdown_display, sale_discount_boost, 
+             purchase_expiry_hours, require_use_by_expiry, auto_expire_purchases)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         $success = $stmt->execute([
@@ -83,7 +100,15 @@ function addStoreItem($data) {
             (float) $data['discount_percentage'],
             $qr_coin_cost['qr_coin_cost'],
             $data['category'],
-            (int) $data['max_per_user']
+            (int) $data['max_per_user'],
+            $sale_start_date,
+            $sale_end_date,
+            $is_flash_sale,
+            $countdown_display,
+            $sale_discount_boost,
+            $purchase_expiry_hours,
+            $require_use_by_expiry,
+            $auto_expire_purchases
         ]);
         
         return [
@@ -221,8 +246,39 @@ try {
     $business_wallet_balance = 0;
 }
 
-// Get store items
-$store_items = StoreManager::getBusinessStoreItems($business_id, false);
+// Get store items with enhanced time features
+try {
+    $stmt = $pdo->prepare("
+        SELECT 
+            id, item_name, item_description, regular_price_cents, discount_percentage, qr_coin_cost, 
+            category, stock_quantity, max_per_user, is_active, valid_from, valid_until,
+            sale_start_date, sale_end_date, is_flash_sale, countdown_display, sale_discount_boost,
+            purchase_expiry_hours, require_use_by_expiry, auto_expire_purchases,
+            CASE 
+                WHEN sale_start_date IS NOT NULL AND sale_end_date IS NOT NULL 
+                     AND NOW() BETWEEN sale_start_date AND sale_end_date 
+                THEN discount_percentage + sale_discount_boost
+                ELSE discount_percentage
+            END as current_discount_percentage,
+            CASE 
+                WHEN sale_end_date IS NOT NULL AND sale_end_date > NOW() 
+                THEN TIMESTAMPDIFF(SECOND, NOW(), sale_end_date)
+                ELSE 0 
+            END as seconds_remaining,
+            CASE
+                WHEN sale_start_date IS NOT NULL AND sale_end_date IS NOT NULL 
+                     AND NOW() BETWEEN sale_start_date AND sale_end_date 
+                THEN 1 ELSE 0
+            END as is_currently_on_sale
+        FROM business_store_items 
+        WHERE business_id = ?
+        ORDER BY is_flash_sale DESC, is_currently_on_sale DESC, qr_coin_cost ASC
+    ");
+    $stmt->execute([$business_id]);
+    $store_items = $stmt->fetchAll();
+} catch (Exception $e) {
+    $store_items = [];
+}
 
 // Get recent sales
 try {
@@ -398,6 +454,119 @@ require_once __DIR__ . '/../core/includes/header.php';
         .list-group-item {
             background: rgba(255, 255, 255, 0.05) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        /* Time-based feature styles */
+        .flash-sale {
+            border: 2px solid #ff6b35 !important;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3) !important;
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+        
+        .on-sale {
+            border-left-color: #28a745 !important;
+            border-left-width: 5px !important;
+        }
+        
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(255, 107, 53, 0.3); }
+            to { box-shadow: 0 0 30px rgba(255, 107, 53, 0.6); }
+        }
+        
+        .flash-sale-banner {
+            text-align: center;
+            animation: flashSaleBanner 1.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes flashSaleBanner {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+        
+        .countdown-timer {
+            text-align: center;
+        }
+        
+        .countdown-display {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .countdown-time {
+            display: inline-block;
+            min-width: 120px;
+        }
+        
+        .sale-period {
+            background: rgba(23, 162, 184, 0.1);
+            border-radius: 4px;
+            padding: 4px 8px;
+        }
+        
+        .discount-info .text-decoration-line-through {
+            font-size: 0.85em;
+        }
+        
+        /* Enhanced form styles for time inputs */
+        .time-feature-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .time-feature-header {
+            color: #64b5f6 !important;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-toggle {
+            margin-bottom: 15px;
+        }
+        
+        .datetime-input {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+        }
+        
+        .datetime-input:focus {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: #64b5f6 !important;
+            box-shadow: 0 0 0 0.25rem rgba(100, 181, 246, 0.25) !important;
+        }
+        
+        /* Countdown timer urgency states */
+        .countdown-timer.urgent .countdown-display {
+            animation: urgentPulse 1s ease-in-out infinite alternate;
+        }
+        
+        .countdown-timer.warning .countdown-display {
+            animation: warningBlink 2s ease-in-out infinite;
+        }
+        
+        .countdown-timer.expired .countdown-display {
+            background: #6c757d !important;
+            color: #ffffff !important;
+        }
+        
+        @keyframes urgentPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+        
+        @keyframes warningBlink {
+            0%, 50% { opacity: 1; }
+            25%, 75% { opacity: 0.7; }
+        }
             color: #ffffff !important;
         }
         
@@ -530,10 +699,33 @@ require_once __DIR__ . '/../core/includes/header.php';
                             <div class="row">
                                 <?php foreach ($store_items as $item): ?>
                                 <div class="col-md-6 mb-3">
-                                    <div class="card store-item-card <?php echo $item['is_active'] ? 'active' : 'inactive'; ?>">
+                                    <div class="card store-item-card <?php echo $item['is_active'] ? 'active' : 'inactive'; ?> <?php echo $item['is_flash_sale'] ? 'flash-sale' : ''; ?> <?php echo $item['is_currently_on_sale'] ? 'on-sale' : ''; ?>">
                                         <div class="card-body">
+                                            <!-- Flash Sale Banner -->
+                                            <?php if ($item['is_flash_sale'] && $item['is_currently_on_sale']): ?>
+                                            <div class="flash-sale-banner mb-2">
+                                                <span class="badge bg-danger">⚡ FLASH SALE</span>
+                                            </div>
+                                            <?php endif; ?>
+                                            
+                                            <!-- Countdown Timer -->
+                                            <?php if ($item['countdown_display'] && $item['seconds_remaining'] > 0): ?>
+                                            <div class="countdown-timer mb-2" data-seconds="<?php echo $item['seconds_remaining']; ?>">
+                                                <div class="d-flex justify-content-center">
+                                                    <div class="countdown-display bg-dark text-white px-2 py-1 rounded">
+                                                        <span class="countdown-time">Loading...</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
+                                            
                                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <h6 class="card-title mb-0"><?php echo htmlspecialchars($item['item_name'] ?? ''); ?></h6>
+                                                <h6 class="card-title mb-0">
+                                                    <?php echo htmlspecialchars($item['item_name'] ?? ''); ?>
+                                                    <?php if ($item['is_currently_on_sale']): ?>
+                                                    <span class="badge bg-success ms-1">ON SALE</span>
+                                                    <?php endif; ?>
+                                                </h6>
                                                 <div class="d-flex align-items-center gap-2">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input" type="checkbox" 
@@ -548,16 +740,44 @@ require_once __DIR__ . '/../core/includes/header.php';
                                                 </div>
                                             </div>
                                             <p class="card-text small text-muted"><?php echo htmlspecialchars($item['item_description'] ?? ''); ?></p>
+                                            
+                                            <!-- Enhanced discount display -->
                                             <div class="row small">
                                                 <div class="col-6">
-                                                    <strong><?php echo $item['discount_percentage']; ?>% Off</strong><br>
+                                                    <?php if ($item['is_currently_on_sale'] && $item['sale_discount_boost'] > 0): ?>
+                                                    <div class="discount-info">
+                                                        <span class="text-decoration-line-through text-muted"><?php echo $item['discount_percentage']; ?>% Off</span><br>
+                                                        <strong class="text-success"><?php echo $item['current_discount_percentage']; ?>% Off</strong>
+                                                        <small class="badge bg-warning text-dark">+<?php echo $item['sale_discount_boost']; ?>% SALE</small>
+                                                    </div>
+                                                    <?php else: ?>
+                                                    <strong><?php echo $item['current_discount_percentage']; ?>% Off</strong><br>
+                                                    <?php endif; ?>
                                                     <span class="text-muted">$<?php echo number_format($item['regular_price_cents'] / 100, 2); ?> items</span>
                                                 </div>
                                                 <div class="col-6 text-end">
                                                     <span class="badge qr-coin-badge"><?php echo number_format($item['qr_coin_cost']); ?> QR Coins</span><br>
                                                     <small class="text-muted">Max: <?php echo $item['max_per_user']; ?> per user</small>
+                                                    
+                                                    <!-- Expiry info -->
+                                                    <?php if ($item['require_use_by_expiry']): ?>
+                                                    <small class="d-block text-warning">
+                                                        <i class="bi bi-clock"></i> Use within <?php echo floor($item['purchase_expiry_hours'] / 24); ?> days
+                                                    </small>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Sale period info -->
+                                            <?php if ($item['sale_start_date'] && $item['sale_end_date']): ?>
+                                            <div class="sale-period mt-2 pt-2 border-top">
+                                                <small class="text-info">
+                                                    <i class="bi bi-calendar-event"></i>
+                                                    Sale: <?php echo date('M j, g:i A', strtotime($item['sale_start_date'])); ?> - 
+                                                    <?php echo date('M j, g:i A', strtotime($item['sale_end_date'])); ?>
+                                                </small>
+                                            </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -677,6 +897,100 @@ require_once __DIR__ . '/../core/includes/header.php';
                                 </div>
                             </div>
                         </div>
+                        <!-- Time-Based Features -->
+                        <div class="time-feature-section">
+                            <div class="time-feature-header">
+                                <i class="bi bi-clock-history"></i>
+                                <span>Time-Based Features (Optional)</span>
+                            </div>
+                            
+                            <!-- Flash Sale Settings -->
+                            <div class="feature-toggle">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="isFlashSale" name="is_flash_sale">
+                                    <label class="form-check-label" for="isFlashSale">
+                                        <strong>Flash Sale</strong> - Creates urgency with special styling
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Countdown Display -->
+                            <div class="feature-toggle">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="countdownDisplay" name="countdown_display">
+                                    <label class="form-check-label" for="countdownDisplay">
+                                        <strong>Show Countdown Timer</strong> - Display time remaining
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Sale Period -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="saleStartDate" class="form-label">Sale Start Date & Time</label>
+                                        <input type="datetime-local" class="form-control datetime-input" id="saleStartDate" name="sale_start_date">
+                                        <small class="text-muted">Leave empty for no specific start time</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="saleEndDate" class="form-label">Sale End Date & Time</label>
+                                        <input type="datetime-local" class="form-control datetime-input" id="saleEndDate" name="sale_end_date">
+                                        <small class="text-muted">Leave empty for no expiration</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sale Discount Boost -->
+                            <div class="mb-3">
+                                <label for="saleDiscountBoost" class="form-label">Additional Sale Discount (%)</label>
+                                <input type="number" class="form-control" id="saleDiscountBoost" name="sale_discount_boost" 
+                                       min="0" max="20" step="0.1" value="0">
+                                <small class="text-muted">Extra discount during sale period (added to base discount)</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Purchase Expiration Settings -->
+                        <div class="time-feature-section">
+                            <div class="time-feature-header">
+                                <i class="bi bi-hourglass-split"></i>
+                                <span>Purchase Expiration (Optional)</span>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="purchaseExpiryHours" class="form-label">Expires After (Hours)</label>
+                                        <input type="number" class="form-control" id="purchaseExpiryHours" name="purchase_expiry_hours" 
+                                               min="1" max="8760" value="720">
+                                        <small class="text-muted">Hours until purchase expires (720 = 30 days)</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="feature-toggle mt-4">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="requireUseByExpiry" name="require_use_by_expiry">
+                                            <label class="form-check-label" for="requireUseByExpiry">
+                                                <strong>Must Use or Expires</strong>
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">Purchase becomes invalid if not used within time limit</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-toggle">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="autoExpirePurchases" name="auto_expire_purchases" checked>
+                                    <label class="form-check-label" for="autoExpirePurchases">
+                                        <strong>Auto-Expire Old Purchases</strong>
+                                    </label>
+                                </div>
+                                <small class="text-muted">System automatically expires purchases past their deadline</small>
+                            </div>
+                        </div>
+
                         <!-- Real-time QR Cost Calculator -->
                         <div class="alert alert-info" id="qrCostCalculator">
                             <div class="row align-items-center">
@@ -895,6 +1209,141 @@ This ensures fair pricing based on demand and scarcity factors.`;
         document.getElementById('addItemModal').addEventListener('shown.bs.modal', function() {
             calculateQRCost();
         });
+        
+        // Countdown Timer Functionality
+        function initCountdownTimers() {
+            const countdownElements = document.querySelectorAll('.countdown-timer');
+            
+            countdownElements.forEach(element => {
+                const seconds = parseInt(element.dataset.seconds);
+                if (seconds > 0) {
+                    startCountdown(element, seconds);
+                }
+            });
+        }
+        
+        function startCountdown(element, totalSeconds) {
+            const countdownDisplay = element.querySelector('.countdown-time');
+            let remainingSeconds = totalSeconds;
+            
+            function updateDisplay() {
+                if (remainingSeconds <= 0) {
+                    countdownDisplay.textContent = 'EXPIRED';
+                    element.classList.add('expired');
+                    return;
+                }
+                
+                const days = Math.floor(remainingSeconds / (24 * 3600));
+                const hours = Math.floor((remainingSeconds % (24 * 3600)) / 3600);
+                const minutes = Math.floor((remainingSeconds % 3600) / 60);
+                const seconds = remainingSeconds % 60;
+                
+                let displayText = '';
+                if (days > 0) {
+                    displayText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                } else if (hours > 0) {
+                    displayText = `${hours}h ${minutes}m ${seconds}s`;
+                } else if (minutes > 0) {
+                    displayText = `${minutes}m ${seconds}s`;
+                } else {
+                    displayText = `${seconds}s`;
+                }
+                
+                countdownDisplay.textContent = displayText;
+                
+                // Add urgency styling when time is low
+                if (remainingSeconds <= 3600) { // Less than 1 hour
+                    element.classList.add('urgent');
+                    countdownDisplay.parentElement.classList.remove('bg-dark');
+                    countdownDisplay.parentElement.classList.add('bg-danger');
+                } else if (remainingSeconds <= 86400) { // Less than 1 day
+                    element.classList.add('warning');
+                    countdownDisplay.parentElement.classList.remove('bg-dark');
+                    countdownDisplay.parentElement.classList.add('bg-warning', 'text-dark');
+                }
+                
+                remainingSeconds--;
+            }
+            
+            updateDisplay(); // Initial update
+            setInterval(updateDisplay, 1000); // Update every second
+        }
+        
+        // Enhanced Form Validation and Interaction
+        document.getElementById('saleStartDate').addEventListener('change', function() {
+            const startDate = this.value;
+            const endDateInput = document.getElementById('saleEndDate');
+            
+            if (startDate) {
+                // Set minimum end date to start date
+                endDateInput.min = startDate;
+                
+                // If no end date set, suggest one hour later
+                if (!endDateInput.value) {
+                    const startDateTime = new Date(startDate);
+                    startDateTime.setHours(startDateTime.getHours() + 1);
+                    endDateInput.value = startDateTime.toISOString().slice(0, 16);
+                }
+                
+                // Auto-enable countdown display for timed sales
+                document.getElementById('countdownDisplay').checked = true;
+            }
+        });
+        
+        document.getElementById('saleEndDate').addEventListener('change', function() {
+            const endDate = this.value;
+            const startDateInput = document.getElementById('saleStartDate');
+            
+            if (endDate) {
+                // Set maximum start date to end date
+                startDateInput.max = endDate;
+                
+                // If no start date set, suggest current time
+                if (!startDateInput.value) {
+                    const now = new Date();
+                    startDateInput.value = now.toISOString().slice(0, 16);
+                }
+            }
+        });
+        
+        // Auto-enable flash sale when countdown is enabled
+        document.getElementById('countdownDisplay').addEventListener('change', function() {
+            if (this.checked && !document.getElementById('isFlashSale').checked) {
+                document.getElementById('isFlashSale').checked = true;
+            }
+        });
+        
+        // Form interaction helpers
+        document.getElementById('isFlashSale').addEventListener('change', function() {
+            if (this.checked) {
+                // Suggest enabling countdown for flash sales
+                if (!document.getElementById('countdownDisplay').checked) {
+                    if (confirm('Enable countdown timer for this flash sale?')) {
+                        document.getElementById('countdownDisplay').checked = true;
+                    }
+                }
+                
+                // Suggest a sale boost
+                const boostInput = document.getElementById('saleDiscountBoost');
+                if (parseFloat(boostInput.value) === 0) {
+                    boostInput.value = '5.0';
+                    boostInput.focus();
+                }
+            }
+        });
+        
+        // Refresh countdown timers every page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initCountdownTimers();
+        });
+        
+        // Refresh timers every 30 seconds to keep them in sync
+        setInterval(function() {
+            // Only refresh if there are active countdowns
+            if (document.querySelectorAll('.countdown-timer:not(.expired)').length > 0) {
+                location.reload();
+            }
+        }, 30000);
     </script>
 
 <?php require_once __DIR__ . '/../core/includes/footer.php'; ?> 

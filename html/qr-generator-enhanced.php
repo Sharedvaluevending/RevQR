@@ -2046,6 +2046,124 @@ class EnhancedQRGenerator {
     }
 }
 
+// Logo upload functionality
+document.addEventListener('DOMContentLoaded', () => {
+    // Logo upload handling
+    const uploadLogoBtn = document.getElementById('uploadLogoBtn');
+    const logoUpload = document.getElementById('logoUpload');
+    const deleteLogoBtn = document.getElementById('deleteLogoBtn');
+    const logoSelect = document.getElementById('logoSelect');
+    const logoPreview = document.getElementById('logoPreview');
+
+    // Load existing logos on page load
+    if (logoSelect) {
+        fetch('/api/qr/logo.php', {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.logos) {
+                data.data.logos.forEach(logo => {
+                    const option = document.createElement('option');
+                    option.value = logo.filename;
+                    option.textContent = logo.filename;
+                    logoSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading logos:', error);
+        });
+    }
+
+    if (uploadLogoBtn && logoUpload) {
+        uploadLogoBtn.addEventListener('click', () => {
+            const file = logoUpload.files[0];
+            if (!file) {
+                alert('Please select a logo file first');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('logo', file);
+
+            fetch('/api/qr/logo.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Add to select dropdown
+                    const option = document.createElement('option');
+                    option.value = data.filename;
+                    option.textContent = data.filename;
+                    logoSelect.appendChild(option);
+                    logoSelect.value = data.filename;
+                    
+                    // Show preview
+                    logoPreview.querySelector('img').src = data.url;
+                    logoPreview.style.display = 'block';
+                    deleteLogoBtn.style.display = 'inline-block';
+                    
+                    alert('Logo uploaded successfully!');
+                } else {
+                    alert('Upload failed: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Upload error:', error);
+                alert('Upload failed: ' + error.message);
+            });
+        });
+    }
+
+    if (deleteLogoBtn && logoSelect) {
+        deleteLogoBtn.addEventListener('click', () => {
+            const selectedOption = logoSelect.options[logoSelect.selectedIndex];
+            
+            if (selectedOption && selectedOption.value) {
+                fetch('/api/qr/logo.php', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ filename: selectedOption.value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        selectedOption.remove();
+                        logoPreview.style.display = 'none';
+                        deleteLogoBtn.style.display = 'none';
+                        logoSelect.value = '';
+                        alert('Logo deleted successfully!');
+                    } else {
+                        alert('Delete failed: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Delete error:', error);
+                    alert('Delete failed: ' + error.message);
+                });
+            }
+        });
+    }
+
+    if (logoSelect) {
+        logoSelect.addEventListener('change', (e) => {
+            if (e.target.value) {
+                logoPreview.querySelector('img').src = '/assets/img/logos/' + e.target.value;
+                logoPreview.style.display = 'block';
+                deleteLogoBtn.style.display = 'inline-block';
+            } else {
+                logoPreview.style.display = 'none';
+                deleteLogoBtn.style.display = 'none';
+            }
+        });
+    }
+});
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing Enhanced QR Generator...');

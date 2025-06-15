@@ -130,6 +130,11 @@ try {
         'preview' => true
     ];
     
+    // Add logo if specified
+    if (!empty($data['logo'])) {
+        $options['logo'] = $data['logo'];
+    }
+    
     // Add enhanced background gradient
     if (!empty($data['enable_background_gradient'])) {
         $options['enable_background_gradient'] = true;

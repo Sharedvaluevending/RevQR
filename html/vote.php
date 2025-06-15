@@ -3,12 +3,24 @@ require_once __DIR__ . '/core/config.php';
 require_once __DIR__ . '/core/session.php';
 require_once __DIR__ . '/core/functions.php';
 require_once __DIR__ . '/core/auto_login.php';
+require_once __DIR__ . '/core/qr_coin_manager.php';
 // VotingService disabled - using simple 2 votes per week system
 // require_once __DIR__ . '/core/services/VotingService.php';
 
 // Simple weekly vote limit system (2 votes per week)
 $user_id = $_SESSION['user_id'] ?? null;
 $voter_ip = $_SERVER['REMOTE_ADDR'];
+
+// Get user's QR balance if logged in
+$user_qr_balance = 0;
+if ($user_id) {
+    try {
+        $user_qr_balance = QRCoinManager::getBalance($user_id);
+    } catch (Exception $e) {
+        error_log("Error getting QR balance: " . $e->getMessage());
+        $user_qr_balance = 0;
+    }
+}
 
 // Get user's weekly vote count
 $weekly_votes_used = 0;
@@ -43,7 +55,8 @@ $votes_remaining = max(0, $weekly_vote_limit - $weekly_votes_used);
 $vote_status = [
     'votes_used' => $weekly_votes_used,
     'votes_remaining' => $votes_remaining,
-    'weekly_limit' => $weekly_vote_limit
+    'weekly_limit' => $weekly_vote_limit,
+    'qr_balance' => $user_qr_balance
 ];
 
 $message = '';
@@ -470,8 +483,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vote'])) {
                     
                     // Award QR coins for voting (30 coins per vote)
                     if ($user_id) {
-                        require_once __DIR__ . '/core/qr_coin_manager.php';
                         QRCoinManager::addTransaction($user_id, 30, 'Vote cast for item', 'vote');
+                        // Update user's QR balance after transaction
+                        try {
+                            $user_qr_balance = QRCoinManager::getBalance($user_id);
+                        } catch (Exception $e) {
+                            error_log("Error updating QR balance after vote: " . $e->getMessage());
+                        }
                     }
                     
                     $message = "Vote successfully recorded! You earned 30 QR coins.";
@@ -483,7 +501,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vote'])) {
                     $vote_status = [
                         'votes_used' => $weekly_votes_used,
                         'votes_remaining' => $votes_remaining,
-                        'weekly_limit' => $weekly_vote_limit
+                        'weekly_limit' => $weekly_vote_limit,
+                        'qr_balance' => $user_qr_balance
                     ];
             
                     // Refresh items list with updated counts
@@ -535,37 +554,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vote'])) {
     }
 }
 
-// Handle spin wheel action
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['spin_wheel']) && $spin_wheel) {
-    // Select a random reward based on rarity
-    if (!empty($spin_rewards)) {
-        $weighted_rewards = [];
-        foreach ($spin_rewards as $reward) {
-            $weight = 11 - $reward['rarity_level']; // Higher rarity = lower weight
-            for ($i = 0; $i < $weight; $i++) {
-                $weighted_rewards[] = $reward;
-            }
-        }
-        
-        if (!empty($weighted_rewards)) {
-            $selected_reward = $weighted_rewards[array_rand($weighted_rewards)];
-            
-            // Log the spin result
-            try {
-                $stmt = $pdo->prepare("INSERT INTO spin_results (spin_wheel_id, reward_id, user_ip, created_at) VALUES (?, ?, ?, NOW())");
-                $stmt->execute([$spin_wheel['id'], $selected_reward['id'], $_SERVER['REMOTE_ADDR']]);
-            } catch (Exception $e) {
-                // Log error but don't break the experience
-            }
-            
-            $message = "🎉 Congratulations! You won: " . $selected_reward['name'];
-            if ($selected_reward['description']) {
-                $message .= " - " . $selected_reward['description'];
-            }
-            $message_type = "success";
-        }
-    }
-}
+// Spin wheel processing removed - users are now redirected to interactive spin wheel page
 
 // Add error messages for debugging
 if (!$qr_data && isset($_GET['code'])) {
@@ -647,24 +636,27 @@ foreach ($promotional_ads as $ad) {
         margin: 0 auto;
     }
 
-    /* Rotating ads styling */
-    .rotating-ads {
-        margin-bottom: 2rem;
-    }
-
+    /* Compact feature row styling */
     .ad-card {
         border: none !important;
         border-radius: 12px !important;
         overflow: hidden;
-        height: 120px;
+        min-height: 180px;
         position: relative;
     }
 
     .ad-card .card-body {
-        padding: 1rem;
         height: 100%;
         display: flex;
         align-items: center;
+        justify-content: center;
+    }
+
+    /* Responsive adjustments for compact layout */
+    @media (max-width: 992px) {
+        .ad-card {
+            min-height: 160px;
+        }
     }
 
     /* Vote status panel icons styling */
@@ -895,129 +887,116 @@ foreach ($promotional_ads as $ad) {
         </div>
         <?php endif; ?>
 
-    <!-- Business Promotional Ads -->
-    <?php if (!empty($promotional_ads)): ?>
-    <div class="rotating-ads">
-        <div class="row g-3">
-            <?php foreach ($promotional_ads as $ad): ?>
-            <div class="col-md-6">
-                <div class="ad-card card" 
+    <!-- Combined Feature Row: Ads, Spin Wheel, Pizza Tracker -->
+    <div class="row g-3 mb-4">
+        <!-- Business Promotional Ads -->
+        <?php if (!empty($promotional_ads)): ?>
+            <?php foreach ($promotional_ads as $index => $ad): ?>
+            <div class="col-lg-3 col-md-6">
+                <div class="ad-card card h-100" 
                      style="background: linear-gradient(135deg, <?php echo $ad['background_color']; ?> 0%, <?php echo $ad['background_color']; ?>dd 100%); color: <?php echo $ad['text_color']; ?>;">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
+                    <div class="card-body p-3">
+                        <div class="text-center">
                             <?php if ($ad['business_logo']): ?>
                                 <img src="<?php echo APP_URL . '/' . htmlspecialchars($ad['business_logo']); ?>" 
                                      alt="<?php echo htmlspecialchars($ad['business_name']); ?>" 
-                                     class="rounded me-3" 
-                                     style="width: 50px; height: 50px; object-fit: contain; background: white; padding: 5px;">
+                                     class="rounded mb-2" 
+                                     style="width: 40px; height: 40px; object-fit: contain; background: white; padding: 3px;">
                             <?php else: ?>
-                                <div class="rounded me-3 d-flex align-items-center justify-content-center text-white" 
-                                     style="width: 50px; height: 50px; background: rgba(255,255,255,0.2);">
-                                    <i class="bi bi-building fs-4"></i>
+                                <div class="rounded mb-2 mx-auto d-flex align-items-center justify-content-center text-white" 
+                                     style="width: 40px; height: 40px; background: rgba(255,255,255,0.2);">
+                                    <i class="bi bi-building"></i>
                                 </div>
                             <?php endif; ?>
                             
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1" style="color: <?php echo $ad['text_color']; ?>;">
-                                    <?php echo htmlspecialchars($ad['ad_title']); ?>
-                                </h6>
-                                <p class="small mb-2 opacity-75" style="color: <?php echo $ad['text_color']; ?>;">
-                                    <?php echo htmlspecialchars($ad['ad_description']); ?>
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="opacity-50" style="color: <?php echo $ad['text_color']; ?>;">
-                                        <?php echo htmlspecialchars($ad['business_name']); ?>
-                                    </small>
-                                    <?php if ($ad['ad_cta_text'] && $ad['ad_cta_url']): ?>
-                                        <a href="<?php echo htmlspecialchars($ad['ad_cta_url']); ?>" 
-                                           class="btn btn-sm btn-light" 
-                                           target="_blank"
-                                           onclick="trackAdClick(<?php echo $ad['id']; ?>)">
-                                            <?php echo htmlspecialchars($ad['ad_cta_text']); ?>
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
+                            <h6 class="mb-1 small" style="color: <?php echo $ad['text_color']; ?>;">
+                                <?php echo htmlspecialchars($ad['ad_title']); ?>
+                            </h6>
+                            <p class="small mb-2 opacity-75" style="color: <?php echo $ad['text_color']; ?>; font-size: 0.75rem;">
+                                <?php echo htmlspecialchars($ad['ad_description']); ?>
+                            </p>
+                            <small class="opacity-50 d-block mb-2" style="color: <?php echo $ad['text_color']; ?>;">
+                                <?php echo htmlspecialchars($ad['business_name']); ?>
+                            </small>
+                            <?php if ($ad['ad_cta_text'] && $ad['ad_cta_url']): ?>
+                                <a href="<?php echo htmlspecialchars($ad['ad_cta_url']); ?>" 
+                                   class="btn btn-sm btn-light" 
+                                   target="_blank"
+                                   onclick="trackAdClick(<?php echo $ad['id']; ?>)">
+                                    <?php echo htmlspecialchars($ad['ad_cta_text']); ?>
+                                </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
             <?php endforeach; ?>
-        </div>
-    </div>
-    <?php endif; ?>
+        <?php endif; ?>
 
-    <!-- Spin Wheel -->
-    <?php if ($spin_wheel && !empty($spin_rewards)): ?>
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card bg-gradient-warning text-dark">
-                <div class="card-header border-0">
-                    <h5 class="mb-0 text-center">
-                        <i class="bi bi-arrow-clockwise me-2"></i>Spin the Wheel
-                    </h5>
-                </div>
-                <div class="card-body text-center">
-                    <p class="mb-3">Vote to earn spins and win amazing rewards!</p>
-                    <form method="post" class="d-inline">
-                        <button type="submit" name="spin_wheel" class="btn btn-dark btn-lg">
-                            <i class="bi bi-arrow-clockwise me-2"></i>Spin Now!
-                        </button>
-                    </form>
-                    <div class="mt-3">
-                        <small class="text-muted">Available rewards: 
+        <!-- Spin Wheel -->
+        <?php if ($spin_wheel && !empty($spin_rewards)): ?>
+        <div class="col-lg-3 col-md-6">
+            <div class="card bg-gradient-warning text-dark h-100">
+                <div class="card-body p-3 text-center">
+                    <h6 class="mb-2">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Spin the Wheel
+                    </h6>
+                    <p class="small mb-2">Vote to earn spins and win amazing rewards!</p>
+                    <a href="<?php echo APP_URL; ?>/public/spin-wheel.php?wheel_id=<?php echo $spin_wheel['id']; ?>" class="btn btn-dark btn-sm mb-2">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Spin Now!
+                    </a>
+                    <div class="mt-2">
+                        <small class="text-muted" style="font-size: 0.7rem;">Available rewards: 
                             <?php echo implode(', ', array_column($spin_rewards, 'name')); ?>
                         </small>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <?php endif; ?>
+        <?php endif; ?>
 
-    <!-- Pizza Tracker -->
-    <?php if ($pizza_tracker): ?>
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card bg-gradient-success text-white">
-                    <div class="card-body text-center">
-                        <h6 class="text-white mb-2">🍕 Pizza Tracker</h6>
-                        <p class="small mb-3">
-                            <strong><?php echo htmlspecialchars($pizza_tracker['name']); ?></strong><br>
-                            <?php echo $pizza_tracker['progress_percent']; ?>% Complete - 
-                            $<?php echo number_format($pizza_tracker['current_revenue'], 2); ?> / $<?php echo number_format($pizza_tracker['revenue_goal'], 2); ?>
-                        </p>
-                        <div class="progress mb-3" style="height: 20px;">
-                            <div class="progress-bar bg-warning" role="progressbar" 
-                                 style="width: <?php echo $pizza_tracker['progress_percent']; ?>%;" 
-                                 aria-valuenow="<?php echo $pizza_tracker['progress_percent']; ?>" 
-                                 aria-valuemin="0" aria-valuemax="100">
-                                <?php echo $pizza_tracker['progress_percent']; ?>%
-                            </div>
+        <!-- Pizza Tracker -->
+        <?php if ($pizza_tracker): ?>
+        <div class="col-lg-3 col-md-6">
+            <div class="card bg-gradient-success text-white h-100">
+                <div class="card-body p-3 text-center">
+                    <h6 class="text-white mb-2">🍕 Pizza Tracker</h6>
+                    <p class="small mb-2">
+                        <strong><?php echo htmlspecialchars($pizza_tracker['name']); ?></strong><br>
+                        <?php echo $pizza_tracker['progress_percent']; ?>% Complete
+                    </p>
+                    <div class="progress mb-2" style="height: 15px;">
+                        <div class="progress-bar bg-warning" role="progressbar" 
+                             style="width: <?php echo $pizza_tracker['progress_percent']; ?>%;" 
+                             aria-valuenow="<?php echo $pizza_tracker['progress_percent']; ?>" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            <?php echo $pizza_tracker['progress_percent']; ?>%
                         </div>
-                        <a href="<?php echo APP_URL; ?>/public/pizza-tracker.php?tracker_id=<?php echo $pizza_tracker['id']; ?>&source=voting" 
-                           class="btn btn-info btn-sm">
-                            <i class="bi bi-pizza me-1"></i>View Pizza Progress
-                        </a>
                     </div>
+                    <small class="d-block mb-2">
+                        $<?php echo number_format($pizza_tracker['current_revenue'], 2); ?> / $<?php echo number_format($pizza_tracker['revenue_goal'], 2); ?>
+                    </small>
+                    <a href="<?php echo APP_URL; ?>/public/pizza-tracker.php?tracker_id=<?php echo $pizza_tracker['id']; ?>&source=voting" 
+                       class="btn btn-info btn-sm">
+                        <i class="bi bi-pizza me-1"></i>View Pizza Progress
+                    </a>
                 </div>
             </div>
         </div>
-    <?php else: ?>
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card bg-gradient-success text-white">
-                    <div class="card-body text-center">
-                        <h6 class="text-white mb-2">🍕 Pizza Tracker</h6>
-                        <p class="small mb-3">Track your pizza order in real-time</p>
-                        <a href="<?php echo APP_URL; ?>/public/pizza-tracker.php" class="btn btn-info btn-sm">
-                            <i class="bi bi-geo-alt me-1"></i>Track Order
-                        </a>
-                    </div>
+        <?php else: ?>
+        <div class="col-lg-3 col-md-6">
+            <div class="card bg-gradient-success text-white h-100">
+                <div class="card-body p-3 text-center">
+                    <h6 class="text-white mb-2">🍕 Pizza Tracker</h6>
+                    <p class="small mb-3">Track your pizza order in real-time</p>
+                    <a href="<?php echo APP_URL; ?>/public/pizza-tracker.php" class="btn btn-info btn-sm">
+                        <i class="bi bi-geo-alt me-1"></i>Track Order
+                    </a>
                 </div>
             </div>
         </div>
-    <?php endif; ?>
+        <?php endif; ?>
+    </div>
 
     <?php if ($qr_data || $campaign): ?>
         <!-- Quick Vote Status Alert -->
