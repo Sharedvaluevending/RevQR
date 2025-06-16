@@ -610,12 +610,17 @@ function toggleQRSelection(element) {
         
         if (checkbox.checked) {
             element.classList.add('selected');
-            selectedQRs.push(checkbox.value);
+            if (!selectedQRs.includes(checkbox.value)) {
+                selectedQRs.push(checkbox.value);
+            }
         } else {
             element.classList.remove('selected');
             selectedQRs = selectedQRs.filter(id => id !== checkbox.value);
         }
     }
+    
+    // Reset to page 0 when selection changes
+    currentPage = 0;
     
     updateStats();
     updateFillPageButton();
@@ -678,7 +683,11 @@ function selectTemplate(element) {
         customOptions.style.display = 'none';
     }
     
+    // Reset to page 0 when template changes
+    currentPage = 0;
+    
     updateStats();
+    updateFillPageButton(); // Update fill button with new template info
     updatePreview();
 }
 
@@ -778,9 +787,7 @@ function generateSheetPreview(sheetIndex, config, qrSize, labelPadding, includeT
             <div style="display: grid; grid-template-columns: repeat(${config.cols}, 1fr); grid-template-rows: repeat(${config.rows}, 1fr); gap: 2px; height: calc(100% - ${includeDate ? '30px' : '10px'}); max-height: 10in;">
     `;
     
-    // Only fill the actual labels needed, not all possible slots
-    const labelsOnThisSheet = Math.min(config.labelsPerSheet, selectedQRs.length - startIndex);
-    
+    // Fill all labels on the sheet, including empty ones
     for (let i = 0; i < config.labelsPerSheet; i++) {
         const qrIndex = startIndex + i;
         const hasQR = qrIndex < selectedQRs.length;
@@ -790,38 +797,72 @@ function generateSheetPreview(sheetIndex, config, qrSize, labelPadding, includeT
             const qrId = selectedQRs[qrIndex];
             const qrCode = getQRCodeById(qrId);
             
-            // Calculate QR size based on label dimensions and padding
-            let qrSizePercent = '70%'; // Default auto fit
+            // Enhanced QR size calculation
+            let qrSizePercent = '70%'; // Default
+            let maxHeight = '90%';
+            
             if (qrSize === 'auto') {
-                // Calculate optimal size based on label content
-                const availableSpace = includeText ? '75%' : '85%';
-                qrSizePercent = availableSpace;
-            } else if (qrSize === 'small') qrSizePercent = '50%';
-            else if (qrSize === 'medium') qrSizePercent = '70%';
-            else if (qrSize === 'large') qrSizePercent = '85%';
-            else if (qrSize === 'fill') qrSizePercent = '90%';
+                // Auto-calculate optimal size based on label content
+                qrSizePercent = includeText ? '65%' : '85%';
+                maxHeight = includeText ? '65%' : '85%';
+            } else if (qrSize === 'small') {
+                qrSizePercent = '45%';
+                maxHeight = '45%';
+            } else if (qrSize === 'medium') {
+                qrSizePercent = '65%';
+                maxHeight = '65%';
+            } else if (qrSize === 'large') {
+                qrSizePercent = '80%';
+                maxHeight = '80%';
+            } else if (qrSize === 'fill') {
+                qrSizePercent = '90%';
+                maxHeight = includeText ? '75%' : '90%';
+            }
+            
+            // Enhanced text size calculation
+            const fontSize = Math.max(6, Math.min(12, parseInt(labelPadding) + 1));
+            
+            // Calculate padding for text spacing
+            const textPadding = 4; // px padding from edges
+            const textHeight = fontSize + (textPadding * 2); // text height + top/bottom padding
             
             labelContent = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%;">
-                    <img src="${qrCode.imagePath}" 
-                         style="width: ${qrSizePercent}; height: auto; max-height: ${includeText ? '70%' : '90%'}; object-fit: contain;" 
-                         alt="QR Code"
-                         onerror="this.src='/uploads/qr/${qrCode.code}.png'; this.onerror=null;">
-                    ${includeText ? `<div style="font-size: ${Math.max(6, Math.min(10, parseInt(labelPadding) - 2))}px; margin-top: 2px; word-break: break-all; text-align: center; flex-shrink: 0;">${qrCode.code}</div>` : ''}
+                <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; padding: ${textPadding}px;">
+                    <div style="display: flex; align-items: center; justify-content: center; width: 100%; ${includeText ? `height: calc(100% - ${textHeight}px);` : 'height: 100%;'}">
+                        <img src="${qrCode.imagePath}" 
+                             style="width: ${qrSizePercent}; height: auto; max-height: ${maxHeight}; max-width: 100%; object-fit: contain;" 
+                             alt="QR Code ${qrCode.code}"
+                             onerror="this.src='/uploads/qr/${qrCode.code}.png'; if(this.src.includes('/uploads/qr/') && this.onerror) { this.src='/uploads/qr/1/${qrCode.code}.png'; this.onerror=null; }">
+                    </div>
+                    ${includeText ? `
+                        <div style="position: absolute; bottom: ${textPadding}px; left: 50%; transform: translateX(-50%); font-size: ${fontSize}px; font-weight: 500; color: #333; text-align: center; word-break: break-word; hyphens: auto; line-height: 1.1; max-width: calc(100% - ${textPadding * 2}px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${qrCode.code}
+                        </div>
+                    ` : ''}
                 </div>
             `;
         }
         
+        // Enhanced label styling with better visual feedback
+        const borderStyle = includeBorder ? 'border: 1px solid #333;' : 'border: 1px dashed #ccc;';
+        const backgroundColor = hasQR ? 'background: white;' : 'background: #f8f9fa;';
+        const labelHeight = config.labelHeight ? `${config.labelHeight * 72}px` : 'auto';
+        
         sheetHTML += `
             <div class="qr-label" style="
                 padding: ${labelPadding}px;
-                ${includeBorder ? 'border: 1px solid #000;' : 'border: 1px dashed #ccc;'}
-                ${hasQR ? 'background: white;' : 'background: #f8f9fa;'}
+                ${borderStyle}
+                ${backgroundColor}
                 box-sizing: border-box;
-                min-height: ${config.labelHeight * 72}px;
+                min-height: ${labelHeight};
                 position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                ${!hasQR ? 'opacity: 0.3;' : ''}
             ">
                 ${labelContent}
+                ${!hasQR ? '<div style="color: #999; font-size: 10px; text-align: center;">Empty</div>' : ''}
             </div>
         `;
     }
@@ -837,21 +878,56 @@ function generateSheetPreview(sheetIndex, config, qrSize, labelPadding, includeT
 async function fetchQRCodeData() {
     if (selectedQRs.length === 0) return;
     
-    // Check if we need to fetch data
-    const needsFetch = selectedQRs.some(id => !qrCodeData[id]);
-    if (!needsFetch) return;
+    // Get unique QR IDs that need fetching
+    const uniqueIds = [...new Set(selectedQRs)];
+    const needsFetch = uniqueIds.filter(id => !qrCodeData[id]);
+    
+    if (needsFetch.length === 0) return;
     
     try {
-        const response = await fetch(`/api/qr/get-qr-data.php?ids=${selectedQRs.join(',')}`);
+        const response = await fetch(`/api/qr/get-qr-data.php?ids=${needsFetch.join(',')}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const result = await response.json();
         
-        if (result.success) {
+        if (result.success && result.data) {
             result.data.forEach(qr => {
-                qrCodeData[qr.id] = qr;
+                qrCodeData[qr.id] = {
+                    id: qr.id,
+                    code: qr.code,
+                    qr_type: qr.qr_type,
+                    machine_name: qr.machine_name,
+                    machine_location: qr.machine_location,
+                    url: qr.url,
+                    image_path: qr.image_path,
+                    status: qr.status,
+                    created_at: qr.created_at
+                };
             });
+        } else {
+            console.warn('Failed to fetch QR code data:', result.error || 'Unknown error');
         }
     } catch (error) {
         console.error('Error fetching QR code data:', error);
+        
+        // Fallback: populate basic data from DOM for missing QR codes
+        needsFetch.forEach(id => {
+            if (!qrCodeData[id]) {
+                const qrItem = document.querySelector(`[data-qr-id="${id}"]`);
+                if (qrItem) {
+                    const label = qrItem.querySelector('label strong');
+                    const code = label ? label.textContent : `QR-${id}`;
+                    qrCodeData[id] = {
+                        id: id,
+                        code: code,
+                        image_path: `/uploads/qr/${code}.png`
+                    };
+                }
+            }
+        });
     }
 }
 
@@ -861,7 +937,10 @@ function getQRCodeById(id) {
         return {
             id: id,
             code: qrCodeData[id].code,
-            imagePath: qrCodeData[id].image_path
+            imagePath: qrCodeData[id].image_path,
+            qrType: qrCodeData[id].qr_type,
+            machineName: qrCodeData[id].machine_name,
+            url: qrCodeData[id].url
         };
     }
     
@@ -870,18 +949,36 @@ function getQRCodeById(id) {
     for (let item of qrItems) {
         if (item.dataset.qrId === id) {
             const label = item.querySelector('label strong');
-            const code = label.textContent;
+            const code = label ? label.textContent : `QR-${id}`;
+            
+            // Try multiple image paths
+            const possiblePaths = [
+                `/uploads/qr/${code}.png`,
+                `/uploads/qr/1/${code}.png`,
+                `/uploads/qr/business/${code}.png`,
+                `/assets/img/qr/${code}.png`,
+                `/qr/${code}.png`
+            ];
+            
             return {
                 id: id,
                 code: code,
-                imagePath: `/uploads/qr/${code}.png`
+                imagePath: possiblePaths[0], // Use first as default
+                possiblePaths: possiblePaths
             };
         }
     }
+    
+    // Final fallback
     return { 
         id: id, 
         code: `QR-${id}`,
-        imagePath: `/uploads/qr/QR-${id}.png`
+        imagePath: `/uploads/qr/QR-${id}.png`,
+        possiblePaths: [
+            `/uploads/qr/QR-${id}.png`,
+            `/uploads/qr/1/QR-${id}.png`,
+            `/uploads/qr/business/QR-${id}.png`
+        ]
     };
 }
 
@@ -1010,20 +1107,45 @@ function updatePaddingDisplay() {
 
 function updateFillPageButton() {
     const fillBtn = document.getElementById('fillPageBtn');
-    if (selectedQRs.length === 1) {
+    if (!fillBtn) return;
+    
+    // Count unique QR codes in selection
+    const uniqueQRs = [...new Set(selectedQRs)];
+    
+    if (uniqueQRs.length === 1) {
         fillBtn.disabled = false;
         fillBtn.classList.remove('btn-outline-success');
         fillBtn.classList.add('btn-success');
-        fillBtn.innerHTML = '<i class="bi bi-grid-3x3-gap-fill me-1"></i>Fill All Labels with This QR';
+        
+        // Get QR code info for better button text
+        const qrCode = getQRCodeById(uniqueQRs[0]);
+        const config = templateConfigs[currentTemplate];
+        let labelsPerSheet = config.labelsPerSheet;
+        
+        if (currentTemplate === 'custom_sheet') {
+            const cols = parseInt(document.getElementById('gridCols')?.value || 3);
+            const rows = parseInt(document.getElementById('gridRows')?.value || 10);
+            labelsPerSheet = cols * rows;
+        }
+        
+        fillBtn.innerHTML = `<i class="bi bi-grid-3x3-gap-fill me-1"></i>Fill ${labelsPerSheet} Labels with "${qrCode.code}"`;
+        fillBtn.title = `Fill entire page with copies of ${qrCode.code}`;
+    } else if (selectedQRs.length === 0) {
+        fillBtn.disabled = true;
+        fillBtn.classList.remove('btn-success');
+        fillBtn.classList.add('btn-outline-success');
+        fillBtn.innerHTML = '<i class="bi bi-grid-3x3-gap-fill me-1"></i>Select One QR to Fill Page';
+        fillBtn.title = 'Select exactly one QR code to fill the entire page';
     } else {
         fillBtn.disabled = true;
         fillBtn.classList.remove('btn-success');
         fillBtn.classList.add('btn-outline-success');
-        fillBtn.innerHTML = '<i class="bi bi-grid-3x3-gap-fill me-1"></i>Fill All Labels with Selected QR';
+        fillBtn.innerHTML = '<i class="bi bi-grid-3x3-gap-fill me-1"></i>Select Only One QR to Fill';
+        fillBtn.title = 'Please select exactly one QR code to use the fill function';
     }
 }
 
-function fillPageWithSelected() {
+async function fillPageWithSelected() {
     if (selectedQRs.length !== 1) {
         alert('Please select exactly one QR code to fill the page.');
         return;
@@ -1043,16 +1165,48 @@ function fillPageWithSelected() {
     const selectedQRId = selectedQRs[0];
     const labelsPerSheet = config.labelsPerSheet;
     
-    // Fill selectedQRs array with copies of the selected QR
-    selectedQRs = Array(labelsPerSheet).fill(selectedQRId);
+    // Show loading message
+    const fillBtn = document.getElementById('fillPageBtn');
+    const originalText = fillBtn.innerHTML;
+    fillBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Filling...';
+    fillBtn.disabled = true;
     
-    // Update the UI to reflect the change
-    updateStats();
-    updatePreview();
-    
-    // Show success message
-    const qrCode = getQRCodeById(selectedQRId);
-    alert(`Page filled with ${labelsPerSheet} copies of "${qrCode.code}"`);
+    try {
+        // Make sure we have the QR code data cached
+        await fetchQRCodeData();
+        
+        // Fill selectedQRs array with copies of the selected QR
+        selectedQRs = Array(labelsPerSheet).fill(selectedQRId);
+        
+        // Update the visual selection state
+        document.querySelectorAll('.qr-checkbox').forEach(checkbox => {
+            checkbox.checked = (checkbox.value === selectedQRId);
+            const qrItem = checkbox.closest('.qr-item');
+            if (checkbox.value === selectedQRId) {
+                qrItem.classList.add('selected');
+            } else {
+                qrItem.classList.remove('selected');
+            }
+        });
+        
+        // Update the UI to reflect the change
+        updateStats();
+        await updatePreview();
+        
+        // Show success message
+        const qrCode = getQRCodeById(selectedQRId);
+        setTimeout(() => {
+            alert(`Page filled with ${labelsPerSheet} copies of "${qrCode.code}"`);
+        }, 100);
+        
+    } catch (error) {
+        console.error('Error filling page:', error);
+        alert('Error filling page. Please try again.');
+    } finally {
+        // Reset button
+        fillBtn.innerHTML = originalText;
+        updateFillPageButton();
+    }
 }
 
 // Initialize

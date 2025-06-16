@@ -26,34 +26,53 @@ if ($filter === 'active') {
     $where_conditions[] = "(bp.expires_at <= NOW() AND bp.status != 'redeemed') OR bp.status = 'expired'";
 }
 
-// Only show purchases with QR codes
-$where_conditions[] = "bp.qr_code_data IS NOT NULL";
+// Show all purchases (QR codes should be generated automatically)
+// Remove the QR code filter to show all discount purchases
+// $where_conditions[] = "bp.qr_code_data IS NOT NULL";
 
 $where_clause = implode(' AND ', $where_conditions);
 
-// Get total count for pagination
+// Get total count for pagination from both tables
 $count_sql = "
-    SELECT COUNT(*)
-    FROM business_purchases bp
-    JOIN business_store_items bsi ON bp.business_store_item_id = bsi.id
-    JOIN businesses b ON bp.business_id = b.id
-    WHERE $where_clause
+    SELECT COUNT(*) FROM (
+        (SELECT bp.id 
+         FROM business_purchases bp
+         JOIN business_store_items bsi ON bp.business_store_item_id = bsi.id
+         JOIN businesses b ON bp.business_id = b.id
+         WHERE bp.user_id = ?)
+        UNION ALL
+        (SELECT usp.id
+         FROM user_store_purchases usp
+         JOIN qr_store_items qsi ON usp.qr_store_item_id = qsi.id
+         WHERE usp.user_id = ?)
+    ) as total_purchases
 ";
 $stmt = $pdo->prepare($count_sql);
-$stmt->execute($params);
+$stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
 $total_items = $stmt->fetchColumn();
 $total_pages = ceil($total_items / $per_page);
 
-// Get QR code purchases
+// Get QR code purchases from both business_purchases and user_store_purchases tables
 $sql = "
-    SELECT 
-        bp.*,
+    (SELECT 
+        bp.id,
+        bp.user_id,
+        bp.business_id,
+        bp.qr_coins_spent,
+        bp.discount_percentage,
+        bp.purchase_code,
+        bp.status,
+        bp.expires_at,
+        bp.created_at,
+        bp.qr_code_data,
+        bp.nayax_machine_id,
         bsi.item_name,
         bsi.item_description,
         b.name as business_name,
         b.type as business_type,
         nm.machine_name,
         nm.location_description,
+        'business' as purchase_type,
         CASE 
             WHEN bp.expires_at <= NOW() AND bp.status != 'redeemed' THEN 'expired'
             WHEN bp.status = 'redeemed' THEN 'redeemed'
@@ -64,13 +83,47 @@ $sql = "
     JOIN business_store_items bsi ON bp.business_store_item_id = bsi.id
     JOIN businesses b ON bp.business_id = b.id
     LEFT JOIN nayax_machines nm ON bp.nayax_machine_id = nm.nayax_machine_id
-    WHERE $where_clause
-    ORDER BY bp.created_at DESC
+    WHERE bp.user_id = ?)
+    
+    UNION ALL
+    
+    (SELECT 
+        usp.id,
+        usp.user_id,
+        usp.business_id,
+        usp.qr_coins_spent,
+        usp.discount_percent as discount_percentage,
+        usp.discount_code as purchase_code,
+        usp.status,
+        usp.expires_at,
+        usp.created_at,
+        NULL as qr_code_data,
+        NULL as nayax_machine_id,
+        qsi.item_name,
+        '' as item_description,
+        b.name as business_name,
+        b.type as business_type,
+        '' as machine_name,
+        '' as location_description,
+        'store' as purchase_type,
+        CASE 
+            WHEN usp.expires_at <= NOW() AND usp.status != 'used' THEN 'expired'
+            WHEN usp.status = 'used' THEN 'redeemed'
+            WHEN usp.status = 'active' AND usp.expires_at > NOW() THEN 'active'
+            ELSE 'unknown'
+        END as current_status
+    FROM user_store_purchases usp
+    JOIN qr_store_items qsi ON usp.qr_store_item_id = qsi.id
+    LEFT JOIN business_store_items bsi ON usp.business_store_item_id = bsi.id
+    LEFT JOIN businesses b ON (bsi.business_id = b.id OR usp.business_id = b.id)
+    WHERE usp.user_id = ?)
+    
+    ORDER BY created_at DESC
     LIMIT $per_page OFFSET $offset
 ";
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute($params);
+$stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);  // Pass user_id twice for UNION query
 $qr_purchases = $stmt->fetchAll();
 
 // Get user's QR code statistics
@@ -286,14 +339,24 @@ require_once __DIR__ . '/../core/includes/header.php';
                             <!-- QR Code Display -->
                             <div class="qr-code-display mb-3">
                                 <?php if ($purchase['current_status'] === 'active'): ?>
-                                    <img src="data:image/png;base64,<?php echo $purchase['qr_code_data']; ?>" 
-                                         alt="Discount QR Code" 
-                                         class="img-fluid qr-code-image"
-                                         style="max-width: 120px; height: auto; cursor: pointer;"
-                                         onclick="showQRModal(<?php echo $purchase['id']; ?>)">
-                                    <div class="mt-2">
-                                        <small class="text-muted">Tap to enlarge</small>
-                                    </div>
+                                    <?php if ($purchase['qr_code_data']): ?>
+                                        <img src="data:image/png;base64,<?php echo $purchase['qr_code_data']; ?>" 
+                                             alt="Discount QR Code" 
+                                             class="img-fluid qr-code-image"
+                                             style="max-width: 120px; height: auto; cursor: pointer;"
+                                             onclick="showQRModal(<?php echo $purchase['id']; ?>)">
+                                        <div class="mt-2">
+                                            <small class="text-muted">Tap to enlarge</small>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="text-primary py-4">
+                                            <i class="bi bi-check-circle fs-1"></i>
+                                            <div class="mt-2">
+                                                <strong>Discount Code: <?php echo $purchase['purchase_code']; ?></strong>
+                                                <br><small class="text-muted">Use this code at checkout or present your purchase confirmation</small>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <div class="text-muted py-4">
                                         <i class="bi bi-qr-code fs-1 opacity-50"></i>

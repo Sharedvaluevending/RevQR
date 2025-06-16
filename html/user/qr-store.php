@@ -255,54 +255,85 @@ foreach ($all_items as $item) {
         </div>
     </div>
 
-    <!-- Category Filter Navigation -->
+    <!-- Category Filter Pills -->
     <div class="row mb-4">
         <div class="col-12">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1 small">Filter by Category:</span>
-                    <div class="navbar-nav">
-                        <a class="nav-link <?php echo $category_filter === 'all' ? 'active' : ''; ?>" 
+            <div class="qr-store-filter-container">
+                <div class="d-flex align-items-center mb-3">
+                    <h6 class="filter-title mb-0 me-3">
+                        <i class="bi bi-funnel me-2 text-primary"></i>Shop Categories
+                    </h6>
+                    <span class="badge bg-light text-dark border">
+                        <?php echo count($filtered_items); ?> items found
+                    </span>
+                </div>
+                
+                <div class="filter-pills-container">
+                    <div class="filter-pills d-flex flex-wrap gap-2">
+                        <a class="filter-pill caution-yellow <?php echo $category_filter === 'all' ? 'active' : ''; ?>" 
                            href="?category=all">
-                            <i class="bi bi-grid me-1"></i>All Items (<?php echo count($all_items); ?>)
+                            <i class="bi bi-grid-3x3-gap me-1"></i>
+                            <span>All Items</span>
+                            <span class="pill-count"><?php echo count($all_items); ?></span>
                         </a>
-                        <a class="nav-link <?php echo $category_filter === 'discount' ? 'active' : ''; ?>" 
+                        
+                        <a class="filter-pill <?php echo $category_filter === 'discount' ? 'active' : ''; ?>" 
                            href="?category=discount">
-                            <i class="bi bi-percent me-1"></i>Business Discounts (<?php echo $category_counts['discount'] ?? 0; ?>)
+                            <i class="bi bi-percent me-1"></i>
+                            <span>Business Deals</span>
+                            <span class="pill-count"><?php echo $category_counts['discount'] ?? 0; ?></span>
                         </a>
-                        <a class="nav-link <?php echo $category_filter === 'avatar' ? 'active' : ''; ?>" 
+                        
+                        <a class="filter-pill <?php echo $category_filter === 'avatar' ? 'active' : ''; ?>" 
                            href="?category=avatar">
-                            <i class="bi bi-person-circle me-1"></i>Avatars (<?php echo $category_counts['avatar'] ?? 0; ?>)
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span>Avatars</span>
+                            <span class="pill-count"><?php echo $category_counts['avatar'] ?? 0; ?></span>
                         </a>
-                        <a class="nav-link <?php echo $category_filter === 'spin_pack' ? 'active' : ''; ?>" 
-                           href="?category=spin_pack">
-                            <i class="bi bi-arrow-clockwise me-1"></i>Spin Wheel Packs (<?php echo $category_counts['spin_pack'] ?? 0; ?>)
-                        </a>
-                        <a class="nav-link <?php echo $category_filter === 'slot_pack' ? 'active text-danger fw-bold' : ''; ?>" 
+                        
+                        <a class="filter-pill casino-pill <?php echo $category_filter === 'slot_pack' ? 'active' : ''; ?>" 
                            href="?category=slot_pack">
-                            <i class="bi bi-suit-diamond-fill me-1"></i>Casino Spins (<?php echo $category_counts['slot_pack'] ?? 0; ?>)
+                            <i class="bi bi-suit-diamond-fill me-1"></i>
+                            <span>Casino Spins</span>
+                            <span class="pill-count"><?php echo $category_counts['slot_pack'] ?? 0; ?></span>
                         </a>
+                        
+                        <a class="filter-pill <?php echo $category_filter === 'spin_pack' ? 'active' : ''; ?>" 
+                           href="?category=spin_pack">
+                            <i class="bi bi-arrow-clockwise me-1"></i>
+                            <span>Spin Packs</span>
+                            <span class="pill-count"><?php echo $category_counts['spin_pack'] ?? 0; ?></span>
+                        </a>
+                        
                         <?php if (($category_counts['vote_pack'] ?? 0) > 0): ?>
-                        <a class="nav-link <?php echo $category_filter === 'vote_pack' ? 'active' : ''; ?>" 
+                        <a class="filter-pill <?php echo $category_filter === 'vote_pack' ? 'active' : ''; ?>" 
                            href="?category=vote_pack">
-                            <i class="bi bi-check2-square me-1"></i>Vote Packs (<?php echo $category_counts['vote_pack'] ?? 0; ?>)
+                            <i class="bi bi-check2-square me-1"></i>
+                            <span>Vote Packs</span>
+                            <span class="pill-count"><?php echo $category_counts['vote_pack'] ?? 0; ?></span>
                         </a>
                         <?php endif; ?>
+                        
                         <?php if (($category_counts['boost'] ?? 0) > 0): ?>
-                        <a class="nav-link <?php echo $category_filter === 'boost' ? 'active' : ''; ?>" 
+                        <a class="filter-pill boost-pill <?php echo $category_filter === 'boost' ? 'active' : ''; ?>" 
                            href="?category=boost">
-                            <i class="bi bi-lightning me-1"></i>Boosts (<?php echo $category_counts['boost'] ?? 0; ?>)
+                            <i class="bi bi-lightning-fill me-1"></i>
+                            <span>Boosts</span>
+                            <span class="pill-count"><?php echo $category_counts['boost'] ?? 0; ?></span>
                         </a>
                         <?php endif; ?>
+                        
                         <?php if (($category_counts['loot_box'] ?? 0) > 0): ?>
-                        <a class="nav-link <?php echo $category_filter === 'loot_box' ? 'active text-warning fw-bold' : ''; ?>" 
+                        <a class="filter-pill loot-pill <?php echo $category_filter === 'loot_box' ? 'active' : ''; ?>" 
                            href="?category=loot_box">
-                            <i class="bi bi-gift me-1"></i>Loot Boxes (<?php echo $category_counts['loot_box'] ?? 0; ?>)
+                            <i class="bi bi-gift-fill me-1"></i>
+                            <span>Mystery Boxes</span>
+                            <span class="pill-count"><?php echo $category_counts['loot_box'] ?? 0; ?></span>
                         </a>
                         <?php endif; ?>
                     </div>
                 </div>
-            </nav>
+            </div>
         </div>
     </div>
 
@@ -874,6 +905,224 @@ foreach ($all_items as $item) {
 </div>
 
 <style>
+/* MODERN FILTER PILLS STYLING */
+.qr-store-filter-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    position: relative;
+    z-index: 10; /* Ensure it's below main nav */
+    margin-top: 10px;
+}
+
+.filter-title {
+    color: #495057;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.filter-pills-container {
+    position: relative;
+}
+
+.filter-pills {
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.2) transparent;
+}
+
+.filter-pills::-webkit-scrollbar {
+    height: 4px;
+}
+
+.filter-pills::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
+.filter-pills::-webkit-scrollbar-thumb {
+    background: rgba(0,123,255,0.3);
+    border-radius: 4px;
+}
+
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 18px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 25px;
+    text-decoration: none;
+    color: #212529;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    backdrop-filter: blur(10px);
+    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
+.filter-pill:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.2);
+    box-shadow: 0 8px 25px rgba(0,123,255,0.15);
+    border-color: rgba(0,123,255,0.4);
+    color: #007bff;
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.9);
+}
+
+/* Caution Yellow Variant for Important Pills */
+.filter-pill.caution-yellow {
+    background: rgba(255,193,7,0.15);
+    border-color: rgba(255,193,7,0.4);
+    color: #212529;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.9);
+}
+
+.filter-pill.caution-yellow:hover {
+    background: rgba(255,193,7,0.25);
+    border-color: rgba(255,193,7,0.6);
+    color: #000;
+    box-shadow: 0 8px 25px rgba(255,193,7,0.2);
+}
+
+.filter-pill.active {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    transform: translateY(-1px);
+}
+
+.filter-pill.active:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,123,255,0.4);
+}
+
+.pill-count {
+    background: rgba(0,0,0,0.2);
+    color: #212529;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+}
+
+.filter-pill.active .pill-count {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+/* Special themed pills */
+.casino-pill:not(.active) {
+    border-color: rgba(220,53,69,0.2);
+}
+
+.casino-pill:not(.active):hover {
+    border-color: rgba(220,53,69,0.4);
+    color: #dc3545;
+    box-shadow: 0 8px 25px rgba(220,53,69,0.15);
+}
+
+.casino-pill.active {
+    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+    border-color: #dc3545;
+    box-shadow: 0 4px 15px rgba(220,53,69,0.3);
+}
+
+.loot-pill:not(.active) {
+    border-color: rgba(255,193,7,0.3);
+}
+
+.loot-pill:not(.active):hover {
+    border-color: rgba(255,193,7,0.5);
+    color: #ffc107;
+    box-shadow: 0 8px 25px rgba(255,193,7,0.15);
+}
+
+.loot-pill.active {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    border-color: #ffc107;
+    color: #212529;
+    box-shadow: 0 4px 15px rgba(255,193,7,0.3);
+}
+
+.boost-pill:not(.active) {
+    border-color: rgba(40,167,69,0.2);
+}
+
+.boost-pill:not(.active):hover {
+    border-color: rgba(40,167,69,0.4);
+    color: #28a745;
+    box-shadow: 0 8px 25px rgba(40,167,69,0.15);
+}
+
+.boost-pill.active {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    border-color: #28a745;
+    box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+    .qr-store-filter-container {
+        padding: 15px;
+        margin-top: 5px;
+    }
+    
+    .filter-pill {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+    
+    .filter-pills {
+        gap: 8px !important;
+    }
+    
+    .d-flex.align-items-center.mb-3 {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+}
+
+/* Animation for pills appearing */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filter-pill {
+    animation: slideInUp 0.5s ease-out forwards;
+}
+
+.filter-pill:nth-child(1) { animation-delay: 0.05s; }
+.filter-pill:nth-child(2) { animation-delay: 0.1s; }
+.filter-pill:nth-child(3) { animation-delay: 0.15s; }
+.filter-pill:nth-child(4) { animation-delay: 0.2s; }
+.filter-pill:nth-child(5) { animation-delay: 0.25s; }
+.filter-pill:nth-child(6) { animation-delay: 0.3s; }
+.filter-pill:nth-child(7) { animation-delay: 0.35s; }
+
 @keyframes loot-box-glow {
     from { box-shadow: 0 0 25px rgba(255, 193, 7, 0.8); }
     to { box-shadow: 0 0 35px rgba(255, 193, 7, 1), 0 0 50px rgba(255, 193, 7, 0.6); }

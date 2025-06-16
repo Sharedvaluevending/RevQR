@@ -194,6 +194,39 @@ p, li, span, div {
                         <h6><i class="bi bi-person-badge text-primary me-2"></i>🎭 Posty Avatar</h6>
                         <p>Unlock the legendary Posty avatar after spending 50,000 QR coins! Get 5% cashback on all spin wheel and casino losses.</p>
                     </div>
+
+                    <div class="update-feature">
+                        <h6><i class="bi bi-phone text-info me-2"></i>📱 Mobile-First Experience</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>QR Code Scanning:</strong> Built-in camera integration</li>
+                                    <li><strong>Touch Optimized:</strong> Smooth mobile interactions</li>
+                                    <li><strong>Offline Support:</strong> Cache data for offline viewing</li>
+                                    <li><strong>Push Notifications:</strong> Real-time alerts</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>GPS Location:</strong> Location-based rewards</li>
+                                    <li><strong>Mobile Wallet:</strong> Quick balance access</li>
+                                    <li><strong>Dark Mode:</strong> Easy on the eyes</li>
+                                    <li><strong>Fast Loading:</strong> Optimized for 3G/4G/5G</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="update-feature">
+                        <h6><i class="bi bi-shield-check text-success me-2"></i>🔒 Account Security</h6>
+                        <ul>
+                            <li><strong>Secure Login:</strong> Strong password requirements and optional 2FA</li>
+                            <li><strong>Privacy Controls:</strong> Manage what information is visible to others</li>
+                            <li><strong>Transaction History:</strong> Complete record of all QR coin activities</li>
+                            <li><strong>Report Issues:</strong> Flag suspicious activity immediately</li>
+                            <li><strong>Data Protection:</strong> GDPR compliant data handling</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -988,24 +1021,61 @@ p, li, span, div {
                 <div class="accordion-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6><i class="bi bi-bug text-danger me-2"></i>Common Issues</h6>
+                            <h6><i class="bi bi-bug text-danger me-2"></i>QR Code Scanning Problems</h6>
                             <ul>
-                                <li><strong>QR Code Won't Scan:</strong> Clean camera lens, ensure good lighting</li>
-                                <li><strong>Coins Not Adding:</strong> Check internet connection, refresh page</li>
-                                <li><strong>Spins Not Working:</strong> Clear browser cache, try different browser</li>
-                                <li><strong>Login Problems:</strong> Reset password, check email verification</li>
-                                <li><strong>Mobile Issues:</strong> Update browser, reinstall PWA</li>
+                                <li><strong>Camera Permission:</strong> Ensure camera access is enabled in browser</li>
+                                <li><strong>Lighting Conditions:</strong> Scan in good lighting, avoid glare</li>
+                                <li><strong>Distance:</strong> Hold phone 6-12 inches from QR code</li>
+                                <li><strong>Code Quality:</strong> Ensure QR code is not damaged or distorted</li>
+                                <li><strong>Browser Issues:</strong> Try different browser or clear cache</li>
+                            </ul>
+                            
+                            <h6><i class="bi bi-exclamation-triangle text-warning me-2"></i>Gaming Issues</h6>
+                            <ul>
+                                <li><strong>Slow Loading:</strong> Check internet connection speed</li>
+                                <li><strong>Payment Problems:</strong> Verify QR coin balance</li>
+                                <li><strong>Game Crashes:</strong> Clear browser cache and reload</li>
+                                <li><strong>Missing Rewards:</strong> Contact support with transaction details</li>
                             </ul>
                         </div>
                         <div class="col-md-6">
+                            <h6><i class="bi bi-person-x text-danger me-2"></i>Account Issues</h6>
+                            <ul>
+                                <li><strong>Login Problems:</strong> Reset password or clear cookies</li>
+                                <li><strong>Missing Coins:</strong> Check transaction history in dashboard</li>
+                                <li><strong>Profile Updates:</strong> Allow time for changes to sync</li>
+                                <li><strong>Email Verification:</strong> Check spam folder for verification emails</li>
+                                <li><strong>Session Expired:</strong> Log out and log back in</li>
+                            </ul>
+                            
                             <h6><i class="bi bi-life-preserver text-info me-2"></i>Getting Help</h6>
                             <ul>
-                                <li><strong>Contact Support:</strong> Email support@revenueqr.com</li>
-                                <li><strong>Live Chat:</strong> Available during business hours</li>
-                                <li><strong>User Manual:</strong> Comprehensive documentation</li>
-                                <li><strong>Video Tutorials:</strong> Step-by-step guides</li>
-                                <li><strong>FAQ Section:</strong> Quick answers to common questions</li>
+                                <li><strong>Platform Support:</strong> Available through user dashboard</li>
+                                <li><strong>Email Support:</strong> support@revenueqr.com</li>
+                                <li><strong>Live Chat:</strong> Available 24/7 through platform</li>
+                                <li><strong>Community Forum:</strong> Connect with other users</li>
+                                <li><strong>Video Tutorials:</strong> Step-by-step visual guides</li>
                             </ul>
+                        </div>
+                    </div>
+
+                    <div class="update-feature">
+                        <h6><i class="bi bi-lightbulb text-warning me-2"></i>💡 Best Practices for Success</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ol>
+                                    <li><strong>Regular Scanning:</strong> Scan QR codes daily for maximum rewards</li>
+                                    <li><strong>Responsible Gaming:</strong> Set personal limits and play responsibly</li>
+                                    <li><strong>Security First:</strong> Keep login credentials secure and private</li>
+                                </ol>
+                            </div>
+                            <div class="col-md-6">
+                                <ol start="4">
+                                    <li><strong>Stay Updated:</strong> Keep browser updated for best performance</li>
+                                    <li><strong>Provide Feedback:</strong> Report issues and suggest improvements</li>
+                                    <li><strong>Community Engagement:</strong> Participate in voting and discussions</li>
+                                </ol>
+                            </div>
                         </div>
                     </div>
                     

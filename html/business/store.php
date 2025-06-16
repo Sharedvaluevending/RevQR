@@ -280,24 +280,47 @@ try {
     $store_items = [];
 }
 
-// Get recent sales
+// Get recent sales from both business_purchases and user_store_purchases
 try {
     $stmt = $pdo->prepare("
-        SELECT 
-            bp.*,
+        (SELECT 
+            bp.id,
+            bp.user_id,
+            bp.business_id,
+            bp.qr_coins_spent,
+            bp.discount_percentage,
+            bp.status,
+            bp.created_at,
             bsi.item_name,
             u.username,
-            bp.discount_percentage
+            'business_discount' as purchase_type
         FROM business_purchases bp
         JOIN business_store_items bsi ON bp.business_store_item_id = bsi.id
         JOIN users u ON bp.user_id = u.id
-        WHERE bp.business_id = ?
-        ORDER BY bp.created_at DESC
+        WHERE bp.business_id = ?)
+        UNION ALL
+        (SELECT 
+            usp.id,
+            usp.user_id,
+            usp.business_id,
+            usp.qr_coins_spent,
+            ROUND((usp.discount_amount_cents / 100) / (5.00) * 100, 1) as discount_percentage,
+            usp.status,
+            usp.created_at,
+            qsi.item_name,
+            u.username,
+            'business_store' as purchase_type
+        FROM user_store_purchases usp
+        JOIN qr_store_items qsi ON usp.store_item_id = qsi.id
+        JOIN users u ON usp.user_id = u.id
+        WHERE usp.business_id = ?)
+        ORDER BY created_at DESC
         LIMIT 20
     ");
-    $stmt->execute([$business_id]);
+    $stmt->execute([$business_id, $business_id]);
     $recent_sales = $stmt->fetchAll();
 } catch (Exception $e) {
+    error_log("Recent sales query error: " . $e->getMessage());
     $recent_sales = [];
 }
 
@@ -826,12 +849,18 @@ require_once __DIR__ . '/../core/includes/header.php';
                                         <div>
                                             <h6 class="mb-1"><?php echo htmlspecialchars($sale['item_name'] ?? ''); ?></h6>
                                             <small class="text-muted">@<?php echo htmlspecialchars($sale['username'] ?? ''); ?></small>
+                                            <?php if (isset($sale['purchase_type'])): ?>
+                                                <small class="badge bg-info ms-1"><?php echo $sale['purchase_type'] === 'business_store' ? 'Store' : 'Discount'; ?></small>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="text-end">
                                             <span class="badge bg-<?php echo $sale['status'] === 'redeemed' ? 'success' : 'warning'; ?>">
                                                 <?php echo ucfirst($sale['status']); ?>
                                             </span>
-                                            <small class="d-block text-muted"><?php echo date('M j', strtotime($sale['created_at'])); ?></small>
+                                            <small class="d-block text-muted"><?php echo date('M j, g:i A', strtotime($sale['created_at'])); ?></small>
+                                            <?php if ($sale['qr_coins_spent'] > 0): ?>
+                                                <small class="d-block text-warning"><?php echo $sale['qr_coins_spent']; ?> coins</small>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>

@@ -399,7 +399,7 @@ window.casinoData = {
     gap: 11px; /* Reduced gap to bring outer reels inward more */
     position: relative;
     z-index: 2;
-    margin-top: -260px; /* Adjusted for much bigger slot machine */
+    margin-top: -230px; /* Adjusted to better fit slot machine frame */
     padding: 0 10px;
 }
 
@@ -712,7 +712,7 @@ window.casinoData = {
     
 .slot-reels-container {
         gap: 9px;
-        margin-top: -195px; /* Adjusted for tablet */
+        margin-top: -170px; /* Adjusted for tablet positioning */
     }
     
     .slot-reel {
@@ -743,7 +743,7 @@ window.casinoData = {
     
 .slot-reels-container {
         gap: 7px;
-        margin-top: -155px; /* Adjusted for mobile */
+        margin-top: -135px; /* Adjusted for mobile positioning */
     }
     
     .slot-reel {

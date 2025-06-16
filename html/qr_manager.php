@@ -193,9 +193,15 @@ require_once __DIR__ . '/core/includes/header.php';
     }
     
     .btn-outline-secondary {
-        color: #6c757d !important;
-        border-color: #6c757d !important;
+        color: #ff8c00 !important;
+        border-color: #ff8c00 !important;
         background-color: transparent !important;
+    }
+    
+    .btn-outline-secondary:hover {
+        color: #ffffff !important;
+        background-color: #ff8c00 !important;
+        border-color: #ff8c00 !important;
     }
     
     .btn-outline-info {

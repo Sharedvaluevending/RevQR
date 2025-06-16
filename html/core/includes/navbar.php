@@ -29,8 +29,6 @@ if (is_logged_in() && has_role('business')) {
         <div class="navbar-brand d-flex align-items-center">
             <img src="<?php echo APP_URL; ?>/img/logoRQ.png" alt="RevenueQR Logo" height="32" class="me-2">
             <span class="d-none d-sm-inline">Revenue QR</span>
-            <span class="badge ms-2" style="background-color: #ffc107; color: #000; font-size: 0.75rem; font-weight: bold;">BRANCH EDIT 2.02</span>
-            
         </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -310,6 +308,18 @@ if (is_logged_in() && has_role('business')) {
                                         <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>QR Manager <span class="badge bg-primary ms-2">New</span>
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/print-shop.php">
+                                        <i class="bi bi-printer me-2"></i>Print Shop
+                                        <span class="badge bg-success ms-1">New</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/qr_dynamic_manager.php">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>Dynamic Edit QR Codes
+                                        <span class="badge bg-info ms-1">Pro</span>
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item" href="<?php echo APP_URL; ?>/qr-generator.php">
@@ -509,75 +519,108 @@ if (is_logged_in() && has_role('business')) {
                             </ul>
                         </li>
                     <?php else: ?>
-                        <!-- 1. Dashboard -->
+                        <!-- 1. Home -->
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo APP_URL; ?>/user/dashboard.php">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                                <i class="bi bi-house-heart me-1"></i>Home
                             </a>
                         </li>
                         
-                        <!-- 2. Engagement Dropdown (with QR Gallery and Casino) -->
-                        <li class="nav-item dropdown engagement-dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="engagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-stars me-1"></i>
-                                <span class="fw-bold">Engagement</span>
+                        <!-- 2. Play Menu (Entertainment Hub) -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="playDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-controller me-1"></i>Play
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-engagement animate__animated animate__fadeInDown" aria-labelledby="engagementDropdown">
+                            <ul class="dropdown-menu">
                                 <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/qr-display-public.php">
-                                        <i class="bi bi-qr-code text-info me-2"></i>
-                                        <span class="fw-semibold">QR Gallery</span>
-                                        <span class="badge bg-gradient bg-info text-white ms-2">New</span>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/casino/index.php">
+                                        <i class="bi bi-suit-diamond me-2"></i>Casino
+                                        <span class="badge bg-danger ms-1">Slots</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/casino/index.php">
-                                        <i class="bi bi-dice-5-fill text-danger me-2"></i>
-                                        <span class="fw-semibold">🎰 Casino</span>
-                                        <?php if (!is_logged_in()): ?>
-                                            <span class="badge bg-gradient bg-danger text-white ms-2">Play Now!</span>
-                                        <?php else: ?>
-                                            <?php
-                                            // Check if user has access to any casino-enabled businesses
-                                            $stmt = $pdo->prepare("
-                                                SELECT COUNT(*) as casino_count 
-                                                FROM business_casino_settings bcs 
-                                                JOIN businesses b ON bcs.business_id = b.id 
-                                                WHERE bcs.casino_enabled = 1
-                                            ");
-                                            $stmt->execute();
-                                            $casino_count = $stmt->fetchColumn();
-                                            
-                                            if ($casino_count > 0): ?>
-                                                <span class="badge bg-gradient bg-success text-white ms-2"><?php echo $casino_count; ?> Available</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-gradient bg-warning text-dark ms-2">Coming Soon</span>
-                                            <?php endif; ?>
-                                        <?php endif; ?>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/horse-racing/quick-races.php">
+                                        <i class="bi bi-speedometer2 me-2"></i>Horse Racing
+                                        <span class="badge bg-warning ms-1">Quick Races</span>
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/spin.php">
-                                        <i class="bi bi-trophy-fill text-warning me-2"></i>
-                                        <span class="fw-semibold">Spin to Win</span>
-                                        <span class="badge bg-gradient bg-warning text-dark ms-2">Daily</span>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/vote.php">
+                                        <i class="bi bi-hand-thumbs-up me-2"></i>Vote
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/spin.php">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>Spin Wheel
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/avatars.php">
-                                        <i class="bi bi-person-badge-fill text-primary me-2"></i>
-                                        <span class="fw-semibold">QR Avatars</span>
-                                        <span class="badge bg-gradient bg-primary text-white ms-2">New</span>
+                                        <i class="bi bi-person-badge me-2"></i>Avatar Gallery
+                                        <span class="badge bg-primary ms-1">New</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        <!-- 3. Shop Menu (Simplified) -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="shopDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-shop me-1"></i>Shop
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/qr-transactions.php">
+                                        <i class="bi bi-wallet2 me-2"></i>My Wallet
+                                        <span class="badge bg-primary ms-1">QR Coins</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/horse-racing/">
-                                        <i class="bi bi-trophy text-warning me-2"></i>
-                                        <span class="fw-semibold">🏇 Horse Racing</span>
-                                        <span class="badge bg-gradient bg-warning text-dark ms-2">Live!</span>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/business-stores.php">
+                                        <i class="bi bi-percent me-2"></i>Local Deals
+                                        <span class="badge bg-success ms-1">Available</span>
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/qr-store.php">
+                                        <i class="bi bi-gem me-2"></i>QR Store
+                                        <span class="badge bg-success ms-1">Available</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/my-purchases.php">
+                                        <i class="bi bi-bag-check me-2"></i>Purchase History
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/my-discount-qr-codes.php">
+                                        <i class="bi bi-qr-code me-2"></i>My QR Codes
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        <!-- 4. Compete Menu -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="competeDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-trophy me-1"></i>Compete
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/leaderboard.php">
+                                        <i class="bi bi-bar-chart me-2"></i>Leaderboard
+                                        <span class="badge bg-warning ms-1">Top 100</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/result.php">
+                                        <i class="bi bi-graph-up-arrow me-2"></i>My Results
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <?php
                                     // Check if user is currently tracking any pizza
@@ -610,80 +653,17 @@ if (is_logged_in() && has_role('business')) {
                                     ?>
                                     <?php if ($is_tracking_pizza && $active_tracker_id): ?>
                                         <a class="dropdown-item" href="<?php echo APP_URL; ?>/public/pizza-tracker.php?tracker_id=<?php echo $active_tracker_id; ?>">
-                                            <i class="bi bi-stopwatch text-success me-2"></i>
-                                            <span class="fw-semibold">🍕 Tracking Pizza</span>
-                                            <span class="badge bg-gradient bg-success text-white ms-2">Active</span>
+                                            <i class="bi bi-stopwatch text-success me-2"></i>Pizza Tracker
+                                            <span class="badge bg-success ms-1">Active</span>
                                         </a>
                                     <?php else: ?>
-                                        <a class="dropdown-item" href="<?php echo APP_URL; ?>/public/pizza-tracker.php" title="You are not tracking any pizza. Scan QR code with pizza tracker link on page or direct URL">
-                                            <i class="bi bi-stopwatch text-warning me-2"></i>
-                                            <span class="fw-semibold">🍕 No Pizza Tracking</span>
-                                            <span class="badge bg-gradient bg-warning text-dark ms-2">Scan QR</span>
+                                        <a class="dropdown-item" href="<?php echo APP_URL; ?>/public/pizza-tracker.php">
+                                            <i class="bi bi-stopwatch me-2"></i>Pizza Tracker
+                                            <span class="badge bg-secondary ms-1">Scan QR</span>
                                         </a>
                                     <?php endif; ?>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/result.php">
-                                        <i class="bi bi-graph-up-arrow text-info me-2"></i>
-                                        <span class="fw-semibold">My Results</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/leaderboard.php">
-                                        <i class="bi bi-trophy-fill text-warning me-2"></i>
-                                        <span class="fw-semibold">Leaderboard</span>
-                                        <span class="badge bg-gradient bg-warning text-dark ms-2">Top 100</span>
-                                    </a>
-                                </li>
                             </ul>
-                        </li>
-                        
-                        <!-- 3. Stores -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="storeDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-shop me-1"></i>Stores
-                                <span class="badge bg-success ms-1">Live</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/qr-store.php">
-                                        <i class="bi bi-gem me-2"></i>QR Store
-                                        <span class="badge bg-success ms-1">Available</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/business-stores.php">
-                                        <i class="bi bi-building me-2"></i>Business Discounts
-                                        <span class="badge bg-success ms-1">Available</span>
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/my-purchases.php">
-                                        <i class="bi bi-bag-check me-2"></i>My Purchases
-                                        <span class="badge bg-success ms-1">New</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/my-discount-qr-codes.php">
-                                        <i class="bi bi-qr-code me-2"></i>My QR Codes
-                                        <span class="badge bg-primary ms-1">Nayax</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo APP_URL; ?>/user/qr-transactions.php">
-                                        <i class="bi bi-clock-history me-2"></i>Transaction History
-                                        <span class="badge bg-success ms-1">New</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        
-                        <!-- 4. Vote -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo APP_URL; ?>/user/vote.php">
-                                <i class="bi bi-check2-square me-1"></i>Vote
-                            </a>
                         </li>
                         
                         <!-- User Guide (kept at the end) -->

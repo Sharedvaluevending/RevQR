@@ -28,36 +28,63 @@ $qr_balance = $user_id ? QRCoinManager::getBalance($user_id) : 0;
                 <li class="nav-item">
                     <a class="nav-link <?php echo $current_page === 'dashboard.php' ? 'active' : ''; ?>" 
                        href="/user/dashboard.php">
-                        <i class="bi bi-house-door me-1"></i>Dashboard
+                        <i class="bi bi-house-heart me-1"></i>Home
                     </a>
                 </li>
                 
-                <li class="nav-item">
-                    <a class="nav-link <?php echo $current_page === 'voting.php' ? 'active' : ''; ?>" 
-                       href="/user/voting.php">
-                        <i class="bi bi-hand-thumbs-up me-1"></i>Vote
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link <?php echo $current_page === 'spin-wheel.php' ? 'active' : ''; ?>" 
-                       href="/user/spin-wheel.php">
-                        <i class="bi bi-arrow-clockwise me-1"></i>Spin Wheel
-                    </a>
-                </li>
-                
-                <!-- QR Stores -->
+                <!-- Play Menu (Entertainment Hub) -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle <?php echo $current_page === 'business-stores.php' ? 'active' : ''; ?>" 
-                       href="#" id="storeDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-shop me-1"></i>Stores
-                        <span class="badge bg-warning ms-1">Beta</span>
+                    <a class="nav-link dropdown-toggle <?php echo in_array($current_page, ['voting.php', 'spin-wheel.php']) ? 'active' : ''; ?>" 
+                       href="#" id="playDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-controller me-1"></i>Play
                     </a>
                     <ul class="dropdown-menu">
                         <li>
+                            <a class="dropdown-item <?php echo $current_page === 'index.php' && strpos($_SERVER['REQUEST_URI'], '/casino/') !== false ? 'active' : ''; ?>" 
+                               href="/casino/index.php">
+                                <i class="bi bi-suit-diamond me-2"></i>Casino
+                                <span class="badge bg-danger ms-1">Slots</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/horse-racing/quick-races.php">
+                                <i class="bi bi-speedometer2 me-2"></i>Horse Racing
+                                <span class="badge bg-warning ms-1">Quick Races</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item <?php echo $current_page === 'voting.php' ? 'active' : ''; ?>" 
+                       href="/user/voting.php">
+                                <i class="bi bi-hand-thumbs-up me-2"></i>Vote
+                    </a>
+                </li>
+                        <li>
+                            <a class="dropdown-item <?php echo $current_page === 'spin-wheel.php' ? 'active' : ''; ?>" 
+                       href="/user/spin-wheel.php">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Spin Wheel
+                    </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Shop Menu (Simplified) -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle <?php echo $current_page === 'business-stores.php' ? 'active' : ''; ?>" 
+                       href="#" id="shopDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-shop me-1"></i>Shop
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/user/qr-transactions.php">
+                                <i class="bi bi-wallet2 me-2"></i>My Wallet
+                                <span class="badge bg-primary ms-1"><?php echo number_format($qr_balance); ?></span>
+                            </a>
+                        </li>
+                        <li>
                             <a class="dropdown-item <?php echo $current_page === 'business-stores.php' ? 'active' : ''; ?>" 
                                href="/user/business-stores.php">
-                                <i class="bi bi-building me-2"></i>Business Discounts
+                                <i class="bi bi-percent me-2"></i>Local Deals
                                 <span class="badge bg-success ms-1">Available</span>
                             </a>
                         </li>
@@ -65,43 +92,37 @@ $qr_balance = $user_id ? QRCoinManager::getBalance($user_id) : 0;
                         <li class="dropdown-header">Coming Soon</li>
                         <li>
                             <span class="dropdown-item-text text-muted">
-                                <i class="bi bi-gem me-2"></i>QR Store
-                                <span class="badge bg-secondary ms-1">Soon</span>
-                            </span>
-                        </li>
-                        <li>
-                            <span class="dropdown-item-text text-muted">
-                                <i class="bi bi-bag-check me-2"></i>My Purchases
+                                <i class="bi bi-gem me-2"></i>Rewards Store
                                 <span class="badge bg-secondary ms-1">Soon</span>
                             </span>
                         </li>
                     </ul>
                 </li>
                 
-                <li class="nav-item">
-                    <a class="nav-link <?php echo $current_page === 'leaderboard.php' ? 'active' : ''; ?>" 
+                <!-- Compete Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle <?php echo in_array($current_page, ['leaderboard.php', 'achievements.php']) ? 'active' : ''; ?>" 
+                       href="#" id="competeDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-trophy me-1"></i>Compete
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item <?php echo $current_page === 'leaderboard.php' ? 'active' : ''; ?>" 
                        href="/user/leaderboard.php">
-                        <i class="bi bi-trophy me-1"></i>Leaderboard
+                                <i class="bi bi-bar-chart me-2"></i>Leaderboard
                     </a>
                 </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link <?php echo $current_page === 'achievements.php' ? 'active' : ''; ?>" 
+                        <li>
+                            <a class="dropdown-item <?php echo $current_page === 'achievements.php' ? 'active' : ''; ?>" 
                        href="/user/achievements.php">
-                        <i class="bi bi-award me-1"></i>Achievements
+                                <i class="bi bi-award me-2"></i>Achievements
                     </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
             
             <ul class="navbar-nav">
-                <!-- QR Coin Wallet -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/qr-transactions.php" title="QR Coin Wallet">
-                        <img src="/img/qrCoin.png" alt="QR Coin" class="me-1" style="width: 20px; height: 20px;">
-                        <span class="fw-semibold"><?php echo number_format($qr_balance); ?></span>
-                    </a>
-                </li>
-                
                 <!-- Notifications -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">

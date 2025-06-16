@@ -22,10 +22,12 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0d6efd">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#1e3c72">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="RevenueQR">
     <title><?php echo APP_NAME; ?></title>
     
     <!-- Cache Control Meta Tags -->
@@ -41,6 +43,242 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
         .navbar { background: rgba(30, 60, 114, 0.95) !important; }
         /* Kill any green */
         * { --green: blue !important; --success: blue !important; }
+    </style>
+    
+    <!-- MOBILE NAVIGATION FIX -->
+    <style id="mobile-nav-fix">
+        /* CRITICAL: Ensure content is visible on mobile */
+        @media (max-width: 991.98px) {
+            body, html {
+                overflow: visible !important;
+                height: auto !important;
+                position: static !important;
+            }
+            
+            main {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: relative !important;
+                z-index: 1 !important;
+            }
+            
+            .container-fluid, .container {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+            
+            .card, .row, .col-md-6, .col-lg-4, .col-12 {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+        }
+        /* Mobile Navigation Fixes */
+        @media (max-width: 991.98px) {
+            /* Fix navbar toggler visibility */
+            .navbar-toggler {
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                padding: 0.25rem 0.5rem !important;
+                font-size: 1.1rem !important;
+                border-radius: 0.375rem !important;
+                position: relative !important;
+                z-index: 1051 !important;
+            }
+            
+            .navbar-toggler:focus {
+                text-decoration: none !important;
+                outline: 0 !important;
+                box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25) !important;
+            }
+            
+            .navbar-toggler-icon {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+                width: 1.2em !important;
+                height: 1.2em !important;
+            }
+            
+            /* Fix mobile navbar collapse */
+            .navbar-collapse {
+                position: absolute !important;
+                top: 100% !important;
+                left: 0 !important;
+                right: 0 !important;
+                background: rgba(30, 60, 114, 0.98) !important;
+                backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                border-top: none !important;
+                border-radius: 0 0 15px 15px !important;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+                z-index: 1050 !important;
+                max-height: calc(100vh - 80px) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            
+            /* Mobile dropdown menu fixes */
+            .navbar-nav .dropdown-menu {
+                position: static !important;
+                float: none !important;
+                width: auto !important;
+                margin-top: 0 !important;
+                background-color: rgba(52, 58, 64, 0.95) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-radius: 0.5rem !important;
+                margin: 0.5rem 1rem !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+            
+            /* Mobile nav links */
+            .navbar-nav .nav-link {
+                padding: 0.75rem 1.5rem !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+                font-weight: 500 !important;
+            }
+            
+            .navbar-nav .nav-link:hover,
+            .navbar-nav .nav-link:focus {
+                background-color: rgba(255, 255, 255, 0.1) !important;
+                color: #ffffff !important;
+                border-radius: 0.375rem !important;
+                margin: 0 0.5rem !important;
+            }
+            
+            /* Mobile dropdown items */
+            .dropdown-item {
+                padding: 0.75rem 1.5rem !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            }
+            
+            .dropdown-item:hover,
+            .dropdown-item:focus {
+                background-color: rgba(255, 255, 255, 0.1) !important;
+                color: #ffffff !important;
+            }
+            
+            /* Mobile badges */
+            .navbar .badge {
+                font-size: 0.7rem !important;
+                padding: 0.25rem 0.5rem !important;
+            }
+            
+                         /* Fix main content padding for mobile */
+             main {
+                 padding-top: 70px !important;
+                 display: block !important;
+                 visibility: visible !important;
+                 min-height: calc(100vh - 70px) !important;
+                 position: relative !important;
+                 z-index: 1 !important;
+             }
+             
+             .container-fluid {
+                 display: block !important;
+                 visibility: visible !important;
+                 position: relative !important;
+                 z-index: 1 !important;
+             }
+         }
+         
+         /* Small mobile devices */
+         @media (max-width: 575.98px) {
+             .navbar-brand span {
+                 display: none !important;
+             }
+             
+             .navbar-brand img {
+                 height: 28px !important;
+             }
+             
+             main {
+                 padding-top: 65px !important;
+                 display: block !important;
+                 visibility: visible !important;
+                 min-height: calc(100vh - 65px) !important;
+             }
+         }
+        
+        /* Fix touch issues on iOS */
+        @supports (-webkit-touch-callout: none) {
+            .navbar-toggler {
+                -webkit-touch-callout: none !important;
+                -webkit-user-select: none !important;
+                -webkit-tap-highlight-color: transparent !important;
+            }
+            
+            .nav-link,
+            .dropdown-item {
+                -webkit-touch-callout: none !important;
+                -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1) !important;
+            }
+        }
+    </style>
+    
+    <!-- MOBILE WHITE FLASH PREVENTION -->
+    <style id="mobile-flash-fix">
+        /* Prevent white flash on mobile devices */
+        html {
+            background: #1e3c72 !important;
+            overscroll-behavior: none !important;
+            -webkit-overflow-scrolling: touch !important;
+            height: 100% !important;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%) !important;
+            overscroll-behavior: none !important;
+            -webkit-overflow-scrolling: touch !important;
+            min-height: 100vh !important;
+            min-height: -webkit-fill-available !important;
+        }
+        
+        /* Mobile-specific fixes */
+        @media (max-width: 768px) {
+            html, body {
+                background-attachment: scroll !important;
+                background-size: 100% 120vh !important;
+                background-repeat: no-repeat !important;
+                background-position: center top !important;
+                overscroll-behavior-y: none !important;
+                overscroll-behavior-x: none !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            
+            /* Extended background for overscroll areas */
+            body::before {
+                content: '';
+                position: fixed;
+                top: -20vh;
+                left: 0;
+                right: 0;
+                bottom: -20vh;
+                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%);
+                z-index: -1;
+                pointer-events: none;
+            }
+            
+            /* REMOVED iOS Safari bounce prevention - was hiding content */
+            main, .container-fluid, .card, .content {
+                display: block !important;
+                visibility: visible !important;
+                position: relative !important;
+                z-index: 1 !important;
+            }
+        }
+        
+        /* iOS specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            html {
+                height: -webkit-fill-available !important;
+            }
+            
+            body {
+                min-height: -webkit-fill-available !important;
+            }
+        }
     </style>
     
     <!-- Favicon -->
@@ -72,11 +310,52 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
     <!-- Initialize Bootstrap Components -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize all dropdowns
+        // Initialize all dropdowns with mobile-friendly options
         var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
         var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-            return new bootstrap.Dropdown(dropdownToggleEl);
+            return new bootstrap.Dropdown(dropdownToggleEl, {
+                autoClose: true,
+                boundary: 'viewport'
+            });
         });
+        
+        // Fix mobile navbar toggler
+        var navbarToggler = document.querySelector('.navbar-toggler');
+        var navbarCollapse = document.querySelector('.navbar-collapse');
+        
+        if (navbarToggler && navbarCollapse) {
+            // Ensure proper Bootstrap collapse initialization
+            var bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+                toggle: false
+            });
+            
+            // Add click handler for mobile toggler
+            navbarToggler.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                bsCollapse.toggle();
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 991.98) {
+                    var isClickInsideNav = navbarCollapse.contains(e.target) || navbarToggler.contains(e.target);
+                    if (!isClickInsideNav && navbarCollapse.classList.contains('show')) {
+                        bsCollapse.hide();
+                    }
+                }
+            });
+            
+            // Close mobile menu when clicking nav links (except dropdowns)
+            var navLinks = document.querySelectorAll('.navbar-nav .nav-link:not(.dropdown-toggle)');
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 991.98 && navbarCollapse.classList.contains('show')) {
+                        bsCollapse.hide();
+                    }
+                });
+            });
+        }
         
         // Initialize all tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -95,6 +374,29 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
         } catch (error) {
             console.warn('Modal initialization warning:', error);
         }
+        
+        // Add touch-friendly enhancements for mobile
+        if ('ontouchstart' in window) {
+            // Add touch class to body for CSS targeting
+            document.body.classList.add('touch-device');
+            
+            // Improve touch targets
+            var touchTargets = document.querySelectorAll('.nav-link, .dropdown-item, .btn');
+            touchTargets.forEach(function(target) {
+                target.style.minHeight = '44px';
+                target.style.display = 'flex';
+                target.style.alignItems = 'center';
+            });
+        }
+        
+        // Prevent iOS double-tap zoom on buttons
+        var clickableElements = document.querySelectorAll('button, .btn, .nav-link, .dropdown-item');
+        clickableElements.forEach(function(element) {
+            element.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                element.click();
+            });
+        });
     });
     </script>
 
@@ -544,39 +846,17 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
             border: 1px solid rgba(255, 255, 255, 0.35) !important;
         }
         
-        /* Responsive Navigation Fixes */
-        @media (max-width: 768px) {
-            /* Adjust main content padding for mobile navbar */
-            main {
-                padding-top: 70px !important;
-            }
-        }
-        
-        @media (max-width: 992px) {
-            /* Tablet navbar adjustments */
-            main {
-                padding-top: 75px !important;
-            }
-        }
-        
-        /* Ensure navbar doesn't cause horizontal scroll */
+        /* Ensure navbar container responsiveness */
         .navbar {
-            /* overflow-x: hidden; - REMOVED: This was causing dropdown scroll issues */
+            position: fixed !important;
+            top: 0 !important;
+            width: 100% !important;
+            z-index: 1030 !important;
         }
         
         .navbar .container {
             max-width: 100%;
-            /* overflow-x: hidden; - REMOVED: This was causing dropdown scroll issues */
-        }
-        
-        /* Fix dropdown menu positioning on mobile */
-        @media (max-width: 991px) {
-            .dropdown-menu {
-                border: none;
-                box-shadow: none;
-                background: rgba(52, 58, 64, 0.95) !important;
-                backdrop-filter: blur(10px);
-            }
+            padding: 0 1rem;
         }
     </style>
 </head>

@@ -165,6 +165,44 @@ p, li, span, div {
                     </div>
                     
                     <!-- New Features Highlight -->
+                    <!-- Business Registration Quick Start -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h5><i class="bi bi-rocket-takeoff me-2"></i>🚀 Quick Business Setup</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>1. Account Setup:</strong>
+                                        <ol class="mb-0 mt-2">
+                                            <li>Complete business profile with logo</li>
+                                            <li>Verify business documentation</li>
+                                            <li>Configure payment processing</li>
+                                            <li>Set up initial QR codes</li>
+                                        </ol>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>2. Revenue Optimization:</strong>
+                                        <ol class="mb-0 mt-2">
+                                            <li>Configure commission structures</li>
+                                            <li>Set up inventory management</li>
+                                            <li>Enable gaming features</li>
+                                            <li>Create promotional campaigns</li>
+                                        </ol>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>3. Go Live:</strong>
+                                        <ol class="mb-0 mt-2">
+                                            <li>Train staff on platform usage</li>
+                                            <li>Launch marketing campaigns</li>
+                                            <li>Monitor analytics dashboard</li>
+                                            <li>Optimize based on performance</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="alert alert-warning">
@@ -395,6 +433,121 @@ p, li, span, div {
                         <strong>Customer Value:</strong> $1.00 savings on $5.00 purchase<br>
                         <strong>Your Cost:</strong> Discounted margin + increased customer loyalty<br>
                         <strong>Result:</strong> Higher customer retention and repeat visits</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Integration & Security -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingPayments">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePayments">
+                    <i class="bi bi-credit-card me-2"></i>
+                    Payment Processing & Security
+                </button>
+            </h2>
+            <div id="collapsePayments" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h6><i class="bi bi-credit-card-2-front text-primary me-2"></i>Supported Payment Methods</h6>
+                                <ul>
+                                    <li><strong>Credit/Debit Cards:</strong> Visa, Mastercard, Amex</li>
+                                    <li><strong>Digital Wallets:</strong> PayPal, Apple Pay, Google Pay</li>
+                                    <li><strong>Cryptocurrency:</strong> Bitcoin and major cryptocurrencies</li>
+                                    <li><strong>Bank Transfers:</strong> Direct ACH transfers</li>
+                                    <li><strong>QR Coin System:</strong> Platform digital currency</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h6><i class="bi bi-shield-check text-success me-2"></i>Security Features</h6>
+                                <ul>
+                                    <li><strong>PCI Compliance:</strong> Industry-standard payment security</li>
+                                    <li><strong>SSL Encryption:</strong> End-to-end transaction protection</li>
+                                    <li><strong>Fraud Detection:</strong> AI-powered fraud prevention</li>
+                                    <li><strong>Two-Factor Auth:</strong> Enhanced account security</li>
+                                    <li><strong>Regular Audits:</strong> Ongoing security assessments</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h6><i class="bi bi-graph-up text-info me-2"></i>NAYAX Vending Integration</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>Cashless Payments:</strong> Seamless card and mobile payments</li>
+                                    <li><strong>Real-Time Processing:</strong> Instant transaction confirmation</li>
+                                    <li><strong>Revenue Tracking:</strong> Automated sales reporting</li>
+                                    <li><strong>Remote Monitoring:</strong> Track all vending transactions</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>Inventory Sync:</strong> Automatic stock level updates</li>
+                                    <li><strong>Multi-Location:</strong> Manage multiple machines</li>
+                                    <li><strong>Analytics Integration:</strong> Combined data reporting</li>
+                                    <li><strong>Maintenance Alerts:</strong> Proactive machine monitoring</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quick-tip">
+                        <i class="bi bi-cash-coin text-success me-2"></i>
+                        <strong>Payment Pro Tip:</strong> Enable multiple payment methods to increase customer conversion rates by up to 35%.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-Location Management -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingMultiLocation">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMultiLocation">
+                    <i class="bi bi-building me-2"></i>
+                    Multi-Location & Enterprise Features
+                </button>
+            </h2>
+            <div id="collapseMultiLocation" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h6><i class="bi bi-buildings text-primary me-2"></i>Centralized Management</h6>
+                                <ul>
+                                    <li><strong>Unified Dashboard:</strong> Manage all locations from one interface</li>
+                                    <li><strong>Performance Comparison:</strong> Compare location metrics</li>
+                                    <li><strong>Resource Allocation:</strong> Optimize inventory distribution</li>
+                                    <li><strong>Staff Management:</strong> Role-based access control</li>
+                                    <li><strong>Bulk Operations:</strong> Update multiple locations simultaneously</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h6><i class="bi bi-gear text-warning me-2"></i>Enterprise Tools</h6>
+                                <ul>
+                                    <li><strong>API Integration:</strong> Connect with existing systems</li>
+                                    <li><strong>Custom Reporting:</strong> Tailored analytics for your needs</li>
+                                    <li><strong>White-Label Options:</strong> Brand the platform as your own</li>
+                                    <li><strong>Dedicated Support:</strong> Priority customer service</li>
+                                    <li><strong>Training Programs:</strong> Staff certification courses</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="revenue-highlight">
+                        <h6><i class="bi bi-trophy text-warning me-2"></i>Enterprise Success Stories</h6>
+                        <p><strong>Multi-Location Chain:</strong> 50+ locations using RevenueQR<br>
+                        <strong>Average Results:</strong> 45% revenue increase, 60% engagement boost<br>
+                        <strong>ROI Timeline:</strong> Full investment return within 8 months<br>
+                        <strong>Customer Satisfaction:</strong> 95% positive feedback ratings</p>
                     </div>
                 </div>
             </div>

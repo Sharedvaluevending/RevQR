@@ -1,0 +1,15 @@
+<h1>QR Text Rendering Debug Test</h1><h2>Test 1: QRGenerator Direct Text Test</h2><p>❌ QRGenerator text test failed: Unknown error</p><h2>Test 2: Font Availability Check</h2><ul><li>/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf - ✅ Exists & Readable</li><li>/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf - ✅ Exists & Readable</li><li>/usr/share/fonts/TTF/DejaVuSans.ttf - ❌ Missing</li><li>/System/Library/Fonts/Arial.ttf - ❌ Missing</li><li>/Windows/Fonts/arial.ttf - ❌ Missing</li><li>/var/www/html/vendor/endroid/qr-code/assets/noto_sans.otf - ✅ Exists & Readable</li><li>/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf - ❌ Missing</li></ul><h2>Test 3: Canvas Size & Positioning Test</h2><h2>Test 4: API Endpoint Tests</h2><h3>Basic Generator API Test</h3>
+Warning: ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 76
+
+Warning: ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+
+Warning: ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+
+Warning: session_name(): Session name cannot be changed after headers have already been sent in /var/www/html/core/session.php on line 5
+
+Warning: session_set_cookie_params(): Session cookie parameters cannot be changed after headers have already been sent in /var/www/html/core/session.php on line 6
+
+Warning: session_start(): Session cannot be started after headers have already been sent in /var/www/html/core/session.php on line 14
+
+Warning: http_response_code(): Cannot set response code - headers already sent (output started at /var/www/test_text_rendering_debug.php:7) in /var/www/html/api/qr/generate.php on line 20
+{"success":false,"message":"Invalid request data"}

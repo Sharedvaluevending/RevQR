@@ -39,7 +39,7 @@ $store_enabled = ConfigManager::get('business_store_enabled', false);
                 
                 <!-- QR Code Management -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle <?php echo in_array($current_page, ['qr-manager.php', 'print-shop.php', 'qr-generator.php', 'qr-generator-enhanced.php']) ? 'active' : ''; ?>" 
+                    <a class="nav-link dropdown-toggle <?php echo in_array($current_page, ['qr-manager.php', 'print-shop.php', 'qr_dynamic_manager.php', 'qr-generator.php', 'qr-generator-enhanced.php']) ? 'active' : ''; ?>" 
                        href="#" id="qrDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-qr-code me-1"></i>QR Codes
                     </a>
@@ -55,6 +55,13 @@ $store_enabled = ConfigManager::get('business_store_enabled', false);
                                href="<?php echo APP_URL; ?>/print-shop.php">
                                 <i class="bi bi-printer me-2"></i>Print Shop
                                 <span class="badge bg-success ms-1">New</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item <?php echo $current_page === 'qr_dynamic_manager.php' ? 'active' : ''; ?>" 
+                               href="<?php echo APP_URL; ?>/qr_dynamic_manager.php">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Dynamic Edit QR Codes
+                                <span class="badge bg-info ms-1">Pro</span>
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>

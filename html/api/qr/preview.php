@@ -34,6 +34,43 @@ try {
         "preview" => true  // Enable preview mode
     ];
     
+    // Add logo if specified
+    if (!empty($input["logo"])) {
+        $options["logo"] = $input["logo"];
+    }
+    
+    // Add text labels
+    if (!empty($input["enable_label"]) && !empty($input["label_text"])) {
+        $options["enable_label"] = true;
+        $options["label_text"] = $input["label_text"];
+        $options["label_font"] = $input["label_font"] ?? "Arial";
+        $options["label_size"] = intval($input["label_size"] ?? 16);
+        $options["label_color"] = $input["label_color"] ?? "#000000";
+        $options["label_alignment"] = $input["label_alignment"] ?? "center";
+        $options["label_bold"] = !empty($input["label_bold"]);
+        $options["label_underline"] = !empty($input["label_underline"]);
+        $options["label_shadow"] = !empty($input["label_shadow"]);
+        $options["label_outline"] = !empty($input["label_outline"]);
+        $options["label_shadow_color"] = $input["label_shadow_color"] ?? "#000000";
+        $options["label_outline_color"] = $input["label_outline_color"] ?? "#000000";
+    }
+    
+    // Add bottom text
+    if (!empty($input["enable_bottom_text"]) && !empty($input["bottom_text"])) {
+        $options["enable_bottom_text"] = true;
+        $options["bottom_text"] = $input["bottom_text"];
+        $options["bottom_font"] = $input["bottom_font"] ?? "Arial";
+        $options["bottom_size"] = intval($input["bottom_size"] ?? 14);
+        $options["bottom_color"] = $input["bottom_color"] ?? "#666666";
+        $options["bottom_alignment"] = $input["bottom_alignment"] ?? "center";
+        $options["bottom_bold"] = !empty($input["bottom_bold"]);
+        $options["bottom_underline"] = !empty($input["bottom_underline"]);
+        $options["bottom_shadow"] = !empty($input["bottom_shadow"]);
+        $options["bottom_outline"] = !empty($input["bottom_outline"]);
+        $options["bottom_shadow_color"] = $input["bottom_shadow_color"] ?? "#000000";
+        $options["bottom_outline_color"] = $input["bottom_outline_color"] ?? "#000000";
+    }
+    
     $result = $generator->generate($options);
     
     if ($result["success"]) {

@@ -357,9 +357,19 @@ require_once __DIR__ . '/../core/includes/header.php';
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Public Spin Wheel Logic
-        const rewards = <?php echo json_encode($rewards); ?>;
-        const wheelId = <?php echo $wheel_id; ?>;
+        // Enhanced error handling
+        function showError(message) {
+            console.error('Spin Wheel Error:', message);
+            alert('Error: ' + message);
+        }
+        
+        // Public Spin Wheel Logic with error handling
+        try {
+            const rewards = <?php echo json_encode($rewards); ?>;
+            const wheelId = <?php echo $wheel_id; ?>;
+            
+            console.log('🎡 Initializing spin wheel with', rewards ? rewards.length : 0, 'rewards');
+            console.log('📊 Rewards data:', rewards);
         
         // Enhanced color palette for high-end look
         const colors = [
@@ -368,8 +378,19 @@ require_once __DIR__ . '/../core/includes/header.php';
         ];
         
         const canvas = document.getElementById('publicSpinWheel');
+        if (!canvas) {
+            throw new Error('Canvas element not found');
+        }
+        
         const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            throw new Error('Could not get canvas 2D context');
+        }
+        
         const spinButton = document.getElementById('spinButton');
+        if (!spinButton) {
+            throw new Error('Spin button element not found');
+        }
         
         let rotation = 0;
         let spinning = false;
@@ -399,17 +420,34 @@ require_once __DIR__ . '/../core/includes/header.php';
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            if (rewards.length === 0) {
+            if (!rewards || rewards.length === 0) {
+                // Draw empty wheel with better styling
                 ctx.fillStyle = '#f0f0f0';
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
                 ctx.fill();
                 
+                // Add border to empty wheel
+                ctx.strokeStyle = '#ddd';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
                 ctx.fillStyle = '#666';
                 ctx.font = '16px Arial';
                 ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
                 ctx.fillText('No prizes available', centerX, centerY);
+                
+                // Disable spin button
+                spinButton.disabled = true;
+                spinButton.innerHTML = '<i class="bi bi-x-circle me-2"></i>No Prizes Available';
                 return;
+            }
+            
+            // Enable spin button if it was disabled
+            if (spinButton.disabled) {
+                spinButton.disabled = false;
+                spinButton.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Spin to Win!';
             }
             
             const anglePerSegment = (2 * Math.PI) / rewards.length;
@@ -592,6 +630,13 @@ require_once __DIR__ . '/../core/includes/header.php';
             setupCanvasSize();
             drawWheel();
         });
+        
+        console.log('✅ Spin wheel initialized successfully');
+        
+    } catch (error) {
+        showError('Failed to initialize spin wheel: ' + error.message);
+        console.error('💥 Fatal spin wheel error:', error);
+    }
     </script>
 </body>
 </html> 

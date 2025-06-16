@@ -683,20 +683,7 @@ require_once __DIR__ . '/core/includes/header.php';
                                                 <option value="Trebuchet MS">Trebuchet MS</option>
                                                 <option value="Lucida Console">Lucida Console</option>
                                                 <option value="Brush Script MT">Brush Script MT</option>
-                                                <option value="Caveat">Caveat</option>
-                                                <option value="Pacifico">Pacifico</option>
-                                                <option value="Lobster">Lobster</option>
-                                                <option value="Bebas Neue">Bebas Neue</option>
-                                                <option value="Oswald">Oswald</option>
-                                                <option value="Montserrat">Montserrat</option>
                                                 <option value="Roboto">Roboto</option>
-                                                <option value="Raleway">Raleway</option>
-                                                <option value="Dancing Script">Dancing Script</option>
-                                                <option value="Permanent Marker">Permanent Marker</option>
-                                                <option value="Orbitron">Orbitron</option>
-                                                <option value="Fjalla One">Fjalla One</option>
-                                                <option value="Shadows Into Light">Shadows Into Light</option>
-                                                <option value="Indie Flower">Indie Flower</option>
                                             </select>
                                             <div class="form-check form-check-inline ms-1">
                                                 <input class="form-check-input" type="checkbox" name="label_bold" id="labelBold">
@@ -774,20 +761,7 @@ require_once __DIR__ . '/core/includes/header.php';
                                                 <option value="Trebuchet MS">Trebuchet MS</option>
                                                 <option value="Lucida Console">Lucida Console</option>
                                                 <option value="Brush Script MT">Brush Script MT</option>
-                                                <option value="Caveat">Caveat</option>
-                                                <option value="Pacifico">Pacifico</option>
-                                                <option value="Lobster">Lobster</option>
-                                                <option value="Bebas Neue">Bebas Neue</option>
-                                                <option value="Oswald">Oswald</option>
-                                                <option value="Montserrat">Montserrat</option>
                                                 <option value="Roboto">Roboto</option>
-                                                <option value="Raleway">Raleway</option>
-                                                <option value="Dancing Script">Dancing Script</option>
-                                                <option value="Permanent Marker">Permanent Marker</option>
-                                                <option value="Orbitron">Orbitron</option>
-                                                <option value="Fjalla One">Fjalla One</option>
-                                                <option value="Shadows Into Light">Shadows Into Light</option>
-                                                <option value="Indie Flower">Indie Flower</option>
                                             </select>
                                             <div class="form-check form-check-inline ms-1">
                                                 <input class="form-check-input" type="checkbox" name="bottom_bold" id="bottomBold">
@@ -1199,6 +1173,42 @@ function generatePreview() {
         logo: selectedLogo
     };
     
+    // Add text label parameters
+    const enableLabel = document.getElementById('enableLabel');
+    if (enableLabel && enableLabel.checked) {
+        const labelText = document.getElementById('labelText')?.value;
+        if (labelText) {
+            formData.enable_label = true;
+            formData.label_text = labelText;
+            formData.label_font = document.getElementById('labelFontSelect')?.value || 'Arial';
+            formData.label_size = parseInt(document.getElementById('labelSizeRange')?.value || 16);
+            formData.label_color = document.getElementById('labelColor')?.value || '#000000';
+            formData.label_alignment = document.getElementById('labelAlignment')?.value || 'center';
+            formData.label_bold = document.getElementById('labelBold')?.checked || false;
+            formData.label_underline = document.getElementById('labelUnderline')?.checked || false;
+            formData.label_shadow = document.getElementById('labelShadow')?.checked || false;
+            formData.label_outline = document.getElementById('labelOutline')?.checked || false;
+        }
+    }
+    
+    // Add bottom text parameters
+    const enableBottomText = document.getElementById('enableBottomText');
+    if (enableBottomText && enableBottomText.checked) {
+        const bottomText = document.getElementById('bottomText')?.value;
+        if (bottomText) {
+            formData.enable_bottom_text = true;
+            formData.bottom_text = bottomText;
+            formData.bottom_font = document.getElementById('bottomFontSelect')?.value || 'Arial';
+            formData.bottom_size = parseInt(document.getElementById('bottomSizeRange')?.value || 14);
+            formData.bottom_color = document.getElementById('bottomColor')?.value || '#666666';
+            formData.bottom_alignment = document.getElementById('bottomAlignment')?.value || 'center';
+            formData.bottom_bold = document.getElementById('bottomBold')?.checked || false;
+            formData.bottom_underline = document.getElementById('bottomUnderline')?.checked || false;
+            formData.bottom_shadow = document.getElementById('bottomShadow')?.checked || false;
+            formData.bottom_outline = document.getElementById('bottomOutline')?.checked || false;
+        }
+    }
+    
     console.log('📤 Calling preview API with:', formData);
     
     // Call preview API
@@ -1259,6 +1269,42 @@ function generateQRCode() {
         background_color: document.getElementById('backgroundColor')?.value || '#FFFFFF',
         logo: selectedLogo
     };
+    
+    // Add text label parameters
+    const enableLabel = document.getElementById('enableLabel');
+    if (enableLabel && enableLabel.checked) {
+        const labelText = document.getElementById('labelText')?.value;
+        if (labelText) {
+            formData.enable_label = true;
+            formData.label_text = labelText;
+            formData.label_font = document.getElementById('labelFontSelect')?.value || 'Arial';
+            formData.label_size = parseInt(document.getElementById('labelSizeRange')?.value || 16);
+            formData.label_color = document.getElementById('labelColor')?.value || '#000000';
+            formData.label_alignment = document.getElementById('labelAlignment')?.value || 'center';
+            formData.label_bold = document.getElementById('labelBold')?.checked || false;
+            formData.label_underline = document.getElementById('labelUnderline')?.checked || false;
+            formData.label_shadow = document.getElementById('labelShadow')?.checked || false;
+            formData.label_outline = document.getElementById('labelOutline')?.checked || false;
+        }
+    }
+    
+    // Add bottom text parameters
+    const enableBottomText = document.getElementById('enableBottomText');
+    if (enableBottomText && enableBottomText.checked) {
+        const bottomText = document.getElementById('bottomText')?.value;
+        if (bottomText) {
+            formData.enable_bottom_text = true;
+            formData.bottom_text = bottomText;
+            formData.bottom_font = document.getElementById('bottomFontSelect')?.value || 'Arial';
+            formData.bottom_size = parseInt(document.getElementById('bottomSizeRange')?.value || 14);
+            formData.bottom_color = document.getElementById('bottomColor')?.value || '#666666';
+            formData.bottom_alignment = document.getElementById('bottomAlignment')?.value || 'center';
+            formData.bottom_bold = document.getElementById('bottomBold')?.checked || false;
+            formData.bottom_underline = document.getElementById('bottomUnderline')?.checked || false;
+            formData.bottom_shadow = document.getElementById('bottomShadow')?.checked || false;
+            formData.bottom_outline = document.getElementById('bottomOutline')?.checked || false;
+        }
+    }
     
     console.log('📤 Calling generate API with:', formData);
     

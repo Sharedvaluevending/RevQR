@@ -586,7 +586,35 @@ include '../core/includes/header.php';
                                                         </a>
                                                     <?php endif; ?>
                                                 </div>
-                                                                        <?php elseif (isset($avatar['unlock_method']) && $avatar['unlock_method'] === 'triple_milestone'): ?>
+                                                                        <?php elseif (isset($avatar['unlock_method']) && $avatar['unlock_method'] === 'milestone'): ?>
+                                                <div class="mb-2">
+                                                    <strong class="text-warning">
+                                                        <i class="bi bi-coin me-1"></i>
+                                                        <?php echo number_format($avatar['unlock_requirement']); ?> QR Coins Spending Milestone
+                                                    </strong>
+                                                </div>
+                                                <div class="text-center">
+                                                    <p class="small text-muted mb-2">
+                                                        Progress: <?php echo number_format($qr_stats['total_spent']); ?> / <?php echo number_format($avatar['unlock_requirement']); ?> coins spent
+                                                    </p>
+                                                    <div class="progress mb-2" style="height: 8px;">
+                                                        <div class="progress-bar bg-warning" style="width: <?php echo min(100, ($qr_stats['total_spent'] / $avatar['unlock_requirement']) * 100); ?>%"></div>
+                                                    </div>
+                                                    <?php if ($qr_stats['total_spent'] >= $avatar['unlock_requirement']): ?>
+                                                        <span class="badge bg-success">
+                                                            <i class="bi bi-check-circle me-1"></i>Unlocked!
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <small class="text-muted">
+                                                            <?php echo number_format($avatar['unlock_requirement'] - $qr_stats['total_spent']); ?> more coins needed
+                                                        </small>
+                                                        <br>
+                                                        <a href="../user/dashboard.php" class="btn btn-sm btn-warning mt-1">
+                                                            <i class="bi bi-arrow-right-circle me-1"></i>Earn More Coins
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php elseif (isset($avatar['unlock_method']) && $avatar['unlock_method'] === 'triple_milestone'): ?>
                                 <div class="mb-2">
                                     <strong class="text-warning">
                                         <i class="bi bi-trophy-fill me-1"></i>

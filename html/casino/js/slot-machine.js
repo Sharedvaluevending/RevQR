@@ -464,7 +464,7 @@ class SlotMachine {
         
         // Animate to final position with bounce
         gsap.to(reelData.container, {
-            y: -this.symbolHeight, // Show middle symbol (winning position)
+            y: 0, // Show all 3 symbols properly positioned
             duration: 0.8,
             ease: "back.out(1.7)",
             onComplete: () => {

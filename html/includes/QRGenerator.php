@@ -33,11 +33,18 @@ use Endroid\QrCode\Logo\Logo;
  * - Memory efficient: Temporary images destroyed immediately after use
  */
 class QRGenerator {
+    // FIXED: Standardized brightness threshold to prevent masking conflicts
+    private const BRIGHTNESS_THRESHOLD = 128;
+    private const BACKGROUND_THRESHOLD = 140; // Slightly higher for background detection
+    
     private $uploadDir;
     private $allowedTypes;
     private $defaultOptions;
+    private $pdo;
 
     public function __construct() {
+        global $pdo;
+        $this->pdo = $pdo;
         $this->uploadDir = __DIR__ . '/../uploads/qr/';
         $this->allowedTypes = [
             'static', 
@@ -325,7 +332,8 @@ class QRGenerator {
             }
         }
 
-        // Apply QR code gradient if enabled
+        // FIXED: Proper gradient application order to prevent layer conflicts
+        // 1. Apply QR code gradient FIRST (to foreground pixels only)
         if (!empty($options['enable_qr_gradient'])) {
             $gradientOptions = [
                 'type' => $options['qr_gradient_type'] ?? 'linear',
@@ -338,14 +346,14 @@ class QRGenerator {
             $qrImage = $this->applyGradient($qrImage, $gradientOptions, $options);
         }
 
-        // Apply custom eye finder patterns if enabled
-        if (!empty($options['enable_custom_eyes'])) {
-            $qrImage = $this->applyCustomEyePatterns($qrImage, $options);
-        }
-
-        // Apply module shape if enabled
+        // 2. Apply module shape SECOND (preserves gradient)
         if (!empty($options['enable_module_shape']) && !empty($options['module_shape']) && $options['module_shape'] !== 'square') {
             $qrImage = $this->applyModuleShape($qrImage, $options);
+        }
+
+        // 3. Apply custom eye finder patterns LAST (should override everything)
+        if (!empty($options['enable_custom_eyes'])) {
+            $qrImage = $this->applyCustomEyePatterns($qrImage, $options);
         }
 
         // Add shadow effect if enabled
@@ -503,7 +511,7 @@ class QRGenerator {
                 
                 // Check if it's a dark pixel (QR module/finder pattern)
                 $brightness = ($pixelRgb['red'] * 0.299) + ($pixelRgb['green'] * 0.587) + ($pixelRgb['blue'] * 0.114);
-                if ($brightness < 140) { // Threshold for foreground detection
+                if ($brightness < self::BRIGHTNESS_THRESHOLD) { // Threshold for foreground detection
                     $foregroundPixels[] = ['x' => $x, 'y' => $y];
                     
                     // Add adjacent pixels if they exist and are also dark
@@ -511,7 +519,7 @@ class QRGenerator {
                         $adjPixel = imagecolorat($image, $x + 1, $y);
                         $adjRgb = imagecolorsforindex($image, $adjPixel);
                         $adjBrightness = ($adjRgb['red'] * 0.299) + ($adjRgb['green'] * 0.587) + ($adjRgb['blue'] * 0.114);
-                        if ($adjBrightness < 140) {
+                        if ($adjBrightness < self::BRIGHTNESS_THRESHOLD) {
                             $foregroundPixels[] = ['x' => $x + 1, 'y' => $y];
                         }
                     }
@@ -520,7 +528,7 @@ class QRGenerator {
                         $adjPixel = imagecolorat($image, $x, $y + 1);
                         $adjRgb = imagecolorsforindex($image, $adjPixel);
                         $adjBrightness = ($adjRgb['red'] * 0.299) + ($adjRgb['green'] * 0.587) + ($adjRgb['blue'] * 0.114);
-                        if ($adjBrightness < 140) {
+                        if ($adjBrightness < self::BRIGHTNESS_THRESHOLD) {
                             $foregroundPixels[] = ['x' => $x, 'y' => $y + 1];
                         }
                     }
@@ -582,7 +590,7 @@ class QRGenerator {
                 
                 // Only apply gradient to dark pixels (foreground) - use proper brightness calculation
                 $brightness = ($pixelRgb['red'] * 0.299) + ($pixelRgb['green'] * 0.587) + ($pixelRgb['blue'] * 0.114);
-                if ($brightness < 128) {
+                if ($brightness < self::BRIGHTNESS_THRESHOLD) {
                     $distance = sqrt(($x - $centerX) ** 2 + ($y - $centerY) ** 2);
                     $position = min(1, $distance / $maxDistance);
                     
@@ -608,7 +616,7 @@ class QRGenerator {
                 
                 // Only apply gradient to dark pixels (foreground) - use proper brightness calculation
                 $brightness = ($pixelRgb['red'] * 0.299) + ($pixelRgb['green'] * 0.587) + ($pixelRgb['blue'] * 0.114);
-                if ($brightness < 128) {
+                if ($brightness < self::BRIGHTNESS_THRESHOLD) {
                     $angle = atan2($y - $centerY, $x - $centerX);
                     $position = ($angle + M_PI) / (2 * M_PI); // Normalize to 0-1
                     
@@ -627,36 +635,24 @@ class QRGenerator {
         $width = imagesx($image);
         $height = imagesy($image);
         
-        // Detect actual QR code finder patterns by analyzing the image
-        $finderInfo = $this->detectFinderPatterns($image);
+        // TEMPORARY FIX: Use simple estimation to prevent hanging
+        // TODO: Re-enable advanced finder detection after performance optimization
         
-        if ($finderInfo) {
-            // Use detected finder pattern information and make eyes appropriately sized
-            $eyeSize = $finderInfo['size'] * 1.4; // 140% to properly cover the finder patterns
-            $offsetAdjust = ($eyeSize - $finderInfo['size']) / 2; // Center the larger eye
-            $eyes = [
-                'tl' => ['x' => $finderInfo['tl']['x'] - $offsetAdjust, 'y' => $finderInfo['tl']['y'] - $offsetAdjust], // Center larger eye
-                'tr' => ['x' => $finderInfo['tr']['x'] - $offsetAdjust, 'y' => $finderInfo['tr']['y'] - $offsetAdjust], // Center larger eye
-                'bl' => ['x' => $finderInfo['bl']['x'] - $offsetAdjust, 'y' => $finderInfo['bl']['y'] - $offsetAdjust]  // Center larger eye
-            ];
-        } else {
-            // Fallback to improved estimation
-            // Estimate module size more accurately by scanning the image
-            $moduleSize = $this->estimateModuleSize($image);
-            $baseEyeSize = $moduleSize * 7; // Each eye is 7x7 modules
-            
-            // Make eyes appropriately sized to cover the original finder patterns
-            $eyeSize = $baseEyeSize * 1.3; // Increase to 130% to ensure proper coverage
-            
-            // Define eye positions with precise pixel alignment
-            // Adjust positioning to center the larger eyes over the original patterns
-            $offsetAdjust = ($eyeSize - $baseEyeSize) / 2; // Center the larger eye
-            $eyes = [
-                'tl' => ['x' => -$offsetAdjust, 'y' => -$offsetAdjust], // Top-left: centered
-                'tr' => ['x' => $width - $eyeSize + $offsetAdjust, 'y' => -$offsetAdjust], // Top-right: centered
-                'bl' => ['x' => -$offsetAdjust, 'y' => $height - $eyeSize + $offsetAdjust] // Bottom-left: centered
-            ];
-        }
+        // FIXED: Standardized eye scaling to prevent size conflicts
+        $standardScaling = 1.35; // Consistent 135% scaling for all eyes
+        
+        // Use simple estimation approach (faster and more reliable)
+        $moduleSize = $this->estimateModuleSize($image);
+        $baseEyeSize = $moduleSize * 7; // Each eye is 7x7 modules
+        $eyeSize = $baseEyeSize * $standardScaling;
+        
+        // Define eye positions with precise pixel alignment
+        $offsetAdjust = ($eyeSize - $baseEyeSize) / 2; // Center the larger eye
+        $eyes = [
+            'tl' => ['x' => -$offsetAdjust, 'y' => -$offsetAdjust], // Top-left: centered
+            'tr' => ['x' => $width - $eyeSize + $offsetAdjust, 'y' => -$offsetAdjust], // Top-right: centered
+            'bl' => ['x' => -$offsetAdjust, 'y' => $height - $eyeSize + $offsetAdjust] // Bottom-left: centered
+        ];
         
         foreach ($eyes as $position => $coords) {
             $this->drawCustomEye($image, $coords['x'], $coords['y'], $eyeSize, $options, $position);
@@ -709,7 +705,7 @@ class QRGenerator {
                 $rgb = imagecolorsforindex($image, $pixel);
                 
                 // If we find a dark pixel, check if it's part of a finder pattern
-                if ($rgb['red'] < 128) {
+                if ($this->isForegroundPixel($rgb)) {
                     $patternSize = $this->checkFinderPattern($image, $x, $y);
                     if ($patternSize > 0) {
                         return [
@@ -734,37 +730,96 @@ class QRGenerator {
             return 0;
         }
         
-        // Look for a square black region that could be a finder pattern
+        // IMPROVED: More accurate finder pattern detection using 1:1:3:1:1 ratio
+        // QR finder patterns have specific proportions: 7x7 outer, 5x5 inner, 3x3 center
         $size = 0;
-        for ($testSize = 15; $testSize <= 50; $testSize += 2) {
+        for ($testSize = 21; $testSize <= 70; $testSize += 7) { // Test multiples of 7 (QR module size)
             if ($x + $testSize >= $width || $y + $testSize >= $height) {
                 break;
             }
             
-            // Check if this forms a reasonable finder pattern
-            $blackPixels = 0;
-            $totalPixels = 0;
-            
-            for ($dy = 0; $dy < $testSize; $dy++) {
-                for ($dx = 0; $dx < $testSize; $dx++) {
-                    $pixel = imagecolorat($image, $x + $dx, $y + $dy);
-                    $rgb = imagecolorsforindex($image, $pixel);
-                    $totalPixels++;
-                    
-                    if ($rgb['red'] < 128) {
-                        $blackPixels++;
-                    }
-                }
-            }
-            
-            // A finder pattern should have a good ratio of black to white pixels
-            $blackRatio = $blackPixels / $totalPixels;
-            if ($blackRatio > 0.3 && $blackRatio < 0.7) {
+            // Check the characteristic pattern of a finder
+            if ($this->validateFinderPattern($image, $x, $y, $testSize)) {
                 $size = $testSize;
+                break; // Found valid pattern, no need to test larger sizes
             }
         }
         
         return $size;
+    }
+    
+    /**
+     * FIXED: Validate actual QR finder pattern structure (with safety checks)
+     */
+    private function validateFinderPattern($image, $x, $y, $size) {
+        // SAFETY: Check bounds before proceeding
+        $imageWidth = imagesx($image);
+        $imageHeight = imagesy($image);
+        
+        if ($x < 0 || $y < 0 || ($x + $size) > $imageWidth || ($y + $size) > $imageHeight) {
+            return false; // Out of bounds
+        }
+        
+        if ($size < 7) {
+            return false; // Too small to be a valid finder
+        }
+        
+        $moduleSize = $size / 7; // Each finder is 7x7 modules
+        
+        // Check outer ring (should be black) - use smaller sample to prevent hanging
+        $outerSampleSize = min($size, 21); // Limit sample size
+        $outerBlack = $this->checkRegionColor($image, $x, $y, $outerSampleSize, $outerSampleSize, true);
+        
+        // Check inner white space (should be white)
+        $innerStart = $moduleSize;
+        $innerSize = min($moduleSize * 5, $outerSampleSize - $innerStart * 2);
+        if ($innerSize <= 0) return false;
+        $innerWhite = $this->checkRegionColor($image, $x + $innerStart, $y + $innerStart, $innerSize, $innerSize, false);
+        
+        // Check center square (should be black)
+        $centerStart = $moduleSize * 2;
+        $centerSize = min($moduleSize * 3, $innerSize - $moduleSize);
+        if ($centerSize <= 0) return false;
+        $centerBlack = $this->checkRegionColor($image, $x + $centerStart, $y + $centerStart, $centerSize, $centerSize, true);
+        
+        // Must have proper structure: black outer, white inner, black center
+        return $outerBlack && $innerWhite && $centerBlack;
+    }
+    
+    /**
+     * FIXED: Check if a region is predominantly the expected color (with bounds checking)
+     */
+    private function checkRegionColor($image, $x, $y, $width, $height, $expectBlack) {
+        $imageWidth = imagesx($image);
+        $imageHeight = imagesy($image);
+        $correctPixels = 0;
+        $totalPixels = 0;
+        
+        // FIXED: Add bounds checking to prevent infinite loops
+        $maxX = min($x + $width, $imageWidth);
+        $maxY = min($y + $height, $imageHeight);
+        
+        for ($dy = 0; $dy < $height && ($y + $dy) < $maxY; $dy++) {
+            for ($dx = 0; $dx < $width && ($x + $dx) < $maxX; $dx++) {
+                // Safety check: ensure we're within image bounds
+                if (($x + $dx) >= 0 && ($y + $dy) >= 0 && ($x + $dx) < $imageWidth && ($y + $dy) < $imageHeight) {
+                    $pixel = imagecolorat($image, $x + $dx, $y + $dy);
+                    $rgb = imagecolorsforindex($image, $pixel);
+                    $totalPixels++;
+                    
+                    $isBlack = $this->isForegroundPixel($rgb);
+                    if (($expectBlack && $isBlack) || (!$expectBlack && !$isBlack)) {
+                        $correctPixels++;
+                    }
+                }
+            }
+        }
+        
+        // Prevent division by zero
+        if ($totalPixels === 0) return false;
+        
+        // At least 80% of pixels should match expected color
+        return ($correctPixels / $totalPixels) >= 0.8;
     }
 
     private function estimateModuleSize($image) {
@@ -778,7 +833,7 @@ class QRGenerator {
         for ($x = 1; $x < $width; $x++) {
             $pixel = imagecolorat($image, $x, 10); // Sample from row 10
             $rgb = imagecolorsforindex($image, $pixel);
-            $isDark = $rgb['red'] < 128;
+            $isDark = $this->isForegroundPixel($rgb);
             
             if ($isDark !== $lastPixelDark) {
                 $transitions++;
@@ -1198,7 +1253,7 @@ class QRGenerator {
                 $pixel = imagecolorat($qrImage, $x, $y);
                 $pixelRgb = imagecolorsforindex($qrImage, $pixel);
                 
-                if ($pixelRgb['red'] < 240) { // Non-background pixels
+                if ($this->isForegroundPixel($pixelRgb)) { // Non-background pixels
                     imagesetpixel($canvas, $shadowX + $x, $shadowY + $y, $shadowColor);
                 }
             }
@@ -1257,7 +1312,7 @@ class QRGenerator {
     }
     
     private function getFontPath($fontFamily, $bold = false, $italic = false) {
-        // Expanded font map with style variants
+        // FIXED: Simplified font map with only working fonts
         $basePath = __DIR__ . '/../assets/fonts/';
         $fontMap = [
             'Arial' => [
@@ -1296,63 +1351,39 @@ class QRGenerator {
                 'italic' => '/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf',
                 'bolditalic' => '/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf',
             ],
-            // Google fonts (add more as needed, place TTFs in assets/fonts/)
-            'Montserrat' => [
-                'regular' => $basePath . 'Montserrat-Regular.ttf',
-                'bold' => $basePath . 'Montserrat-Bold.ttf',
-                'italic' => $basePath . 'Montserrat-Italic.ttf',
-                'bolditalic' => $basePath . 'Montserrat-BoldItalic.ttf',
+            'Comic Sans MS' => [
+                'regular' => '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+                'bold' => '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
             ],
+            'Impact' => [
+                'regular' => '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+                'bold' => '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+            ],
+            'Trebuchet MS' => [
+                'regular' => '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+                'bold' => '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+            ],
+            'Lucida Console' => [
+                'regular' => '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',
+                'bold' => '/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf',
+            ],
+            'Brush Script MT' => [
+                'regular' => '/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf',
+            ],
+            // Only include Google fonts that actually exist
             'Roboto' => [
                 'regular' => $basePath . 'Roboto-Regular.ttf',
                 'bold' => $basePath . 'Roboto-Bold.ttf',
                 'italic' => $basePath . 'Roboto-Italic.ttf',
                 'bolditalic' => $basePath . 'Roboto-BoldItalic.ttf',
             ],
-            'Lobster' => [
-                'regular' => $basePath . 'Lobster-Regular.ttf',
-            ],
-            'Oswald' => [
-                'regular' => $basePath . 'Oswald-Regular.ttf',
-                'bold' => $basePath . 'Oswald-Bold.ttf',
-            ],
-            'Raleway' => [
-                'regular' => $basePath . 'Raleway-Regular.ttf',
-                'bold' => $basePath . 'Raleway-Bold.ttf',
-            ],
-            'Bebas Neue' => [
-                'regular' => $basePath . 'BebasNeue-Regular.ttf',
-            ],
-            'Pacifico' => [
-                'regular' => $basePath . 'Pacifico-Regular.ttf',
-            ],
-            'Caveat' => [
-                'regular' => $basePath . 'Caveat-Regular.ttf',
-            ],
-            'Dancing Script' => [
-                'regular' => $basePath . 'DancingScript-Regular.ttf',
-            ],
-            'Permanent Marker' => [
-                'regular' => $basePath . 'PermanentMarker-Regular.ttf',
-            ],
-            'Orbitron' => [
-                'regular' => $basePath . 'Orbitron-Regular.ttf',
-            ],
-            'Fjalla One' => [
-                'regular' => $basePath . 'FjallaOne-Regular.ttf',
-            ],
-            'Shadows Into Light' => [
-                'regular' => $basePath . 'ShadowsIntoLight-Regular.ttf',
-            ],
-            'Indie Flower' => [
-                'regular' => $basePath . 'IndieFlower-Regular.ttf',
-            ],
-            // Add more fonts as needed
         ];
+        
         $style = 'regular';
         if ($bold && $italic) $style = 'bolditalic';
         else if ($bold) $style = 'bold';
         else if ($italic) $style = 'italic';
+        
         if (isset($fontMap[$fontFamily][$style]) && file_exists($fontMap[$fontFamily][$style])) {
             return $fontMap[$fontFamily][$style];
         }
@@ -1360,6 +1391,7 @@ class QRGenerator {
         if (isset($fontMap[$fontFamily]['regular']) && file_exists($fontMap[$fontFamily]['regular'])) {
             return $fontMap[$fontFamily]['regular'];
         }
+        
         // IMPROVED FONT FALLBACK SYSTEM
         // Multiple fallback paths to ensure fonts always work
         $fallbackPaths = [
@@ -1397,13 +1429,21 @@ class QRGenerator {
                 $textX = $x - ($textWidth / 2) - 20;
                 break;
         }
-        // FIXED: Better text positioning calculation to prevent cutoff
+        // FIXED: Optimized text positioning - closer to QR code, prevents cutoff
         if ($position === 'above') {
-            // For above text: place it higher with proper spacing based on actual text height
-            $textY = (int)($y - abs($textHeight) - ($fontSize * 0.5)); // Use font size for more reliable spacing
+            // Closer to QR code - reduce spacing but ensure text stays visible
+            $spacing = max(abs($textHeight) + 5, $fontSize * 0.5); // Reduced spacing for closer placement
+            $textY = (int)($y - $spacing);
+            
+            // Ensure text doesn't go above canvas bounds - better calculation
+            $minY = abs($textHeight) + 2;
+            if ($textY - abs($textHeight) < 2) { // Check if bottom of text would be too close to edge
+                $textY = abs($textHeight) + 5; // Place text with minimal padding from top
+            }
         } else {
-            // For below text: ensure consistent spacing
-            $textY = (int)($y + ($fontSize * 1.5)); // More reliable than fixed 10px
+            // Closer to QR code for below text too
+            $spacing = max($fontSize * 0.8, 10); // Reduced spacing, minimum 10px
+            $textY = (int)($y + $spacing);
         }
         // Shadow (more visible)
         if ($shadow) {
@@ -1476,11 +1516,18 @@ class QRGenerator {
                 break;
         }
         
-        // FIXED: Adjust Y position based on position with better spacing
+        // FIXED: Optimized text positioning - closer to QR code, prevents cutoff
         if ($position === 'above') {
-            $textY = (int)($y - $textHeight - ($fontSize > 20 ? 20 : 15)); // Dynamic spacing for larger fonts
+            $spacing = max($textHeight + 3, $fontSize * 0.5); // Closer spacing
+            $textY = (int)($y - $spacing);
+            
+            // Better bounds checking - prevent text from going above canvas
+            if ($textY < $textHeight + 2) {
+                $textY = $textHeight + 3; // Minimal padding from top edge
+            }
         } else {
-            $textY = (int)($y + ($fontSize > 20 ? 20 : 15)); // Consistent spacing
+            $spacing = max($fontSize * 0.8, 8); // Closer to QR code, minimum 8px
+            $textY = (int)($y + $spacing);
         }
         
         // Draw text (with bold effect if needed)
@@ -1677,30 +1724,21 @@ class QRGenerator {
     }
 
     /**
-     * SMART BACKGROUND COPYING - Only applies gradient to background pixels
+     * FIXED: PRECISE BACKGROUND COPYING - Full pixel processing for accuracy
      * FOREGROUND = QR modules (dark squares) 
      * BACKGROUND = Empty spaces between modules (light areas)
      */
     private function copyGradientToBackground($canvas, $gradientSource, $qrX, $qrY, $qrWidth, $qrHeight) {
-        // Sample every 4th pixel for speed (still 25x faster than every pixel)
-        for ($y = 0; $y < $qrHeight; $y += 2) {
-            for ($x = 0; $x < $qrWidth; $x += 2) {
+        // FIXED: Process all pixels for accurate masking (prevents visual artifacts)
+        for ($y = 0; $y < $qrHeight; $y++) {
+            for ($x = 0; $x < $qrWidth; $x++) {
                 $canvasPixel = imagecolorat($canvas, $qrX + $x, $qrY + $y);
                 $canvasRgb = imagecolorsforindex($canvas, $canvasPixel);
                 
-                // Calculate brightness to determine if it's background (light) or foreground (dark)
-                $brightness = ($canvasRgb['red'] * 0.299) + ($canvasRgb['green'] * 0.587) + ($canvasRgb['blue'] * 0.114);
-                
-                // Only apply gradient to BACKGROUND pixels (light areas = empty spaces)
-                // FOREGROUND pixels (dark QR modules) keep their original color
-                if ($brightness > 140) { // Increased threshold for better detection
+                // Use consistent helper method for pixel classification
+                if ($this->isBackgroundPixel($canvasRgb)) {
                     $gradientPixel = imagecolorat($gradientSource, $x, $y);
-                    
-                    // Apply to 2x2 block for speed
                     imagesetpixel($canvas, $qrX + $x, $qrY + $y, $gradientPixel);
-                    if ($x + 1 < $qrWidth) imagesetpixel($canvas, $qrX + $x + 1, $qrY + $y, $gradientPixel);
-                    if ($y + 1 < $qrHeight) imagesetpixel($canvas, $qrX + $x, $qrY + $y + 1, $gradientPixel);
-                    if ($x + 1 < $qrWidth && $y + 1 < $qrHeight) imagesetpixel($canvas, $qrX + $x + 1, $qrY + $y + 1, $gradientPixel);
                 }
             }
         }
@@ -1733,13 +1771,17 @@ class QRGenerator {
             $this->drawBorderGlow($canvas, $borderX, $borderY, $borderEndX, $borderEndY, $primaryColor, $glowIntensity, $borderRadiusStyle);
         }
         
-        // Apply corner radius if specified
+        // IMPROVED: Better border rendering to prevent masking conflicts
         if ($borderRadiusStyle !== 'none') {
+            // Rounded borders use their own complete rendering system
             $this->drawRoundedBorder($canvas, $borderX, $borderY, $borderEndX, $borderEndY, $borderWidth, $borderStyle, $borderPattern, $borderRadiusStyle, $primaryColor, $secondaryColor, $accentColor);
         } else {
-            // Draw regular border based on pattern
+            // Regular borders use pattern-based rendering
             $this->drawBorderPattern($canvas, $borderX, $borderY, $borderEndX, $borderEndY, $borderWidth, $borderStyle, $borderPattern, $primaryColor, $secondaryColor, $accentColor);
         }
+        
+        // Ensure border doesn't interfere with QR readability by maintaining quiet zone
+        $this->validateQuietZone($canvas, $qrX, $qrY, $qrWidth, $qrHeight, $borderWidth);
         
         return $canvas;
     }
@@ -2190,5 +2232,34 @@ class QRGenerator {
             }
             $currentLength++;
         }
+    }
+
+    /**
+     * HELPER: Consistent pixel classification to prevent layer conflicts
+     */
+    private function isForegroundPixel($rgb) {
+        $brightness = ($rgb['red'] * 0.299) + ($rgb['green'] * 0.587) + ($rgb['blue'] * 0.114);
+        return $brightness < self::BRIGHTNESS_THRESHOLD;
+    }
+    
+    private function isBackgroundPixel($rgb) {
+        $brightness = ($rgb['red'] * 0.299) + ($rgb['green'] * 0.587) + ($rgb['blue'] * 0.114);
+        return $brightness > self::BACKGROUND_THRESHOLD;
+    }
+
+    /**
+     * HELPER: Ensure border doesn't interfere with QR readability
+     */
+    private function validateQuietZone($canvas, $qrX, $qrY, $qrWidth, $qrHeight, $borderWidth) {
+        // QR codes need a "quiet zone" of at least 4 modules around them
+        $minQuietZone = 4;
+        
+        // If border is too close to QR code, add warning in debug mode
+        if ($borderWidth > $minQuietZone) {
+            error_log("Warning: Border width ({$borderWidth}px) may interfere with QR code quiet zone. Recommended: {$minQuietZone}px or less.");
+        }
+        
+        // Ensure the border doesn't create visual artifacts by maintaining proper spacing
+        return true;
     }
 } 

@@ -235,7 +235,7 @@ require_once __DIR__ . '/core/includes/header.php';
                         <div id="machineFields" class="mb-3" style="display: none;">
                             <label class="form-label">Machine Name</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" name="machine_name" id="machineName" placeholder="Enter machine name">
+                                <input type="text" class="form-control" name="machine_name" id="machineName" placeholder="Enter machine name" autocomplete="off">
                                 <a href="/business/manage-machine.php" class="btn btn-outline-secondary" target="_blank">
                                     <i class="bi bi-gear"></i> Manage
                                 </a>
@@ -244,7 +244,7 @@ require_once __DIR__ . '/core/includes/header.php';
 
                         <div id="promotionFields" class="mb-3" style="display: none;">
                             <label class="form-label">Machine Name</label>
-                            <input type="text" class="form-control" name="machine_name_sales" placeholder="Enter machine name">
+                            <input type="text" class="form-control" name="machine_name_sales" placeholder="Enter machine name" autocomplete="off">
                             <small class="form-text text-muted">
                                 QR code will show current promotions and sales for this machine
                             </small>
@@ -252,7 +252,7 @@ require_once __DIR__ . '/core/includes/header.php';
 
                         <div id="machinePromotionFields" class="mb-3" style="display: none;">
                             <label class="form-label">Machine Name</label>
-                            <input type="text" class="form-control" name="machine_name_promotion" id="machinePromotionMachine" placeholder="Enter machine name">
+                            <input type="text" class="form-control" name="machine_name_promotion" id="machinePromotionMachine" placeholder="Enter machine name" autocomplete="off">
                             <label class="form-label mt-2">Promotion</label>
                             <select class="form-select" name="promotion_id" id="machinePromotionSelect">
                                 <option value="">Select a promotion</option>
@@ -372,7 +372,7 @@ require_once __DIR__ . '/core/includes/header.php';
 
                         <div class="mb-3">
                             <label class="form-label">Location</label>
-                            <input type="text" class="form-control" name="location" required placeholder="e.g., Main Lobby, Building A">
+                            <input type="text" class="form-control" name="location" required placeholder="e.g., Main Lobby, Building A" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -482,20 +482,7 @@ require_once __DIR__ . '/core/includes/header.php';
                                             <option value="Trebuchet MS">Trebuchet MS</option>
                                             <option value="Lucida Console">Lucida Console</option>
                                             <option value="Brush Script MT">Brush Script MT</option>
-                                            <option value="Caveat">Caveat</option>
-                                            <option value="Pacifico">Pacifico</option>
-                                            <option value="Lobster">Lobster</option>
-                                            <option value="Bebas Neue">Bebas Neue</option>
-                                            <option value="Oswald">Oswald</option>
-                                            <option value="Montserrat">Montserrat</option>
                                             <option value="Roboto">Roboto</option>
-                                            <option value="Raleway">Raleway</option>
-                                            <option value="Dancing Script">Dancing Script</option>
-                                            <option value="Permanent Marker">Permanent Marker</option>
-                                            <option value="Orbitron">Orbitron</option>
-                                            <option value="Fjalla One">Fjalla One</option>
-                                            <option value="Shadows Into Light">Shadows Into Light</option>
-                                            <option value="Indie Flower">Indie Flower</option>
                                         </select>
                                         <div class="form-check form-check-inline ms-1">
                                             <input class="form-check-input" type="checkbox" name="label_bold" id="labelBold">
@@ -573,20 +560,7 @@ require_once __DIR__ . '/core/includes/header.php';
                                             <option value="Trebuchet MS">Trebuchet MS</option>
                                             <option value="Lucida Console">Lucida Console</option>
                                             <option value="Brush Script MT">Brush Script MT</option>
-                                            <option value="Caveat">Caveat</option>
-                                            <option value="Pacifico">Pacifico</option>
-                                            <option value="Lobster">Lobster</option>
-                                            <option value="Bebas Neue">Bebas Neue</option>
-                                            <option value="Oswald">Oswald</option>
-                                            <option value="Montserrat">Montserrat</option>
                                             <option value="Roboto">Roboto</option>
-                                            <option value="Raleway">Raleway</option>
-                                            <option value="Dancing Script">Dancing Script</option>
-                                            <option value="Permanent Marker">Permanent Marker</option>
-                                            <option value="Orbitron">Orbitron</option>
-                                            <option value="Fjalla One">Fjalla One</option>
-                                            <option value="Shadows Into Light">Shadows Into Light</option>
-                                            <option value="Indie Flower">Indie Flower</option>
                                         </select>
                                         <div class="form-check form-check-inline ms-1">
                                             <input class="form-check-input" type="checkbox" name="bottom_bold" id="bottomBold">
@@ -1299,8 +1273,14 @@ class EnhancedQRGenerator {
                 this.debouncePreview();
             });
 
-            this.form.addEventListener('input', () => {
-                this.debouncePreview();
+            // Use longer debounce for input events to give users time to type
+            this.form.addEventListener('input', (e) => {
+                // Skip auto-preview for text inputs that users are actively typing in
+                if (e.target.type === 'text' || e.target.type === 'textarea') {
+                    this.debouncePreviewLong();
+                } else {
+                    this.debouncePreview();
+                }
             });
         } else {
             console.error('Form element not found');
@@ -1510,6 +1490,13 @@ class EnhancedQRGenerator {
         }, 500);
     }
 
+    debouncePreviewLong() {
+        clearTimeout(this.previewTimeout);
+        this.previewTimeout = setTimeout(() => {
+            this.generatePreview();
+        }, 2000); // 2 second delay for text inputs to give users time to type
+    }
+
     generatePreview() {
         // Validate form first
         if (!this.validateForm()) {
@@ -1571,12 +1558,13 @@ class EnhancedQRGenerator {
         const qrType = qrTypeEl.value;
         const location = locationEl.value;
 
-        // Check required fields based on QR type
+        // Check required fields based on QR type - but don't auto-populate aggressive defaults
         switch(qrType) {
             case 'static':
             case 'dynamic':
                 const urlEl = document.querySelector('[name="url"]');
                 if (urlEl && !urlEl.value) {
+                    // Only auto-populate URL if it's completely empty for basic QR types
                     urlEl.value = 'https://example.com';
                 }
                 break;
@@ -1588,20 +1576,19 @@ class EnhancedQRGenerator {
                 break;
             case 'dynamic_vending':
                 const machineVendingEl = document.querySelector('[name="machine_name"]');
+                // Remove aggressive auto-population - let user fill manually
                 if (machineVendingEl && !machineVendingEl.value) {
-                    machineVendingEl.value = 'Test Machine';
+                    console.warn('Machine name not specified for vending QR');
                 }
                 break;
             case 'machine_sales':
                 const machineSalesEl = document.querySelector('[name="machine_name_sales"]') || 
                                       document.querySelector('[name="machine_name_promotion"]') || 
                                       document.querySelector('[name="machine_name"]');
+                // Remove aggressive auto-population - let user fill manually
                 if (machineSalesEl && !machineSalesEl.value) {
-                    machineSalesEl.value = 'Test Machine';
+                    console.warn('Machine name not specified for sales QR');
                 }
-                break;
-            case 'spin_wheel':
-                // No additional validation needed for spin_wheel
                 break;
             case 'spin_wheel':
                 const spinWheelEl = document.querySelector('[name="spin_wheel_id"]');
@@ -1617,8 +1604,10 @@ class EnhancedQRGenerator {
                 break;
         }
 
-        if (!location.trim()) {
-            locationEl.value = 'Test Location';
+        // Remove aggressive location auto-population - only suggest if completely empty
+        if (!location.trim() && document.activeElement !== locationEl) {
+            // Only auto-populate location if user is not currently typing in the field
+            console.warn('Location not specified - please enter a location');
         }
 
         return true;
