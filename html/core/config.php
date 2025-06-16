@@ -72,10 +72,12 @@ if (!file_exists($logDir)) {
 // Set timezone to Eastern Time (Ontario, Canada)
 date_default_timezone_set('America/Toronto');
 
-// Session configuration
-ini_set('session.cookie_httponly', 1);
-ini_set('session.use_only_cookies', 1);
-ini_set('session.cookie_secure', 1);
+// Session configuration (only set if session is not already active)
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_only_cookies', 1);
+    ini_set('session.cookie_secure', 1);
+}
 
 // Cache busting function to prevent browser caching issues
 function asset_version($file_path) {
