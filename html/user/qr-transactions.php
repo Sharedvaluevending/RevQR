@@ -70,6 +70,9 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $transactions = $stmt->fetchAll();
 
+// Get user's current balance first
+$current_balance = QRCoinManager::getBalance($_SESSION['user_id']);
+
 // Calculate balance_after for each transaction by working backwards from current balance
 $running_balance = $current_balance;
 foreach ($transactions as &$transaction) {
@@ -108,9 +111,6 @@ $activity_sql = "
 $stmt = $pdo->prepare($activity_sql);
 $stmt->execute($params);
 $activity_breakdown = $stmt->fetchAll();
-
-// Get user's current balance
-$current_balance = QRCoinManager::getBalance($_SESSION['user_id']);
 
 require_once __DIR__ . '/../core/includes/header.php';
 ?>
