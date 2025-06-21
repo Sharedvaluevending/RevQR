@@ -216,13 +216,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Handle purchase confirmation
+    // Handle purchase confirmation - Enhanced with better error handling
     document.getElementById('confirm-purchase').addEventListener('click', function() {
         if (!currentItemId) return;
         
         const btn = this;
+        const originalText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Processing...';
+        
+        // Clear any existing alerts
+        document.querySelectorAll('.alert.position-fixed').forEach(alert => alert.remove());
         
         fetch('purchase-business-item.php', {
             method: 'POST',
@@ -234,37 +238,94 @@ document.addEventListener('DOMContentLoaded', function() {
                 item_id: currentItemId
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Purchase response:', data); // Debug logging
+            
             if (data.success) {
                 purchaseModal.hide();
                 
-                // Show success message
+                // Enhanced success message with QR code status
                 const alert = document.createElement('div');
                 alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
                 alert.style.zIndex = '9999';
+                alert.style.minWidth = '400px';
+                
+                let qrStatusIcon = data.qr_code_generated ? 
+                    '<i class="bi bi-qr-code text-success me-1"></i>' : 
+                    '<i class="bi bi-exclamation-triangle text-warning me-1"></i>';
+                
                 alert.innerHTML = `
-                    <i class="bi bi-check-circle me-2"></i>
-                    <strong>Purchase Successful!</strong> Your redemption code: <strong>${data.purchase_code}</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                        <div class="flex-grow-1">
+                            <strong>Purchase Successful!</strong><br>
+                            <strong>Item:</strong> ${data.item_name || 'Discount Item'}<br>
+                            <strong>Business:</strong> ${data.business_name}<br>
+                            <strong>Discount:</strong> ${data.discount_percentage}% OFF<br>
+                            <strong>Code:</strong> <code>${data.purchase_code}</code><br>
+                            <strong>Expires:</strong> ${data.expires_in_days} days<br>
+                            ${qrStatusIcon}<strong>QR Code:</strong> ${data.qr_code_generated ? 'Generated' : 'Failed'}
+                            ${data.qr_message ? `<br><small class="text-muted">${data.qr_message}</small>` : ''}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                 `;
                 document.body.appendChild(alert);
+                
+                // Auto-dismiss after 8 seconds
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.remove();
+                    }
+                }, 8000);
                 
                 // Refresh page after 3 seconds to update balance
                 setTimeout(() => {
                     window.location.reload();
                 }, 3000);
             } else {
-                alert('Purchase failed: ' + (data.message || 'Unknown error'));
+                // Enhanced error display
+                const errorMsg = data.message || 'Unknown error occurred';
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+                alert.style.zIndex = '9999';
+                alert.style.minWidth = '350px';
+                alert.innerHTML = `
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    <strong>Purchase Failed!</strong><br>
+                    ${errorMsg}
+                    ${data.debug_info ? `<br><small class="text-muted">Debug: ${JSON.stringify(data.debug_info)}</small>` : ''}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alert);
+                
+                console.error('Purchase failed:', data);
             }
         })
         .catch(error => {
             console.error('Purchase error:', error);
-            alert('Purchase failed. Please try again.');
+            
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+            alert.style.zIndex = '9999';
+            alert.innerHTML = `
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <strong>Connection Error!</strong><br>
+                Failed to connect to server. Please check your connection and try again.
+                <br><small class="text-muted">Error: ${error.message}</small>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
         })
         .finally(() => {
             btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-cart-check me-1"></i>Confirm Purchase';
+            btn.innerHTML = originalText;
         });
     });
     
