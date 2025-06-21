@@ -187,14 +187,13 @@ class NayaxDiscountManager {
     public function validateDiscountCode($discount_code, $nayax_machine_id = null) {
         try {
             $stmt = $this->pdo->prepare("
-                SELECT usp.*, qsi.item_name, bsi.nayax_machine_id, u.username,
+                SELECT usp.*, bsi.item_name, bsi.nayax_machine_id, u.username,
                        b.id as business_id, b.name as business_name
                 FROM user_store_purchases usp
-                JOIN qr_store_items qsi ON usp.qr_store_item_id = qsi.id
-                LEFT JOIN business_store_items bsi ON usp.business_store_item_id = bsi.id
+                JOIN business_store_items bsi ON usp.store_item_id = bsi.id
                 LEFT JOIN businesses b ON bsi.business_id = b.id
                 LEFT JOIN users u ON usp.user_id = u.id
-                WHERE usp.discount_code = ? AND usp.status = 'active'
+                WHERE usp.purchase_code = ? AND usp.status = 'pending'
             ");
             
             $stmt->execute([$discount_code]);

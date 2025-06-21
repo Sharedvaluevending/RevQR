@@ -9,6 +9,7 @@
  */
 
 require_once __DIR__ . '/config_manager.php';
+require_once __DIR__ . '/../core/qr_coin_manager.php';
 
 class QRCoinManager {
     

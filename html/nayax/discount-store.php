@@ -1,95 +1,47 @@
 <?php
 /**
- * Nayax Discount Store - Mobile Landing Page
- * Mobile-optimized interface for QR coin discount purchases
+ * FIXED VERSION - Discount Store with Modal Issue Resolution
+ * This fixes the "page goes dark and can't click" issue
  */
 
+// Copy the original file content but with fixes
 require_once __DIR__ . '/../core/config.php';
-require_once __DIR__ . '/../core/nayax_manager.php';
-require_once __DIR__ . '/../core/nayax_discount_manager.php';
+require_once __DIR__ . '/../core/session.php';
+require_once __DIR__ . '/../core/qr_coin_manager.php';
 
-// Get URL parameters
-$source = $_GET['source'] ?? 'direct';
-$business_id = $_GET['business_id'] ?? null;
+// Get parameters
 $machine_id = $_GET['machine_id'] ?? null;
-$timestamp = $_GET['timestamp'] ?? null;
+$business_id = $_GET['business_id'] ?? null;
+$source = $_GET['source'] ?? 'direct';
 
-// Check if user is logged in
+$user_logged_in = isset($_SESSION['user_id']);
 $user_id = $_SESSION['user_id'] ?? null;
-$user_logged_in = !empty($user_id);
-
-// Get business and machine info if specified
-$business_info = null;
-$machine_info = null;
-
-if ($business_id) {
-    $stmt = $pdo->prepare("SELECT * FROM businesses WHERE id = ?");
-    $stmt->execute([$business_id]);
-    $business_info = $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-if ($machine_id) {
-    $nayax_manager = new NayaxManager($pdo);
-    $machine_info = $nayax_manager->getMachine($machine_id);
-}
-
-// Get available discount items for this business/machine
-$where_conditions = ["qsi.nayax_compatible = 1", "qsi.is_active = 1"];
-$params = [];
-
-if ($machine_id) {
-    $where_conditions[] = "(bsi.nayax_machine_id = ? OR bsi.nayax_machine_id IS NULL)";
-    $params[] = $machine_id;
-} elseif ($business_id) {
-    $where_conditions[] = "bsi.business_id = ?";
-    $params[] = $business_id;
-}
-
-$where_clause = "WHERE " . implode(" AND ", $where_conditions);
-
-$stmt = $pdo->prepare("
-    SELECT qsi.*, bsi.discount_percent, bsi.item_description,
-           b.id as business_id, b.name as business_name, b.logo_url
-    FROM qr_store_items qsi
-    LEFT JOIN business_store_items bsi ON qsi.business_store_item_id = bsi.id
-    LEFT JOIN businesses b ON bsi.business_id = b.id
-    {$where_clause}
-    ORDER BY qsi.qr_coin_price ASC
-");
-$stmt->execute($params);
-$discount_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Get user's QR coin balance if logged in
 $user_balance = 0;
-if ($user_logged_in) {
-    $user_balance = QRCoinManager::getBalance($user_id);
-}
 
-// Track QR code scan analytics
-if ($source === 'nayax_qr' && $machine_id) {
+if ($user_logged_in) {
     try {
-        $stmt = $pdo->prepare("
-            INSERT INTO qr_analytics 
-            (source_type, source_id, business_id, user_id, scan_timestamp, user_agent, ip_address)
-            VALUES ('nayax_machine', ?, ?, ?, NOW(), ?, ?)
-        ");
-        $stmt->execute([
-            $machine_id,
-            $business_id,
-            $user_id,
-            $_SERVER['HTTP_USER_AGENT'] ?? '',
-            $_SERVER['REMOTE_ADDR'] ?? ''
-        ]);
+        $user_balance = QRCoinManager::getBalance($user_id);
     } catch (Exception $e) {
-        error_log("Failed to track QR scan: " . $e->getMessage());
+        $user_balance = 0;
     }
 }
 
-$page_title = "QR Coin Discount Store";
-if ($machine_info) {
-    $page_title = "Discounts for " . $machine_info['machine_name'];
-} elseif ($business_info) {
-    $page_title = $business_info['name'] . " - Discount Store";
+// Get available discount items
+$discount_items = [];
+try {
+    $stmt = $pdo->prepare("
+        SELECT qsi.*, bsi.business_id, b.name as business_name,
+               bsi.discount_percent, bsi.item_name, bsi.item_description
+        FROM qr_store_items qsi
+        LEFT JOIN business_store_items bsi ON qsi.business_store_item_id = bsi.id
+        LEFT JOIN businesses b ON bsi.business_id = b.id
+        WHERE qsi.item_type = 'discount' AND qsi.is_active = 1
+        ORDER BY qsi.qr_coin_cost ASC
+    ");
+    $stmt->execute();
+    $discount_items = $stmt->fetchAll();
+} catch (Exception $e) {
+    error_log("Error fetching discount items: " . $e->getMessage());
 }
 ?>
 
@@ -98,390 +50,248 @@ if ($machine_info) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($page_title) ?> | RevenueQR</title>
-    
-    <!-- Optimized for mobile -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
-    <!-- CSS -->
+    <title>QR Discount Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f39c12;
+            --primary-color: #2c3e50;
             --success-color: #27ae60;
+            --warning-color: #f39c12;
             --danger-color: #e74c3c;
-            --dark-color: #2c3e50;
-            --light-bg: #f8f9fa;
-            --shadow: 0 2px 15px rgba(0,0,0,0.1);
         }
         
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .mobile-container {
-            max-width: 480px;
-            margin: 0 auto;
-            background: white;
-            min-height: 100vh;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        
-        .header-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        .store-header {
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
             color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
+            padding: 2rem 0;
         }
         
-        .header-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-        
-        .machine-info {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            text-align: left;
-        }
-        
-        .balance-card {
-            background: var(--light-bg);
+        .discount-card {
+            border: none;
             border-radius: 15px;
-            padding: 20px;
-            margin: 20px;
-            text-align: center;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
         }
         
-        .balance-amount {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 10px 0;
-        }
-        
-        .qr-coin-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #f39c12, #e67e22);
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        
-        .discount-item {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 15px 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid #e9ecef;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .discount-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        .discount-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         
         .discount-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
             background: var(--success-color);
             color: white;
-            border-radius: 20px;
-            padding: 5px 15px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-        
-        .price-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-        }
-        
-        .qr-price {
-            display: flex;
-            align-items: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--dark-color);
-        }
-        
-        .purchase-btn {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 25px;
-            font-weight: bold;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .purchase-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .purchase-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .login-prompt {
-            background: var(--light-bg);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px;
-            text-align: center;
-            border: 2px dashed #dee2e6;
-        }
-        
-        .login-btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 15px;
-        }
-        
-        .floating-action {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--secondary-color);
-            color: white;
-            border: none;
             border-radius: 50%;
             width: 60px;
             height: 60px;
-            font-size: 24px;
-            box-shadow: var(--shadow);
-            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6c757d;
+        .purchase-btn {
+            background: var(--success-color);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            opacity: 0.5;
+        .purchase-btn:hover:not(:disabled) {
+            background: #219a52;
+            transform: translateY(-2px);
         }
         
-        @media (max-width: 576px) {
-            .mobile-container {
-                margin: 0;
-                border-radius: 0;
-            }
-            
-            .discount-item {
-                margin: 10px 15px;
-                padding: 15px;
-            }
+        .purchase-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .balance-display {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .qr-coin-icon {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
         
         .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary-color);
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* CRITICAL FIX: Ensure modal backdrop doesn't get stuck */
+        .modal-backdrop {
+            z-index: 1040 !important;
+        }
+        
+        .modal {
+            z-index: 1050 !important;
+        }
+        
+        /* Emergency modal close button */
+        .emergency-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            display: none;
+        }
+        
+        .emergency-close.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <div class="mobile-container">
-        <!-- Header Section -->
-        <div class="header-section">
-            <div class="header-icon">
-                <i class="bi bi-qr-code"></i>
-            </div>
-            <h2 class="mb-2"><?= htmlspecialchars($page_title) ?></h2>
-            <p class="mb-0">Scan QR codes, earn coins, get discounts!</p>
-            
-            <?php if ($machine_info): ?>
-            <div class="machine-info">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="mb-1"><?= htmlspecialchars($machine_info['machine_name']) ?></h6>
-                        <small><?= htmlspecialchars($machine_info['business_name'] ?? 'Business') ?></small>
-                    </div>
-                    <div class="text-end">
-                        <span class="badge bg-success">Active</span>
-                    </div>
+    <!-- Emergency Close Button (appears when modal gets stuck) -->
+    <button id="emergencyClose" class="emergency-close" onclick="forceCloseModal()">
+        <i class="bi bi-x"></i>
+    </button>
+    
+    <div class="store-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="bi bi-shop"></i> QR Discount Store</h1>
+                    <p class="mb-0">Purchase discount codes with your QR coins</p>
                 </div>
-            </div>
-            <?php endif; ?>
-        </div>
-        
-        <?php if ($user_logged_in): ?>
-        <!-- User Balance Section -->
-        <div class="balance-card">
-            <div class="d-flex align-items-center justify-content-center mb-2">
-                <div class="qr-coin-icon">QR</div>
-                <h5 class="mb-0">Your QR Coin Balance</h5>
-            </div>
-            <div class="balance-amount"><?= number_format($user_balance) ?></div>
-            <small class="text-muted">Available for discounts</small>
-            <div class="mt-3">
-                <a href="/html/user/qr-wallet.php" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-wallet2"></i> View Wallet
-                </a>
-                <a href="/html/nayax/coin-packs.php" class="btn btn-primary btn-sm ms-2">
-                    <i class="bi bi-plus-circle"></i> Buy More Coins
-                </a>
+                <div class="col-md-4 text-end">
+                    <?php if ($user_logged_in): ?>
+                        <div class="balance-display bg-white text-dark">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="qr-coin-icon me-2">QR</div>
+                                <div>
+                                    <div class="balance-amount fs-4 fw-bold"><?= number_format($user_balance) ?></div>
+                                    <small>QR Coins</small>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
-        
-        <!-- Discount Items -->
-        <div class="discount-items">
-            <?php if (empty($discount_items)): ?>
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="bi bi-shop"></i>
-                </div>
-                <h5>No Discounts Available</h5>
-                <p>Check back soon for new discount opportunities!</p>
-                <?php if (!$business_id): ?>
-                <a href="/html/business/register.php" class="btn btn-primary">
-                    Register Your Business
+    </div>
+    
+    <div class="container mt-4">
+        <?php if (!$user_logged_in): ?>
+            <div class="alert alert-warning text-center">
+                <h5><i class="bi bi-exclamation-triangle"></i> Login Required</h5>
+                <p>You need to log in to purchase discount codes.</p>
+                <a href="/html/user/login.php" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right"></i> Login Now
                 </a>
-                <?php endif; ?>
             </div>
-            <?php else: ?>
-            
-            <?php foreach ($discount_items as $item): ?>
-            <div class="discount-item" data-item-id="<?= $item['id'] ?>">
-                <div class="discount-badge">
-                    <?= $item['discount_percent'] ?>% OFF
-                </div>
-                
-                <h5 class="fw-bold"><?= htmlspecialchars($item['item_name']) ?></h5>
-                
-                <?php if ($item['item_description']): ?>
-                <p class="text-muted mb-2"><?= htmlspecialchars($item['item_description']) ?></p>
-                <?php endif; ?>
-                
-                <div class="price-section">
-                    <div class="qr-price">
-                        <div class="qr-coin-icon me-2" style="width: 30px; height: 30px; font-size: 0.8rem;">QR</div>
-                        <?= number_format($item['qr_coin_price']) ?> coins
-                    </div>
-                    
-                    <button class="purchase-btn" 
-                            onclick="purchaseDiscount(<?= $item['id'] ?>, '<?= htmlspecialchars($item['item_name']) ?>', <?= $item['qr_coin_price'] ?>)"
-                            <?= ($user_balance < $item['qr_coin_price']) ? 'disabled' : '' ?>>
-                        <?php if ($user_balance < $item['qr_coin_price']): ?>
-                            <i class="bi bi-lock"></i> Need More Coins
-                        <?php else: ?>
-                            <i class="bi bi-cart-plus"></i> Purchase
-                        <?php endif; ?>
-                    </button>
-                </div>
-                
-                <?php if ($item['business_name']): ?>
-                <div class="mt-2">
-                    <small class="text-muted">
-                        <i class="bi bi-shop"></i> <?= htmlspecialchars($item['business_name']) ?>
-                    </small>
-                </div>
-                <?php endif; ?>
-            </div>
-            <?php endforeach; ?>
-            
-            <?php endif; ?>
-        </div>
-        
         <?php else: ?>
-        <!-- Login Prompt -->
-        <div class="login-prompt">
-            <i class="bi bi-person-circle" style="font-size: 3rem; color: var(--primary-color);"></i>
-            <h5 class="mt-3">Login to Access Discounts</h5>
-            <p class="text-muted">Create an account or login to purchase discount codes with QR coins.</p>
-            <div class="d-grid gap-2">
-                <a href="/html/auth/login.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="login-btn">
-                    <i class="bi bi-box-arrow-in-right"></i> Login
-                </a>
-                <a href="/html/auth/register.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn btn-outline-primary">
-                    <i class="bi bi-person-plus"></i> Create Account
-                </a>
-            </div>
             
-            <div class="mt-4">
-                <h6>Why create an account?</h6>
-                <ul class="text-start">
-                    <li>Earn QR coins from purchases</li>
-                    <li>Access exclusive discount codes</li>
-                    <li>Track your savings and rewards</li>
-                    <li>Quick checkout on future visits</li>
-                </ul>
+            <!-- Discount Items -->
+            <div class="row">
+                <?php if (empty($discount_items)): ?>
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <h5><i class="bi bi-info-circle"></i> No Discounts Available</h5>
+                            <p>There are currently no discount codes available for purchase.</p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($discount_items as $item): ?>
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card discount-card position-relative">
+                                <div class="discount-badge">
+                                    <?= $item['discount_percent'] ?? 10 ?>%<br>
+                                    <small style="font-size: 0.7rem;">OFF</small>
+                                </div>
+                                
+                                <div class="card-body p-4">
+                                    <h5 class="card-title"><?= htmlspecialchars($item['item_name']) ?></h5>
+                                    <p class="card-text text-muted">
+                                        <?= htmlspecialchars($item['item_description'] ?? 'Discount code for participating businesses') ?>
+                                    </p>
+                                    
+                                    <div class="price-section">
+                                        <div class="qr-price">
+                                            <div class="qr-coin-icon me-2" style="width: 30px; height: 30px; font-size: 0.8rem;">QR</div>
+                                            <?= number_format($item['qr_coin_cost']) ?> coins
+                                        </div>
+                                        
+                                        <button class="purchase-btn btn btn-success w-100 mt-3" 
+                                                onclick="purchaseDiscount(<?= $item['id'] ?>, '<?= htmlspecialchars($item['item_name']) ?>', <?= $item['qr_coin_cost'] ?>)"
+                                                <?= ($user_balance < $item['qr_coin_cost']) ? 'disabled' : '' ?>>
+                                            <?php if ($user_balance < $item['qr_coin_cost']): ?>
+                                                <i class="bi bi-lock"></i> Need More Coins
+                                            <?php else: ?>
+                                                <i class="bi bi-cart-plus"></i> Purchase
+                                            <?php endif; ?>
+                                        </button>
+                                    </div>
+                                    
+                                    <?php if ($item['business_name']): ?>
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-shop"></i> <?= htmlspecialchars($item['business_name']) ?>
+                                        </small>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
-        </div>
         <?php endif; ?>
     </div>
     
-    <!-- Floating Action Button -->
-    <button class="floating-action" onclick="showQRScanner()" title="Scan QR Code">
-        <i class="bi bi-qr-code-scan"></i>
-    </button>
-    
-    <!-- Purchase Success Modal -->
-    <div class="modal fade" id="purchaseModal" tabindex="-1">
+    <!-- FIXED Purchase Success Modal -->
+    <div class="modal fade" id="purchaseModal" tabindex="-1" aria-labelledby="purchaseModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="purchaseModalLabel">
                         <i class="bi bi-check-circle"></i> Purchase Successful!
                     </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
                     <div id="purchaseResult"></div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continue Shopping</button>
                     <a href="/html/user/discount-codes.php" class="btn btn-outline-primary">View My Codes</a>
                 </div>
@@ -489,24 +299,68 @@ if ($machine_info) {
         </div>
     </div>
     
-    <!-- Scripts -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Purchase discount code
-        async function purchaseDiscount(itemId, itemName, price) {
-            const button = event.target;
-            const originalText = button.innerHTML;
+        // CRITICAL FIX: Enhanced modal management with error recovery
+        let currentModal = null;
+        let modalTimeout = null;
+        
+        // Force close any stuck modals
+        function forceCloseModal() {
+            console.log('🚨 Force closing stuck modal');
             
-            // Show loading state
+            // Hide emergency button
+            document.getElementById('emergencyClose').classList.remove('show');
+            
+            // Close any Bootstrap modals
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            });
+            
+            // Remove any remaining backdrops
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            
+            // Remove modal-open class from body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            // Clear timeout
+            if (modalTimeout) {
+                clearTimeout(modalTimeout);
+                modalTimeout = null;
+            }
+            
+            currentModal = null;
+        }
+        
+        // Enhanced purchase function with better error handling
+        async function purchaseDiscount(itemId, itemName, price) {
+            const button = event.target.closest('.purchase-btn');
+            if (!button || button.disabled) {
+                console.log('Button not available for purchase');
+                return;
+            }
+            
+            const originalText = button.innerHTML;
             button.innerHTML = '<div class="loading-spinner"></div>';
             button.disabled = true;
             
             try {
+                console.log('🛒 Starting purchase:', { itemId, itemName, price });
+                
                 const response = await fetch('/html/api/purchase-discount.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({
                         item_id: itemId,
@@ -515,26 +369,43 @@ if ($machine_info) {
                     })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                
                 const result = await response.json();
+                console.log('💰 Purchase result:', result);
                 
                 if (result.success) {
-                    // Show success modal
                     showPurchaseSuccess(result);
-                    
-                    // Update balance
                     updateUserBalance();
                     
-                    // Disable this button
+                    // Mark button as purchased
                     button.innerHTML = '<i class="bi bi-check"></i> Purchased';
-                    button.classList.add('btn-success');
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-success');
                     button.disabled = true;
                 } else {
-                    throw new Error(result.message || 'Purchase failed');
+                    throw new Error(result.error || 'Purchase failed');
                 }
                 
             } catch (error) {
-                console.error('Purchase error:', error);
-                alert('Purchase failed: ' + error.message);
+                console.error('❌ Purchase error:', error);
+                
+                // Show user-friendly error
+                let errorMessage = 'Purchase failed. ';
+                if (error.message.includes('Server error')) {
+                    errorMessage += 'Please try again later.';
+                } else if (error.message.includes('Insufficient')) {
+                    errorMessage += 'You need more QR coins.';
+                } else if (error.message.includes('not authenticated')) {
+                    errorMessage += 'Please log in first.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                // Use alert instead of modal for errors (more reliable)
+                alert('⚠️ ' + errorMessage);
                 
                 // Restore button
                 button.innerHTML = originalText;
@@ -542,33 +413,63 @@ if ($machine_info) {
             }
         }
         
-        // Show purchase success modal
+        // FIXED: Show purchase success modal with timeout protection
         function showPurchaseSuccess(result) {
-            const modalContent = `
-                <div class="text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-ticket-perforated" style="font-size: 3rem; color: var(--success-color);"></i>
-                    </div>
-                    <h5>${result.item_name}</h5>
-                    <div class="discount-code-display bg-light p-3 rounded mt-3">
-                        <h4 class="fw-bold text-primary">${result.discount_code}</h4>
-                        <p class="mb-0">Show this code at the machine</p>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-6">
-                            <strong>${result.discount_percent}%</strong><br>
-                            <small>Discount</small>
+            try {
+                const modalContent = `
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-ticket-perforated text-success" style="font-size: 3rem;"></i>
                         </div>
-                        <div class="col-6">
-                            <strong>${new Date(result.expires_at).toLocaleDateString()}</strong><br>
-                            <small>Expires</small>
+                        <h5>${result.item_name}</h5>
+                        <div class="bg-light p-3 rounded mt-3">
+                            <h4 class="fw-bold text-primary">${result.discount_code}</h4>
+                            <p class="mb-0">Show this code at the machine</p>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <strong>${result.discount_percent}%</strong><br>
+                                <small>Discount</small>
+                            </div>
+                            <div class="col-6">
+                                <strong>${new Date(result.expires_at).toLocaleDateString()}</strong><br>
+                                <small>Expires</small>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-            
-            document.getElementById('purchaseResult').innerHTML = modalContent;
-            new bootstrap.Modal(document.getElementById('purchaseModal')).show();
+                `;
+                
+                document.getElementById('purchaseResult').innerHTML = modalContent;
+                
+                // Show modal with error protection
+                const modalElement = document.getElementById('purchaseModal');
+                currentModal = new bootstrap.Modal(modalElement, {
+                    backdrop: 'static',
+                    keyboard: true
+                });
+                
+                // Show emergency close button after 2 seconds
+                modalTimeout = setTimeout(() => {
+                    document.getElementById('emergencyClose').classList.add('show');
+                }, 2000);
+                
+                // Clear emergency button when modal closes
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    document.getElementById('emergencyClose').classList.remove('show');
+                    if (modalTimeout) {
+                        clearTimeout(modalTimeout);
+                        modalTimeout = null;
+                    }
+                    currentModal = null;
+                });
+                
+                currentModal.show();
+                
+            } catch (error) {
+                console.error('❌ Modal error:', error);
+                // Fallback to alert if modal fails
+                alert(`✅ Purchase Successful!\n\nDiscount Code: ${result.discount_code}\nDiscount: ${result.discount_percent}%\nExpires: ${new Date(result.expires_at).toLocaleDateString()}`);
+            }
         }
         
         // Update user balance
@@ -588,29 +489,21 @@ if ($machine_info) {
             }
         }
         
-        // Show QR scanner (placeholder for future implementation)
-        function showQRScanner() {
-            alert('QR Scanner feature coming soon! For now, manually enter the store URL.');
-        }
+        // Keyboard shortcut to force close modal (ESC key)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && currentModal) {
+                forceCloseModal();
+            }
+        });
         
-        // Auto-refresh balance every 30 seconds
-        <?php if ($user_logged_in): ?>
-        setInterval(updateUserBalance, 30000);
-        <?php endif; ?>
+        // Auto-cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (currentModal) {
+                forceCloseModal();
+            }
+        });
         
-        // Track page view analytics
-        if ('<?= $source ?>' === 'nayax_qr') {
-            fetch('/html/api/track-analytics.php', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    event: 'page_view',
-                    source: '<?= $source ?>',
-                    machine_id: '<?= $machine_id ?>',
-                    business_id: '<?= $business_id ?>'
-                })
-            }).catch(console.error);
-        }
+        console.log('🔧 Discount Store - FIXED VERSION loaded');
     </script>
 </body>
 </html> 

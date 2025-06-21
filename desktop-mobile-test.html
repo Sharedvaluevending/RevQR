@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Mode Mobile Layout Test - FIXED</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Apply the FIXED CSS from header.php */
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3d72b4 75%, #5a95d1 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 80px 0 20px 0;
+        }
+        
+        /* Standard desktop containers */
+        .container, .container-fluid {
+            max-width: 1200px !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+        
+        /* Phone desktop mode fix - NATURAL LAYOUT LIKE PC */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            /* Containers should behave like normal desktop */
+            .container, .container-fluid {
+                max-width: 1200px !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+            }
+            
+            /* Bootstrap row/col system - NORMAL BEHAVIOR */
+            .row {
+                width: 100% !important;
+                margin-left: -15px !important;
+                margin-right: -15px !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                /* REMOVED: justify-content: center - this was causing left alignment */
+            }
+            
+            /* Column behavior - NORMAL BOOTSTRAP BEHAVIOR */
+            [class*="col-"] {
+                position: relative !important;
+                width: 100% !important;
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+                /* REMOVED: display: flex and justify-content: center */
+            }
+            
+            /* Fix specific column layouts - STANDARD BOOTSTRAP */
+            .col-md-6 { 
+                flex: 0 0 50% !important; 
+                max-width: 50% !important;
+            }
+            
+            /* Cards - NORMAL BEHAVIOR */
+            .card {
+                width: 100% !important;
+                margin-bottom: 1rem !important;
+                /* REMOVED: margin: 0 auto - let cards flow naturally */
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+        }
+        
+        .test-navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(30, 60, 114, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-good { background-color: #28a745; }
+    </style>
+</head>
+<body>
+    <!-- Test navbar -->
+    <nav class="navbar test-navbar">
+        <div class="container">
+            <span class="navbar-brand text-white">Desktop Mode Test - FIXED</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-white">
+                        <h3 class="card-title text-center">✅ DESKTOP MODE ON MOBILE - FIXED!</h3>
+                        <p class="text-center">Cards should now behave exactly like on PC desktop</p>
+                        <div id="device-info" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test card layout that was problematic -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-white">
+                        <h5 class="card-title">Left Card</h5>
+                        <p class="card-text">This card should take 50% width and align naturally (not forced center)</p>
+                        <ul class="text-white">
+                            <li>Should not be stuck to left</li>
+                            <li>Should not be over-centered</li>
+                            <li>Should match PC layout exactly</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-white">
+                        <h5 class="card-title">Right Card</h5>
+                        <p class="card-text">This card should also take 50% width naturally</p>
+                        <ul class="text-white">
+                            <li>Natural Bootstrap grid behavior</li>
+                            <li>Same spacing as PC</li>
+                            <li>No forced flexbox center</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Full width test -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-white">
+                        <h5 class="card-title">Full Width Card</h5>
+                        <p class="card-text">This should span the full container width naturally</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Three column test -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-white">
+                        <h6 class="card-title">Card 1</h6>
+                        <p class="card-text">33% width</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-white">
+                        <h6 class="card-title">Card 2</h6>
+                        <p class="card-text">33% width</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-white">
+                        <h6 class="card-title">Card 3</h6>
+                        <p class="card-text">33% width</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const viewportWidth = window.innerWidth;
+            const isDesktopMode = isMobile && viewportWidth >= 768;
+            
+            const deviceInfo = document.getElementById('device-info');
+            deviceInfo.innerHTML = `
+                <p><span class="status-indicator status-good"></span><strong>Device:</strong> ${isMobile ? 'Mobile' : 'Desktop'}</p>
+                <p><span class="status-indicator status-good"></span><strong>Viewport:</strong> ${viewportWidth} x ${window.innerHeight}</p>
+                <p><span class="status-indicator status-good"></span><strong>Desktop Mode:</strong> ${isDesktopMode ? 'YES - Should work like PC now!' : 'No'}</p>
+                <p><span class="status-indicator status-good"></span><strong>Status:</strong> ${isDesktopMode ? 'FIXED - Natural Bootstrap layout' : 'Standard layout'}</p>
+            `;
+        });
+    </script>
+</body>
+</html> 

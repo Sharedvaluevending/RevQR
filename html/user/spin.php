@@ -230,6 +230,11 @@ $specific_rewards = [
     ['name' => '500 QR Coins!', 'rarity_level' => 10, 'weight' => 7, 'points' => 500]
 ];
 
+// Pre-determine the selected prize for this spin (if spinning)
+$selected_reward = null;
+$selected_reward_index = null;
+$spin_angle = null;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $can_spin) {
     // Check if this is a QR Easybake super spin
     $is_super_spin = false;
@@ -243,14 +248,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $can_spin) {
     $total_weight = array_sum(array_column($specific_rewards, 'weight'));
     $random = mt_rand(1, $total_weight);
     $current_weight = 0;
-    $selected_reward = null;
     
-    foreach ($specific_rewards as $reward) {
+    foreach ($specific_rewards as $index => $reward) {
         $current_weight += $reward['weight'];
         if ($random <= $current_weight) {
             $selected_reward = $reward;
+            $selected_reward_index = $index;
             break;
         }
+    }
+    
+    // Calculate the exact angle where this prize should land
+    if ($selected_reward_index !== null) {
+        $slice_angle = 360 / count($specific_rewards); // 45 degrees per slice (8 prizes)
+        $prize_center_angle = ($selected_reward_index * $slice_angle) + ($slice_angle / 2); // Center of the prize slice
+        $pointer_offset = 90; // Pointer is at top (90 degrees)
+        $target_angle = $prize_center_angle - $pointer_offset;
+        
+        // Ensure the angle is positive and within 0-360 range
+        $target_angle = ($target_angle + 360) % 360;
+        
+        // Add multiple full rotations for dramatic effect (3-5 full rotations)
+        $full_rotations = 3 + mt_rand(0, 2); // 3-5 full rotations
+        $spin_angle = ($full_rotations * 360) + $target_angle;
     }
     
     if ($selected_reward) {
@@ -1047,6 +1067,10 @@ require_once __DIR__ . '/../core/includes/header.php';
     const spinBtn = document.querySelector('.spin-btn');
     const msgDiv = document.getElementById('spin-message');
     
+    // Get the pre-determined spin angle from server (if spinning)
+    const serverSpinAngle = <?php echo $spin_angle ? $spin_angle : 'null'; ?>;
+    const selectedRewardIndex = <?php echo $selected_reward_index !== null ? $selected_reward_index : 'null'; ?>;
+    
     if (document.getElementById('spin-form')) {
         document.getElementById('spin-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1058,13 +1082,22 @@ require_once __DIR__ . '/../core/includes/header.php';
             const spinDuration = 5000;
             const startTime = Date.now();
             const startRotation = rotation;
-            const spinAngle = 10 + Math.random() * 5;
+            
+            // Use server-determined angle if available, otherwise use random
+            let finalSpinAngle;
+            if (serverSpinAngle !== null) {
+                // Convert degrees to radians and use server angle
+                finalSpinAngle = (serverSpinAngle * Math.PI) / 180;
+            } else {
+                // Fallback to random angle (shouldn't happen in normal flow)
+                finalSpinAngle = (10 + Math.random() * 5) * 2 * Math.PI;
+            }
             
             function animate() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / spinDuration, 1);
                 const easeOut = t => 1 - Math.pow(1 - t, 3);
-                rotation = startRotation + (spinAngle * 2 * Math.PI * easeOut(progress));
+                rotation = startRotation + (finalSpinAngle * easeOut(progress));
                 drawWheel();
                 if (progress < 1) {
                     requestAnimationFrame(animate);

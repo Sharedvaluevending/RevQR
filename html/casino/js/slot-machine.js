@@ -373,35 +373,67 @@ class SlotMachine {
                 betAmount = parseInt(input.value);
             }
         });
-        const results = this.generateSpinResults();
         
-        console.log('🎰 Starting spin with results:', results.map(r => `${r.name}${r.isWild ? ' (WILD)' : ''}`));
-        
-        // Start the spinning animation
-        await this.startGSAPSpin();
-        
-        // Stop reels with final results
-        await this.stopReelsWithGSAP(results);
-        
-        // Show results and handle API
-        setTimeout(() => {
-            // Get the actual displayed symbols for win checking
-            const actualDisplayed = this.getDisplayedSymbols();
-            console.log('Generated results:', results.map(r => `${r.name}${r.isWild ? ' (WILD)' : ''}`));
-            console.log('Actually displayed:', actualDisplayed.map(r => `${r.name}${r.isWild ? ' (WILD)' : ''}`));
+        try {
+            // Get server-side generated results
+            const response = await fetch(`${this.appUrl}/api/casino/generate-slot-results.php`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    business_id: this.businessId,
+                    bet_amount: betAmount
+                })
+            });
             
-            // Use the actually displayed symbols for win checking
-            const winData = this.checkWin(actualDisplayed.length === 3 ? actualDisplayed : results, betAmount);
-            if (winData.isWin) {
-                this.showWin(winData);
+            if (!response.ok) {
+                throw new Error('Failed to generate slot results');
             }
             
-            // Record the play (this will handle balance updates via API)
-            this.recordPlay(betAmount, winData.amount, actualDisplayed.length === 3 ? actualDisplayed : results);
+            const data = await response.json();
             
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to generate slot results');
+            }
+            
+            // Use server-generated results
+            const results = data.results;
+            const winData = {
+                isWin: data.is_win,
+                amount: data.win_amount,
+                type: data.win_type,
+                message: data.message,
+                winningRow: data.winning_row
+            };
+            
+            console.log('🎰 Server generated results:', results.map(r => `${r.middleSymbol?.name || r.name}${r.middleSymbol?.isWild || r.isWild ? ' (WILD)' : ''}`));
+            
+            // Start the spinning animation
+            await this.startGSAPSpin();
+            
+            // Stop reels with server-generated results
+            await this.stopReelsWithGSAP(results);
+            
+            // Show results and handle API
+            setTimeout(() => {
+                if (winData.isWin) {
+                    this.showWin(winData);
+                }
+                
+                // Record the play (this will handle balance updates via API)
+                this.recordPlay(betAmount, winData.amount, results);
+                
+                this.isSpinning = false;
+                this.updateSpinButton();
+            }, 500);
+            
+        } catch (error) {
+            console.error('Error generating slot results:', error);
+            alert('Error generating slot results: ' + error.message);
             this.isSpinning = false;
             this.updateSpinButton();
-        }, 500);
+        }
     }
 
     async startGSAPSpin() {
@@ -440,13 +472,11 @@ class SlotMachine {
     }
 
     async stopReelsWithGSAP(results) {
-        // Check if we have a winning combination to ensure visual alignment
-        const winData = this.checkWin(results, 1); // Use bet amount 1 just for checking
-        
+        // Use the server-provided win data instead of calculating it client-side
         const stopPromises = this.reelElements.map((reelData, index) => {
             return new Promise(resolve => {
                 setTimeout(() => {
-                    this.stopSingleReelGSAP(reelData, results[index], index + 1, winData);
+                    this.stopSingleReelGSAP(reelData, results[index], index + 1);
                     resolve();
                 }, index * 400); // 400ms delay between stops
             });
@@ -455,12 +485,12 @@ class SlotMachine {
         await Promise.all(stopPromises);
     }
 
-    stopSingleReelGSAP(reelData, result, reelIndex, winData) {
+    stopSingleReelGSAP(reelData, result, reelIndex) {
         // Remove spinning class
         reelData.reel.classList.remove('spinning');
         
         // Build final reel state
-        this.buildFinalReel(reelData, result, reelIndex, winData);
+        this.buildFinalReel(reelData, result, reelIndex);
         
         // Animate to final position with bounce
         gsap.to(reelData.container, {
@@ -468,20 +498,13 @@ class SlotMachine {
             duration: 0.8,
             ease: "back.out(1.7)",
             onComplete: () => {
-                // Add winning glow effect only if this reel contributes to a win
-                if (winData && winData.isWin) {
-                    gsap.to(reelData.reel, {
-                        boxShadow: "0 0 30px rgba(255, 193, 7, 0.8)",
-                        duration: 0.3,
-                        yoyo: true,
-                        repeat: 1
-                    });
-                }
+                // Add winning glow effect if this is a winning symbol
+                // This will be handled by the markWinningSymbolInGrid method
             }
         });
     }
 
-    buildFinalReel(reelData, result, reelIndex, winData) {
+    buildFinalReel(reelData, result, reelIndex) {
         // Clear and rebuild reel with 3 visible rows
         reelData.container.innerHTML = '';
         
@@ -501,11 +524,6 @@ class SlotMachine {
             // Add wild styling
             if (symbol.isWild) {
                 symbolDiv.classList.add('wild-symbol');
-            }
-            
-            // Mark winning symbols based on win pattern and position
-            if (winData && winData.isWin) {
-                this.markWinningSymbolInGrid(symbolDiv, symbol, reelIndex, rowIndex, winData);
             }
             
             const img = document.createElement('img');
@@ -898,19 +916,80 @@ class SlotMachine {
             ease: "back.out(1.7)"
         });
         
-        // Highlight winning symbols with GSAP
-        document.querySelectorAll('.winning-symbol').forEach(symbol => {
-            gsap.to(symbol, {
-                scale: 1.1,
-                duration: 0.6,
-                ease: "power2.inOut",
-                yoyo: true,
-                repeat: -1
-            });
-        });
+        // Highlight winning symbols based on server-provided win data
+        this.highlightWinningSymbols(winData);
         
         // Play celebration effect
         this.playCelebrationEffect(winData.type);
+    }
+    
+    highlightWinningSymbols(winData) {
+        // Clear any previous winning symbols
+        document.querySelectorAll('.winning-symbol').forEach(symbol => {
+            symbol.classList.remove('winning-symbol');
+            gsap.killTweensOf(symbol);
+        });
+        
+        // Mark winning symbols based on win type and winning row
+        const winType = winData.type;
+        const winningRow = winData.winningRow;
+        
+        this.reelElements.forEach((reelData, reelIndex) => {
+            const symbols = reelData.container.querySelectorAll('.slot-symbol');
+            
+            symbols.forEach((symbolDiv, rowIndex) => {
+                let shouldMark = false;
+                
+                // Determine which positions should be marked based on win type
+                switch (winType) {
+                    case 'straight_line':
+                    case 'rare_jackpot':
+                    case 'mythical_jackpot':
+                    case 'rarity_line':
+                    case 'wild_line':
+                        // Mark the winning row (could be top, middle, or bottom)
+                        shouldMark = (rowIndex === winningRow);
+                        break;
+                        
+                    case 'diagonal_tl':
+                    case 'diagonal_exact':
+                        // Top-left to bottom-right diagonal: [0,0], [1,1], [2,2]
+                        shouldMark = (reelIndex === rowIndex);
+                        break;
+                        
+                    case 'diagonal_tr':
+                        // Top-right to bottom-left diagonal: [0,2], [1,1], [2,0]
+                        shouldMark = (reelIndex + rowIndex === 2);
+                        break;
+                        
+                    default:
+                        // For other win types, mark the winning row
+                        shouldMark = (rowIndex === winningRow);
+                        break;
+                }
+                
+                if (shouldMark) {
+                    symbolDiv.classList.add('winning-symbol');
+                    
+                    // Animate winning symbols with GSAP
+                    gsap.to(symbolDiv, {
+                        scale: 1.1,
+                        duration: 0.6,
+                        ease: "power2.inOut",
+                        yoyo: true,
+                        repeat: -1
+                    });
+                    
+                    // Add glow effect to the reel
+                    gsap.to(reelData.reel, {
+                        boxShadow: "0 0 30px rgba(255, 193, 7, 0.8)",
+                        duration: 0.3,
+                        yoyo: true,
+                        repeat: 1
+                    });
+                }
+            });
+        });
     }
 
     playCelebrationEffect(winType) {

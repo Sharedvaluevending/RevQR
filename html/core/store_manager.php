@@ -193,24 +193,27 @@ class StoreManager {
             // Generate unique purchase code
             $purchase_code = self::generatePurchaseCode();
             
-            // Create purchase record
-            $discount_amount_cents = (int) (($item['regular_price_cents'] * $item['discount_percentage']) / 100);
+            // Create purchase record in business_purchases table (for QR codes)
+            $expires_at = date('Y-m-d H:i:s', strtotime('+30 days')); // 30-day expiration
             
             $stmt = $pdo->prepare("
-                INSERT INTO user_store_purchases 
-                (user_id, business_id, store_item_id, qr_coins_spent, discount_amount_cents, purchase_code)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO business_purchases 
+                (user_id, business_id, business_store_item_id, qr_coins_spent, discount_percentage, purchase_code, expires_at, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
             ");
             $stmt->execute([
                 $user_id,
                 $item['business_id'],
                 $store_item_id,
                 $item['qr_coin_cost'],
-                $discount_amount_cents,
-                $purchase_code
+                $item['discount_percentage'],
+                $purchase_code,
+                $expires_at
             ]);
             
-                        // Spend QR coins
+            $purchase_id = $pdo->lastInsertId();
+            
+            // Spend QR coins
             $spent = QRCoinManager::spendCoins(
                 $user_id,
                 $item['qr_coin_cost'],
@@ -245,19 +248,35 @@ class StoreManager {
                     'original_qr_cost' => $item['qr_coin_cost'],
                     'platform_fee' => $item['qr_coin_cost'] - $business_earning
                 ],
-                $pdo->lastInsertId(),
+                $purchase_id,
                 'store_purchase'
             );
+
+            // Generate QR code for the purchase
+            require_once __DIR__ . '/qr_code_manager.php';
+            $purchase_data = [
+                'purchase_code' => $purchase_code,
+                'business_id' => $item['business_id'],
+                'discount_percentage' => $item['discount_percentage'],
+                'expires_at' => $expires_at,
+                'user_id' => $user_id
+            ];
+            
+            $qr_result = QRCodeManager::generateDiscountQRCode($purchase_id, $purchase_data);
 
             $pdo->commit();
             
             return [
                 'success' => true,
-                'message' => 'Purchase successful!',
+                'message' => 'Purchase successful! QR code generated for easy redemption.',
                 'purchase_code' => $purchase_code,
                 'item_name' => $item['item_name'],
-                'discount_amount' => $discount_amount_cents / 100,
-                'qr_coins_spent' => $item['qr_coin_cost']
+                'discount_percentage' => $item['discount_percentage'],
+                'qr_coins_spent' => $item['qr_coin_cost'],
+                'expires_at' => $expires_at,
+                'purchase_id' => $purchase_id,
+                'qr_code_generated' => $qr_result['success'] ?? false,
+                'qr_message' => $qr_result['message'] ?? null
             ];
             
         } catch (PDOException $e) {

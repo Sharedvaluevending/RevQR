@@ -39,11 +39,11 @@ $count_sql = "
          FROM business_purchases bp
          JOIN business_store_items bsi ON bp.business_store_item_id = bsi.id
          JOIN businesses b ON bp.business_id = b.id
-         WHERE bp.user_id = ?)
+         WHERE bp.user_id = ? AND bp.qr_code_data IS NOT NULL)
         UNION ALL
         (SELECT usp.id
          FROM user_store_purchases usp
-         JOIN qr_store_items qsi ON usp.qr_store_item_id = qsi.id
+         JOIN business_store_items bsi ON usp.store_item_id = bsi.id
          WHERE usp.user_id = ?)
     ) as total_purchases
 ";
@@ -52,7 +52,7 @@ $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
 $total_items = $stmt->fetchColumn();
 $total_pages = ceil($total_items / $per_page);
 
-// Get QR code purchases from both business_purchases and user_store_purchases tables
+// Get discount codes from both business_purchases (Nayax QR codes) and user_store_purchases (static promotion codes)
 $sql = "
     (SELECT 
         bp.id,
@@ -66,13 +66,15 @@ $sql = "
         bp.created_at,
         bp.qr_code_data,
         bp.nayax_machine_id,
+        bp.scan_count,
+        bp.redeemed_at,
         bsi.item_name,
         bsi.item_description,
         b.name as business_name,
         b.type as business_type,
         nm.machine_name,
         nm.location_description,
-        'business' as purchase_type,
+        'nayax_qr' as purchase_type,
         CASE 
             WHEN bp.expires_at <= NOW() AND bp.status != 'redeemed' THEN 'expired'
             WHEN bp.status = 'redeemed' THEN 'redeemed'
@@ -83,7 +85,7 @@ $sql = "
     JOIN business_store_items bsi ON bp.business_store_item_id = bsi.id
     JOIN businesses b ON bp.business_id = b.id
     LEFT JOIN nayax_machines nm ON bp.nayax_machine_id = nm.nayax_machine_id
-    WHERE bp.user_id = ?)
+    WHERE bp.user_id = ? AND bp.qr_code_data IS NOT NULL)
     
     UNION ALL
     
@@ -92,30 +94,31 @@ $sql = "
         usp.user_id,
         usp.business_id,
         usp.qr_coins_spent,
-        usp.discount_percent as discount_percentage,
-        usp.discount_code as purchase_code,
+        usp.discount_amount_cents / 100 as discount_percentage,
+        usp.purchase_code,
         usp.status,
-        usp.expires_at,
+        usp.redeemed_at as expires_at,
         usp.created_at,
         NULL as qr_code_data,
         NULL as nayax_machine_id,
-        qsi.item_name,
-        '' as item_description,
+        0 as scan_count,
+        usp.redeemed_at,
+        bsi.item_name,
+        bsi.item_description,
         b.name as business_name,
         b.type as business_type,
         '' as machine_name,
         '' as location_description,
-        'store' as purchase_type,
+        'promotion_code' as purchase_type,
         CASE 
-            WHEN usp.expires_at <= NOW() AND usp.status != 'used' THEN 'expired'
-            WHEN usp.status = 'used' THEN 'redeemed'
-            WHEN usp.status = 'active' AND usp.expires_at > NOW() THEN 'active'
+            WHEN usp.status = 'redeemed' THEN 'redeemed'
+            WHEN usp.status = 'pending' THEN 'active'
+            WHEN usp.status = 'expired' THEN 'expired'
             ELSE 'unknown'
         END as current_status
     FROM user_store_purchases usp
-    JOIN qr_store_items qsi ON usp.qr_store_item_id = qsi.id
-    LEFT JOIN business_store_items bsi ON usp.business_store_item_id = bsi.id
-    LEFT JOIN businesses b ON (bsi.business_id = b.id OR usp.business_id = b.id)
+    JOIN business_store_items bsi ON usp.store_item_id = bsi.id
+    LEFT JOIN businesses b ON usp.business_id = b.id
     WHERE usp.user_id = ?)
     
     ORDER BY created_at DESC
@@ -200,9 +203,9 @@ require_once __DIR__ . '/../core/includes/header.php';
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div class="mb-3 mb-md-0">
                     <h1 class="mb-2">
-                        <i class="bi bi-qr-code text-primary me-2"></i>My Discount QR Codes
+                        <i class="bi bi-qr-code text-primary me-2"></i>My Discount Codes
                     </h1>
-                    <p class="text-muted mb-0">Scan these QR codes at Nayax vending machines to redeem your discounts</p>
+                    <p class="text-muted mb-0">QR codes for Nayax machines and static promotion codes for discounts</p>
                 </div>
                 <div class="text-end">
                     <div class="d-flex align-items-center mb-2">
@@ -278,12 +281,12 @@ require_once __DIR__ . '/../core/includes/header.php';
                 <div class="card text-center py-5">
                     <div class="card-body">
                         <i class="bi bi-qr-code display-1 text-muted mb-3"></i>
-                        <h3 class="text-muted mb-3">No QR Codes Found</h3>
+                        <h3 class="text-muted mb-3">No Discount Codes Found</h3>
                         <p class="text-muted mb-4">
                             <?php if ($filter === 'active'): ?>
-                                You don't have any active discount QR codes. Purchase some business discounts to get started!
+                                You don't have any active discount codes. Purchase some business discounts or promotion codes to get started!
                             <?php else: ?>
-                                No QR codes found for the selected filter.
+                                No discount codes found for the selected filter.
                             <?php endif; ?>
                         </p>
                         <div class="d-flex justify-content-center gap-3 flex-wrap">
@@ -340,8 +343,9 @@ require_once __DIR__ . '/../core/includes/header.php';
                             <div class="qr-code-display mb-3">
                                 <?php if ($purchase['current_status'] === 'active'): ?>
                                     <?php if ($purchase['qr_code_data']): ?>
+                                        <!-- Nayax QR Code -->
                                         <img src="data:image/png;base64,<?php echo $purchase['qr_code_data']; ?>" 
-                                             alt="Discount QR Code" 
+                                             alt="Nayax QR Code" 
                                              class="img-fluid qr-code-image"
                                              style="max-width: 120px; height: auto; cursor: pointer;"
                                              onclick="showQRModal(<?php echo $purchase['id']; ?>)">
@@ -349,17 +353,22 @@ require_once __DIR__ . '/../core/includes/header.php';
                                             <small class="text-muted">Tap to enlarge</small>
                                         </div>
                                     <?php else: ?>
+                                        <!-- Static Promotion Code -->
                                         <div class="text-primary py-4">
-                                            <i class="bi bi-check-circle fs-1"></i>
+                                            <i class="bi bi-tag fs-1"></i>
                                             <div class="mt-2">
-                                                <strong>Discount Code: <?php echo $purchase['purchase_code']; ?></strong>
-                                                <br><small class="text-muted">Use this code at checkout or present your purchase confirmation</small>
+                                                <strong>Promotion Code: <?php echo $purchase['purchase_code']; ?></strong>
+                                                <br><small class="text-muted">Use this code at checkout or present to staff</small>
                                             </div>
                                         </div>
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <div class="text-muted py-4">
-                                        <i class="bi bi-qr-code fs-1 opacity-50"></i>
+                                        <?php if ($purchase['qr_code_data']): ?>
+                                            <i class="bi bi-qr-code fs-1 opacity-50"></i>
+                                        <?php else: ?>
+                                            <i class="bi bi-tag fs-1 opacity-50"></i>
+                                        <?php endif; ?>
                                         <div class="mt-2">
                                             <small><?php echo $purchase['current_status'] === 'redeemed' ? 'Already Redeemed' : 'Expired'; ?></small>
                                         </div>
@@ -383,10 +392,16 @@ require_once __DIR__ . '/../core/includes/header.php';
                                 <div class="d-flex justify-content-between mb-1">
                                     <span>Expires:</span>
                                     <span class="<?php echo $purchase['current_status'] === 'expired' ? 'text-danger' : ''; ?>">
-                                        <?php echo date('M j, Y', strtotime($purchase['expires_at'])); ?>
+                                        <?php 
+                                        if ($purchase['expires_at']) {
+                                            echo date('M j, Y', strtotime($purchase['expires_at']));
+                                        } else {
+                                            echo 'No expiry';
+                                        }
+                                        ?>
                                     </span>
                                 </div>
-                                <?php if ($purchase['scan_count'] > 0): ?>
+                                <?php if ($purchase['purchase_type'] === 'nayax_qr' && $purchase['scan_count'] > 0): ?>
                                     <div class="d-flex justify-content-between mb-1">
                                         <span>Scans:</span>
                                         <span><?php echo $purchase['scan_count']; ?></span>
@@ -405,7 +420,11 @@ require_once __DIR__ . '/../core/includes/header.php';
                             <div class="card-footer bg-light">
                                 <small class="text-success">
                                     <i class="bi bi-info-circle me-1"></i>
-                                    Scan this QR code at the vending machine to apply your discount
+                                    <?php if ($purchase['qr_code_data']): ?>
+                                        Scan this QR code at the vending machine to apply your discount
+                                    <?php else: ?>
+                                        Use this promotion code at checkout or present to staff
+                                    <?php endif; ?>
                                 </small>
                             </div>
                         <?php endif; ?>
@@ -464,7 +483,7 @@ require_once __DIR__ . '/../core/includes/header.php';
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="qrModalLabel">
-                    <i class="bi bi-qr-code me-2"></i>Discount QR Code
+                    <i class="bi bi-qr-code me-2"></i>Discount Code
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -477,7 +496,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                 </div>
                 <div class="alert alert-info mt-3">
                     <i class="bi bi-info-circle me-2"></i>
-                    <small>Show this QR code to the vending machine scanner to automatically apply your discount</small>
+                    <small id="modalInstructions">Instructions will be shown here</small>
                 </div>
             </div>
             <div class="modal-footer justify-content-center">
@@ -494,13 +513,29 @@ function showQRModal(purchaseId) {
     const purchase = purchaseData.find(p => p.id == purchaseId);
     if (!purchase) return;
     
-    // Update modal content
-    document.getElementById('qrCodeContainer').innerHTML = `
-        <img src="data:image/png;base64,${purchase.qr_code_data}" 
-             alt="Discount QR Code" 
-             class="qr-code-large img-fluid"
-             style="max-width: 300px;">
-    `;
+    // Update modal content based on type
+    if (purchase.qr_code_data) {
+        // Nayax QR Code
+        document.getElementById('qrCodeContainer').innerHTML = `
+            <img src="data:image/png;base64,${purchase.qr_code_data}" 
+                 alt="Nayax QR Code" 
+                 class="qr-code-large img-fluid"
+                 style="max-width: 300px;">
+        `;
+        document.getElementById('modalInstructions').textContent = 'Show this QR code to the vending machine scanner to automatically apply your discount';
+    } else {
+        // Static Promotion Code
+        document.getElementById('qrCodeContainer').innerHTML = `
+            <div class="text-primary py-4">
+                <i class="bi bi-tag display-1"></i>
+                <div class="mt-3">
+                    <h3 class="text-primary">${purchase.purchase_code}</h3>
+                    <p class="text-muted">Promotion Code</p>
+                </div>
+            </div>
+        `;
+        document.getElementById('modalInstructions').textContent = 'Use this promotion code at checkout or present to staff to apply your discount';
+    }
     
     document.getElementById('qrDetailsContainer').innerHTML = `
         <div class="text-start">
@@ -511,7 +546,7 @@ function showQRModal(purchaseId) {
                 <span class="text-muted">Code: ${purchase.purchase_code}</span>
             </div>
             <div class="text-muted">
-                <small>Expires: ${new Date(purchase.expires_at).toLocaleDateString()}</small>
+                <small>Expires: ${purchase.expires_at ? new Date(purchase.expires_at).toLocaleDateString() : 'No expiry'}</small>
             </div>
         </div>
     `;
@@ -525,10 +560,10 @@ function showQRModal(purchaseId) {
 document.addEventListener('DOMContentLoaded', function() {
     const filter = '<?php echo $filter; ?>';
     const titleMap = {
-        'active': 'Active QR Codes',
-        'all': 'All QR Codes', 
-        'redeemed': 'Redeemed QR Codes',
-        'expired': 'Expired QR Codes'
+        'active': 'Active Discount Codes',
+        'all': 'All Discount Codes', 
+        'redeemed': 'Redeemed Discount Codes',
+        'expired': 'Expired Discount Codes'
     };
     
     if (titleMap[filter]) {

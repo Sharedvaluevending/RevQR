@@ -270,15 +270,40 @@ require_once __DIR__ . '/../core/includes/header.php';
             max-width: 100% !important;
         }
 
-        @media (max-width: 768px) {
+        /* FIX: Desktop mode on mobile - ensure natural Bootstrap behavior */
+        @media (min-width: 768px) and (max-width: 1024px) {
             .promotions-page .container-fluid {
-                padding: 0 1rem !important;
+                max-width: 1200px !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+                padding-left: 15px !important;
+                padding-right: 15px !important;
             }
-        }
-
-        @media (max-width: 576px) {
-            .promotions-page .container-fluid {
-                padding: 0 0.5rem !important;
+            
+            /* Ensure Bootstrap grid behaves naturally */
+            .row {
+                width: 100% !important;
+                margin-left: -15px !important;
+                margin-right: -15px !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+            }
+            
+            [class*="col-"] {
+                position: relative !important;
+                width: 100% !important;
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+            }
+            
+            .col-md-6 { 
+                flex: 0 0 50% !important; 
+                max-width: 50% !important;
+            }
+            
+            .card {
+                width: 100% !important;
+                margin-bottom: 1rem !important;
             }
         }
 
@@ -489,6 +514,20 @@ require_once __DIR__ . '/../core/includes/header.php';
         .text-warning { color: #ff9800 !important; }
         .text-info { color: #00bcd4 !important; }
         .text-muted { color: rgba(255, 255, 255, 0.75) !important; }
+
+        @media (max-width: 768px) {
+            .promotions-page .container-fluid {
+                padding: 0 1rem !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .promotions-page .container-fluid {
+                padding: 0 0.5rem !important;
+            }
+        }
+
+        .promotions-page .navbar,
     </style>
 </head>
 <body class="promotions-page">

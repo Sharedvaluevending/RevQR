@@ -1,0 +1,27 @@
+=== VOTING PAGES COMPARISON ===
+
+1. html/vote.php (MAIN VOTING PAGE)
+   - Primary voting interface
+   - Full AJAX functionality 
+   - Real-time updates (5 seconds)
+   - QR coin rewards
+   - Extra vote purchases
+   - Toast notifications
+   - Weekly vote limits
+
+2. html/public/vote.php (PUBLIC VOTING PAGE)
+   - Simplified public interface
+   - Basic form submission (page reload)
+   - Limited real-time updates (30 seconds)
+   - No coin rewards
+   - No extra vote purchases
+   - Simpler UI
+
+3. html/user/vote.php (USER VOTING PAGE)
+   - User-specific voting interface
+   - Full user features
+   - Avatar integration
+   - Stats and analytics
+   - Comprehensive user experience
+
+RECOMMENDATION: Use html/vote.php for main testing

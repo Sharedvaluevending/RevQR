@@ -858,6 +858,48 @@ header("X-Robots-Tag: noindex, nofollow, noarchive, nosnippet");
             max-width: 100%;
             padding: 0 1rem;
         }
+        
+        /* GLOBAL FIX: Desktop mode on mobile - ensure natural Bootstrap behavior for ALL pages */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .container, .container-fluid {
+                max-width: 1200px !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+            }
+            
+            /* Ensure Bootstrap grid behaves naturally */
+            .row {
+                width: 100% !important;
+                margin-left: -15px !important;
+                margin-right: -15px !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+            }
+            
+            [class*="col-"] {
+                position: relative !important;
+                width: 100% !important;
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+            }
+            
+            .col-md-6 { 
+                flex: 0 0 50% !important; 
+                max-width: 50% !important;
+            }
+            
+            .col-lg-6 {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+            
+            .card {
+                width: 100% !important;
+                margin-bottom: 1rem !important;
+            }
+        }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">

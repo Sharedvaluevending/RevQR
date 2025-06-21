@@ -702,6 +702,43 @@ body.pizza-tracker-page {
     max-width: 100% !important;
 }
 
+/* FIX: Desktop mode on mobile - ensure natural Bootstrap behavior */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .pizza-tracker-page .container-fluid {
+        max-width: 1200px !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    
+    /* Ensure Bootstrap grid behaves naturally */
+    .row {
+        width: 100% !important;
+        margin-left: -15px !important;
+        margin-right: -15px !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+    }
+    
+    [class*="col-"] {
+        position: relative !important;
+        width: 100% !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    
+    .col-md-6 { 
+        flex: 0 0 50% !important; 
+        max-width: 50% !important;
+    }
+    
+    .card {
+        width: 100% !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
 .pizza-tracker-page .container {
     background: rgba(26, 26, 26, 0.95) !important;
     border-radius: 16px !important;

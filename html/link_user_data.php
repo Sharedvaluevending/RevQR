@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/core/config.php';
+require_once __DIR__ . '/../core/qr_coin_manager.php';
 require_once __DIR__ . '/core/session.php';
 require_once __DIR__ . '/core/auth.php';
 require_once __DIR__ . '/core/functions.php';
@@ -85,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "<ul>";
         echo "<li>Total Votes: {$stats['voting_stats']['total_votes']}</li>";
         echo "<li>Total Spins: {$stats['spin_stats']['total_spins']}</li>";
-        echo "<li>Total Points: {$stats['user_points']}</li>";
+        echo "<li>Total Points: {QRCoinManager::getBalance($user_id)}</li>";
         echo "</ul>";
         
         echo "<p><a href='user/dashboard.php' class='btn btn-primary'>Go to Dashboard</a></p>";
@@ -105,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<ul>";
     echo "<li>Total Votes: {$stats['voting_stats']['total_votes']}</li>";
     echo "<li>Total Spins: {$stats['spin_stats']['total_spins']}</li>";
-    echo "<li>Total Points: {$stats['user_points']}</li>";
+    echo "<li>Total Points: {QRCoinManager::getBalance($user_id)}</li>";
     echo "</ul>";
     
     // Check for orphaned data

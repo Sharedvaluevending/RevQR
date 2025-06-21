@@ -3,6 +3,7 @@ require_once __DIR__ . '/../core/config.php';
 require_once __DIR__ . '/../core/session.php';
 require_once __DIR__ . '/../core/auth.php';
 require_once __DIR__ . '/../core/functions.php';
+require_once __DIR__ . '/../core/qr_coin_manager.php';
 
 // Require user role
 require_role('user');
@@ -13,47 +14,40 @@ header('Cache-Control: post-check=0, pre-check=0', false);
 header('Pragma: no-cache');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 
-// Get filter and pagination parameters
+// Set up filter and ordering
 $filter = $_GET['filter'] ?? 'level';
-$page = max(1, intval($_GET['page'] ?? 1));
-$per_page = 25;
+$page = max(1, (int)($_GET['page'] ?? 1));
+$per_page = 20;
 $offset = ($page - 1) * $per_page;
 
-$valid_filters = ['level', 'votes', 'spins', 'wins', 'activity', 'streak', 'points'];
-if (!in_array($filter, $valid_filters)) {
-    $filter = 'level';
-}
-
-// Avatar filename function is now in functions.php
-
-// Build leaderboard query based on filter
-switch($filter) {
+// Set up ordering based on filter
+switch ($filter) {
     case 'votes':
         $orderBy = 'total_votes DESC, total_activity DESC, user_id ASC';
-        $title = 'Top Voters';
+        $title = 'Vote Leaders';
         $subtitle = 'Users ranked by total votes cast';
         $primaryMetric = 'total_votes';
-        $primaryLabel = 'Votes';
+        $primaryLabel = 'Total Votes';
         break;
         
     case 'spins':
         $orderBy = 'total_spins DESC, total_activity DESC, user_id ASC';
-        $title = 'Spin Masters';
+        $title = 'Spin Leaders';
         $subtitle = 'Users ranked by total spins';
         $primaryMetric = 'total_spins';
-        $primaryLabel = 'Spins';
+        $primaryLabel = 'Total Spins';
         break;
         
     case 'wins':
-        $orderBy = 'real_wins DESC, total_spins DESC, total_activity DESC, user_id ASC';
-        $title = 'Lucky Winners';
+        $orderBy = 'real_wins DESC, total_activity DESC, user_id ASC';
+        $title = 'Win Leaders';
         $subtitle = 'Users ranked by spin wheel wins';
         $primaryMetric = 'real_wins';
         $primaryLabel = 'Real Wins';
         break;
         
     case 'activity':
-        $orderBy = 'total_activity DESC, user_points DESC, user_id ASC';
+        $orderBy = 'total_activity DESC, user_id ASC';
         $title = 'Most Active';
         $subtitle = 'Users ranked by total engagement';
         $primaryMetric = 'total_activity';
@@ -69,7 +63,7 @@ switch($filter) {
         break;
         
     case 'points':
-        $orderBy = 'user_points DESC, total_activity DESC, user_id ASC';
+        $orderBy = 'total_activity DESC, user_id ASC'; // Will be sorted by points in PHP
         $title = 'QR Coin Leaders';
         $subtitle = 'Users ranked by total QR coins earned';
         $primaryMetric = 'user_points';
@@ -77,7 +71,7 @@ switch($filter) {
         break;
         
     default: // level
-        $orderBy = 'user_points DESC, total_activity DESC, user_id ASC';
+        $orderBy = 'total_activity DESC, user_id ASC'; // Will be sorted by level in PHP
         $title = 'Level Leaders';
         $subtitle = 'Users ranked by level and experience';
         $primaryMetric = 'user_level';
@@ -87,44 +81,24 @@ switch($filter) {
 
 // Improved query to get leaderboard data - STRICT activity filtering to prevent duplicates
 $stmt = $pdo->prepare("
-    SELECT DISTINCT
+    SELECT 
         u.id as user_id,
-        u.username,
-        COALESCE(NULLIF(TRIM(u.username), ''), CONCAT('User_', u.id)) as display_name,
-        COALESCE(latest_ip.voter_ip, 'Unknown') as voter_ip,
-        
-        -- Vote stats (strict filtering)
+        u.username, 
+        u.email,
+        COALESCE(u.equipped_avatar, 1) as equipped_avatar,
         COALESCE(vote_stats.total_votes, 0) as total_votes,
         COALESCE(vote_stats.votes_in, 0) as votes_in,
         COALESCE(vote_stats.votes_out, 0) as votes_out,
         COALESCE(vote_stats.voting_days, 0) as voting_days,
-        
-        -- Spin stats (strict filtering)
         COALESCE(spin_stats.total_spins, 0) as total_spins,
         COALESCE(spin_stats.big_wins, 0) as big_wins,
         COALESCE(spin_stats.real_wins, 0) as real_wins,
         COALESCE(spin_stats.losses, 0) as losses,
         COALESCE(spin_stats.spin_days, 0) as spin_days,
-        
-        -- Combined metrics
+        COALESCE(spin_stats.total_prize_points, 0) as total_prize_points,
+        COALESCE(latest_ip.voter_ip, '') as voter_ip,
         (COALESCE(vote_stats.total_votes, 0) + COALESCE(spin_stats.total_spins, 0)) as total_activity,
-        GREATEST(COALESCE(vote_stats.voting_days, 0), COALESCE(spin_stats.spin_days, 0)) as activity_days,
-        
-        -- Points calculation (consistent with dashboard)
-        (
-            (COALESCE(vote_stats.total_votes, 0) * 10) + 
-            (COALESCE(spin_stats.total_spins, 0) * 25) +
-            (COALESCE(vote_stats.voting_days, 0) * 50) + 
-            (COALESCE(spin_stats.spin_days, 0) * 100) +
-            COALESCE(spin_stats.total_prize_points, 0)
-        ) as user_points,
-        
-        -- Get equipped avatar from users table or default to 1
-        COALESCE(u.equipped_avatar, 1) as equipped_avatar,
-        
-        -- Add timestamp for debugging
-        NOW() as query_time
-        
+        GREATEST(COALESCE(vote_stats.voting_days, 0), COALESCE(spin_stats.spin_days, 0)) as activity_days
     FROM users u
     
     -- Get user's most recent IP for display
@@ -188,8 +162,16 @@ $all_leaderboard_data = $stmt->fetchAll();
 // Get total count for pagination
 $total_users = count($all_leaderboard_data);
 
-// Calculate levels for each user
+// Calculate levels and user_points for each user
 foreach ($all_leaderboard_data as &$user) {
+    // Get user points using QRCoinManager
+    $user['user_points'] = QRCoinManager::getBalance($user['user_id']);
+    
+    // Ensure equipped_avatar has fallback value
+    if (empty($user['equipped_avatar'])) {
+        $user['equipped_avatar'] = 1;
+    }
+    
     $level_data = calculateUserLevel(
         $user['total_votes'], 
         $user['user_points'], 
@@ -201,17 +183,32 @@ foreach ($all_leaderboard_data as &$user) {
     $user['level_progress'] = $level_data['progress'];
 }
 
-// Sort by level if that's the selected filter
-if ($filter === 'level') {
-    usort($all_leaderboard_data, function($a, $b) {
-        if ($a['user_level'] == $b['user_level']) {
+// Sort by the appropriate metric in PHP since user_points and user_level are calculated
+switch ($filter) {
+    case 'points':
+        usort($all_leaderboard_data, function($a, $b) {
             if ($a['user_points'] == $b['user_points']) {
                 return $b['total_activity'] - $a['total_activity'];
             }
             return $b['user_points'] - $a['user_points'];
-        }
-        return $b['user_level'] - $a['user_level'];
-    });
+        });
+        break;
+        
+    case 'level':
+        usort($all_leaderboard_data, function($a, $b) {
+            if ($a['user_level'] == $b['user_level']) {
+                if ($a['user_points'] == $b['user_points']) {
+                    return $b['total_activity'] - $a['total_activity'];
+                }
+                return $b['user_points'] - $a['user_points'];
+            }
+            return $b['user_level'] - $a['user_level'];
+        });
+        break;
+        
+    default:
+        // Other filters are already sorted by the SQL query
+        break;
 }
 
 // Apply pagination
@@ -555,7 +552,7 @@ include '../core/includes/header.php';
                                             $trophyIcon = '';
                                         }
                                         
-                                        $avatarFile = getAvatarFilename($user['equipped_avatar']);
+                                        $avatarFile = getAvatarFilename($user['equipped_avatar'] ?? 1);
                                     ?>
                                     <tr>
                                         <td>
@@ -573,7 +570,7 @@ include '../core/includes/header.php';
                                         </td>
                                         <td>
                                             <div class="fw-semibold">
-                                                <?php echo htmlspecialchars($user['display_name']); ?>
+                                                <?php echo htmlspecialchars($user['username'] ?? 'Unknown User'); ?>
                                                 <?php if ($isCurrentUser): ?>
                                                     <span class="badge bg-primary ms-1"><i class="bi bi-star-fill me-1"></i>You</span>
                                                 <?php endif; ?>
@@ -582,7 +579,7 @@ include '../core/includes/header.php';
                                                 <?php if ($user['user_id']): ?>
                                                     <i class="bi bi-person-check-fill me-1 text-success"></i>Registered User
                                                 <?php else: ?>
-                                                    <i class="bi bi-globe2 me-1 text-info"></i>IP: <?php echo htmlspecialchars(substr($user['voter_ip'], -8)); ?>
+                                                    <i class="bi bi-globe2 me-1 text-info"></i>IP: <?php echo htmlspecialchars(substr($user['voter_ip'] ?? '', -8)); ?>
                                                 <?php endif; ?>
                                             </small>
                                         </td>

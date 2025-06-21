@@ -166,13 +166,13 @@ $spin_stats = $stats['spin_stats'];
 // Note: user_points is already fetched from QRCoinManager above
 
 // Calculate user level using QR coin balance (consistent with new system)
-$level_data = calculateUserLevel($voting_stats['total_votes'], $user_points, $voting_stats['voting_days'], $spin_stats['spin_days'], $_SESSION['user_id']);
+$level_data = calculateUserLevel($voting_stats['total_votes'] ?? 0, $user_points, $voting_stats['voting_days'] ?? 0, $spin_stats['spin_days'] ?? 0, $_SESSION['user_id']);
 $user_level = $level_data['level'];
 $level_progress = $level_data['progress'];
 $points_to_next = $level_data['points_to_next'];
 
 // Get user's rank compared to others - fixed calculation
-$user_total_activity = $voting_stats['total_votes'] + $spin_stats['total_spins'];
+$user_total_activity = ($voting_stats['total_votes'] ?? 0) + ($spin_stats['total_spins'] ?? 0);
 $stmt = $pdo->prepare("
     SELECT COUNT(*) as rank_position
     FROM (
@@ -270,18 +270,18 @@ $recent_activity = $stmt->fetchAll();
 $recent_achievements = [];
 
 // Check for voting milestones
-if ($voting_stats['total_votes'] >= 100) {
+if (($voting_stats['total_votes'] ?? 0) >= 100) {
     $recent_achievements[] = ['type' => 'milestone', 'title' => 'Voting Champion', 'desc' => '100+ votes cast', 'icon' => 'trophy-fill', 'color' => 'warning'];
-} elseif ($voting_stats['total_votes'] >= 50) {
+} elseif (($voting_stats['total_votes'] ?? 0) >= 50) {
     $recent_achievements[] = ['type' => 'milestone', 'title' => 'Active Voter', 'desc' => '50+ votes cast', 'icon' => 'award-fill', 'color' => 'success'];
-} elseif ($voting_stats['total_votes'] >= 10) {
+} elseif (($voting_stats['total_votes'] ?? 0) >= 10) {
     $recent_achievements[] = ['type' => 'milestone', 'title' => 'Getting Started', 'desc' => '10+ votes cast', 'icon' => 'check-circle-fill', 'color' => 'primary'];
 }
 
 // Check for spin achievements
-if ($spin_stats['total_spins'] >= 30) {
+if (($spin_stats['total_spins'] ?? 0) >= 30) {
     $recent_achievements[] = ['type' => 'milestone', 'title' => 'Spin Master', 'desc' => '30+ spins completed', 'icon' => 'stars', 'color' => 'warning'];
-} elseif ($spin_stats['total_spins'] >= 10) {
+} elseif (($spin_stats['total_spins'] ?? 0) >= 10) {
     $recent_achievements[] = ['type' => 'milestone', 'title' => 'Lucky Player', 'desc' => '10+ spins completed', 'icon' => 'dice-6-fill', 'color' => 'info'];
 }
 
@@ -372,8 +372,8 @@ $business_engagement = $stmt->fetchAll();
 // Get quick insights for engagement
 $insights = [];
 
-if ($voting_stats['total_votes'] > 0) {
-    $vote_in_percentage = round(($voting_stats['votes_in'] / $voting_stats['total_votes']) * 100);
+if (($voting_stats['total_votes'] ?? 0) > 0) {
+    $vote_in_percentage = round((($voting_stats['votes_in'] ?? 0) / ($voting_stats['total_votes'] ?? 1)) * 100);
     if ($vote_in_percentage > 70) {
         $insights[] = "You're optimistic! {$vote_in_percentage}% of your votes are for adding items.";
     } elseif ($vote_in_percentage < 30) {
@@ -395,7 +395,7 @@ if ($current_streak >= 5) {
 $predictive_insights = [];
 
 // Calculate level prediction
-if ($voting_stats['total_votes'] > 0 || $spin_stats['total_spins'] > 0) {
+if (($voting_stats['total_votes'] ?? 0) > 0 || ($spin_stats['total_spins'] ?? 0) > 0) {
     // Calculate daily average activity over last 7 days
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as recent_activity_count
@@ -707,8 +707,8 @@ require_once __DIR__ . '/../core/includes/header.php';
                                     <img src="../assets/page/giftbox.png" alt="Vote Box" style="width: 48px; height: 48px;">
                                 </div>
                                 <div class="text-start">
-                                    <h4 class="mb-0"><?php echo $vote_status['votes_used']; ?></h4>
-                                    <h6 class="mb-1">Vote<?php echo $vote_status['votes_used'] != 1 ? 's' : ''; ?> Used</h6>
+                                    <h4 class="mb-0"><?php echo $vote_status['votes_used'] ?? 0; ?></h4>
+                                    <h6 class="mb-1">Vote<?php echo ($vote_status['votes_used'] ?? 0) != 1 ? 's' : ''; ?> Used</h6>
                                     <div class="small text-muted">
                                         <i class="bi bi-clock me-1"></i>This week
                                     </div>
@@ -717,14 +717,14 @@ require_once __DIR__ . '/../core/includes/header.php';
                         </div>
 
                         <!-- Votes Remaining This Week -->
-                        <div class="alert alert-<?php echo $vote_status['votes_remaining'] > 0 ? 'info' : 'warning'; ?> border-start border-4 border-<?php echo $vote_status['votes_remaining'] > 0 ? 'info' : 'warning'; ?> bg-<?php echo $vote_status['votes_remaining'] > 0 ? 'info' : 'warning'; ?> bg-opacity-10 mb-2 p-3">
+                        <div class="alert alert-<?php echo ($vote_status['votes_remaining'] ?? 0) > 0 ? 'info' : 'warning'; ?> border-start border-4 border-<?php echo ($vote_status['votes_remaining'] ?? 0) > 0 ? 'info' : 'warning'; ?> bg-<?php echo ($vote_status['votes_remaining'] ?? 0) > 0 ? 'info' : 'warning'; ?> bg-opacity-10 mb-2 p-3">
                             <div class="d-flex align-items-center justify-content-center">
                                 <div class="me-3">
                                     <img src="../assets/page/star.png" alt="Star" style="width: 48px; height: 48px;">
                                 </div>
                                 <div class="text-start">
-                                    <h4 class="mb-0"><?php echo $vote_status['votes_remaining']; ?></h4>
-                                    <h6 class="mb-1">Vote<?php echo $vote_status['votes_remaining'] != 1 ? 's' : ''; ?> Remaining</h6>
+                                    <h4 class="mb-0"><?php echo $vote_status['votes_remaining'] ?? 0; ?></h4>
+                                    <h6 class="mb-1">Vote<?php echo ($vote_status['votes_remaining'] ?? 0) != 1 ? 's' : ''; ?> Remaining</h6>
                                     <div class="small text-muted">
                                         <i class="bi bi-coin me-1"></i>Earns 30 QR coins each
                                     </div>
@@ -739,7 +739,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                                     <img src="../assets/page/votepre.png" alt="Weekly Limit" style="width: 48px; height: 48px;">
                                 </div>
                                 <div class="text-start">
-                                    <h4 class="mb-0"><?php echo $vote_status['weekly_limit']; ?></h4>
+                                    <h4 class="mb-0"><?php echo $vote_status['weekly_limit'] ?? 2; ?></h4>
                                     <h6 class="mb-1">Weekly Limit</h6>
                                     <div class="small text-muted">
                                         <i class="bi bi-calendar-week me-1"></i>Resets Monday
@@ -756,7 +756,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                                 <div class="alert alert-primary border-start border-4 border-primary bg-primary bg-opacity-10 mb-2 p-3">
                                     <div class="text-center">
                                         <i class="bi bi-trophy-fill text-primary me-2"></i>
-                                        <strong><?php echo number_format($voting_stats['total_votes']); ?></strong>
+                                        <strong><?php echo number_format($voting_stats['total_votes'] ?? 0); ?></strong>
                                         <div class="small text-muted mt-1">Total Votes Cast</div>
                                     </div>
                                 </div>
@@ -766,7 +766,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                                 <div class="alert alert-secondary border-start border-4 border-secondary bg-secondary bg-opacity-10 mb-2 p-3">
                                     <div class="text-center">
                                         <i class="bi bi-calendar-week text-secondary me-2"></i>
-                                        <strong><?php echo $voting_stats['voting_days']; ?></strong>
+                                        <strong><?php echo $voting_stats['voting_days'] ?? 0; ?></strong>
                                         <div class="small text-muted mt-1">Active Days</div>
                                     </div>
                                 </div>
@@ -776,7 +776,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                                 <div class="alert alert-success border-start border-4 border-success bg-success bg-opacity-10 mb-2 p-2">
                                     <div class="text-center">
                                         <i class="bi bi-plus-circle-fill text-success"></i>
-                                        <strong class="d-block"><?php echo number_format($voting_stats['votes_in']); ?></strong>
+                                        <strong class="d-block"><?php echo number_format($voting_stats['votes_in'] ?? 0); ?></strong>
                                         <div class="small text-muted">IN</div>
                                     </div>
                                 </div>
@@ -786,7 +786,7 @@ require_once __DIR__ . '/../core/includes/header.php';
                                 <div class="alert alert-danger border-start border-4 border-danger bg-danger bg-opacity-10 mb-2 p-2">
                                     <div class="text-center">
                                         <i class="bi bi-dash-circle-fill text-danger"></i>
-                                        <strong class="d-block"><?php echo number_format($voting_stats['votes_out']); ?></strong>
+                                        <strong class="d-block"><?php echo number_format($voting_stats['votes_out'] ?? 0); ?></strong>
                                         <div class="small text-muted">OUT</div>
                                     </div>
                                 </div>
@@ -801,19 +801,19 @@ require_once __DIR__ . '/../core/includes/header.php';
                         <div class="text-center p-2 bg-light bg-opacity-50 rounded">
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <div class="small">
-                                        <strong>Used:</strong> <?php echo $vote_status['votes_used']; ?>/<?php echo $vote_status['weekly_limit']; ?>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="small">
-                                        <strong>Remaining:</strong> <?php echo $vote_status['votes_remaining']; ?>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="small">
-                                        <strong>QR Balance:</strong> <?php echo number_format($vote_status['qr_balance']); ?>
-                                    </div>
+                                                        <div class="small">
+                        <strong>Used:</strong> <?php echo $vote_status['votes_used'] ?? 0; ?>/<?php echo $vote_status['weekly_limit'] ?? 2; ?>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="small">
+                        <strong>Remaining:</strong> <?php echo $vote_status['votes_remaining'] ?? 0; ?>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="small">
+                        <strong>QR Balance:</strong> <?php echo number_format($vote_status['qr_balance'] ?? 0); ?>
+                    </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="text-center">

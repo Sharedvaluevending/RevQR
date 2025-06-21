@@ -124,10 +124,10 @@ try {
     $stmt = $pdo->prepare("
         SELECT 
             usp.*,
-            qsi.item_name,
-            qsi.rarity
+            bsi.item_name,
+            bsi.discount_percentage
         FROM user_store_purchases usp
-        LEFT JOIN qr_store_items qsi ON usp.qr_store_item_id = qsi.id
+        LEFT JOIN business_store_items bsi ON usp.store_item_id = bsi.id
         WHERE usp.user_id = ?
         ORDER BY usp.created_at DESC
         LIMIT 10

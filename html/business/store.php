@@ -76,8 +76,8 @@ function addStoreItem($data) {
         $countdown_display = isset($data['countdown_display']) ? (bool)$data['countdown_display'] : false;
         $sale_discount_boost = isset($data['sale_discount_boost']) ? (float)$data['sale_discount_boost'] : 0.00;
         $purchase_expiry_hours = isset($data['purchase_expiry_hours']) ? (int)$data['purchase_expiry_hours'] : 720;
-        $require_use_by_expiry = isset($data['require_use_by_expiry']) ? (bool)$data['require_use_by_expiry'] : false;
-        $auto_expire_purchases = isset($data['auto_expire_purchases']) ? (bool)$data['auto_expire_purchases'] : true;
+        $require_use_by_expiry = !empty($data['require_use_by_expiry']) ? 1 : 0;
+        $auto_expire_purchases = !empty($data['auto_expire_purchases']) ? 1 : 0;
         
         // Validate sale dates
         if ($sale_start_date && $sale_end_date && strtotime($sale_start_date) >= strtotime($sale_end_date)) {
@@ -147,18 +147,51 @@ function deleteStoreItem($item_id) {
     global $pdo, $business_id;
     
     try {
-        // First check if item has any purchases
+        // Check if item has any purchases in business_purchases table
         $stmt = $pdo->prepare("
             SELECT COUNT(*) FROM business_purchases 
             WHERE business_store_item_id = ?
         ");
         $stmt->execute([$item_id]);
-        $purchase_count = $stmt->fetchColumn();
+        $business_purchase_count = $stmt->fetchColumn();
         
-        if ($purchase_count > 0) {
+        // Check if item has any purchases in user_store_purchases table
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) FROM user_store_purchases 
+            WHERE store_item_id = ?
+        ");
+        $stmt->execute([$item_id]);
+        $user_purchase_count = $stmt->fetchColumn();
+        
+        // Check if item has any QR codes referencing it
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) FROM qr_codes 
+            WHERE store_item_id = ?
+        ");
+        $stmt->execute([$item_id]);
+        $qr_code_count = $stmt->fetchColumn();
+        
+        $total_references = $business_purchase_count + $user_purchase_count + $qr_code_count;
+        
+        if ($total_references > 0) {
             return [
                 'success' => false, 
-                'message' => "Cannot delete item with {$purchase_count} existing purchases. Disable it instead."
+                'message' => "Cannot delete item with {$total_references} existing references (purchases or QR codes). Disable it instead."
+            ];
+        }
+        
+        // Check if item exists and belongs to this business
+        $stmt = $pdo->prepare("
+            SELECT id, item_name FROM business_store_items 
+            WHERE id = ? AND business_id = ?
+        ");
+        $stmt->execute([$item_id, $business_id]);
+        $item = $stmt->fetch();
+        
+        if (!$item) {
+            return [
+                'success' => false,
+                'message' => 'Item not found or you do not have permission to delete it.'
             ];
         }
         
@@ -169,13 +202,38 @@ function deleteStoreItem($item_id) {
         ");
         $success = $stmt->execute([$item_id, $business_id]);
         
-        return [
-            'success' => $success,
-            'message' => $success ? 'Item deleted successfully' : 'Failed to delete item'
-        ];
+        if ($success) {
+            return [
+                'success' => true,
+                'message' => "Item '{$item['item_name']}' deleted successfully"
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Failed to delete item. Please try again or contact support.'
+            ];
+        }
         
+    } catch (PDOException $e) {
+        // Check if it's a foreign key constraint error
+        if ($e->getCode() == '23000' && strpos($e->getMessage(), 'foreign key constraint') !== false) {
+            return [
+                'success' => false,
+                'message' => 'Cannot delete item because it has existing purchases or is referenced by other data. Please disable it instead.'
+            ];
+        }
+        
+        error_log("Delete store item error: " . $e->getMessage());
+        return [
+            'success' => false, 
+            'message' => 'Database error occurred. Please try again or contact support.'
+        ];
     } catch (Exception $e) {
-        return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
+        error_log("Delete store item error: " . $e->getMessage());
+        return [
+            'success' => false, 
+            'message' => 'An error occurred. Please try again or contact support.'
+        ];
     }
 }
 

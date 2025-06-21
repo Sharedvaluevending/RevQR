@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../core/qr_coin_manager.php';
 
 /**
  * Get client IP address
@@ -449,83 +450,118 @@ function getAvatarFilename($avatar_id) {
 }
 
 /**
- * Get comprehensive user stats with improved consistency for user_id vs voter_ip tracking
- * This function prioritizes user_id when available and handles IP changes better
+ * Legacy getUserStats function wrapper for compatibility
+ * @deprecated This function should not be used - use QRCoinManager::getBalance() instead
+ * @param int $user_id User ID
+ * @param string $fallback_ip Fallback IP address
+ * @return array User stats array
  */
 function getUserStats($user_id = null, $fallback_ip = null) {
     global $pdo;
     
+    // Log deprecation warning
+    $backtrace = debug_backtrace();
+    $caller = isset($backtrace[1]) ? $backtrace[1]['file'] . ":" . $backtrace[1]['line'] : 'unknown location';
+    error_log("DEPRECATED: getUserStats() called from " . $caller . ". Use QRCoinManager::getBalance() instead.");
+    
+    // Default empty stats
+    $default_stats = [
+        'voting_stats' => [
+            'total_votes' => 0, 
+            'votes_in' => 0, 
+            'votes_out' => 0, 
+            'voting_days' => 0, 
+            'created_at' => null
+        ],
+        'spin_stats' => [
+            'total_spins' => 0, 
+            'spin_days' => 0
+        ],
+        'user_points' => 0
+    ];
+    
     if (!$user_id && !$fallback_ip) {
-        return [
-            'voting_stats' => ['total_votes' => 0, 'votes_in' => 0, 'votes_out' => 0, 'voting_days' => 0, 'created_at' => null],
-            'spin_stats' => ['total_spins' => 0, 'spin_days' => 0],
-            'user_points' => 0
-        ];
+        return $default_stats;
     }
     
-    // Get voting stats - prioritize user_id but include IP-only votes for completeness
-    if ($user_id) {
-        // For logged-in users, get all votes associated with this user_id, regardless of IP
-        $stmt = $pdo->prepare("
-            SELECT 
-                COUNT(*) as total_votes,
-                COUNT(CASE WHEN vote_type IN ('in', 'vote_in') THEN 1 END) as votes_in,
-                COUNT(CASE WHEN vote_type IN ('out', 'vote_out') THEN 1 END) as votes_out,
-                COUNT(DISTINCT DATE(created_at)) as voting_days,
-                MIN(created_at) as created_at
-            FROM votes 
-            WHERE user_id = ?
-        ");
-        $stmt->execute([$user_id]);
-    } else {
-        // For non-logged-in users, use IP only
-        $stmt = $pdo->prepare("
-            SELECT 
-                COUNT(*) as total_votes,
-                COUNT(CASE WHEN vote_type IN ('in', 'vote_in') THEN 1 END) as votes_in,
-                COUNT(CASE WHEN vote_type IN ('out', 'vote_out') THEN 1 END) as votes_out,
-                COUNT(DISTINCT DATE(created_at)) as voting_days,
-                MIN(created_at) as created_at
-            FROM votes 
-            WHERE voter_ip = ? AND user_id IS NULL
-        ");
-        $stmt->execute([$fallback_ip]);
+    try {
+        // Get voting stats - prioritize user_id but include IP-only votes for completeness
+        if ($user_id) {
+            // For logged-in users, get all votes associated with this user_id
+            $stmt = $pdo->prepare("
+                SELECT 
+                    COUNT(*) as total_votes,
+                    COUNT(CASE WHEN vote_type IN ('in', 'vote_in') THEN 1 END) as votes_in,
+                    COUNT(CASE WHEN vote_type IN ('out', 'vote_out') THEN 1 END) as votes_out,
+                    COUNT(DISTINCT DATE(created_at)) as voting_days,
+                    MIN(created_at) as created_at
+                FROM votes 
+                WHERE user_id = ?
+            ");
+            $stmt->execute([$user_id]);
+        } else {
+            // For non-logged-in users, use IP only
+            $stmt = $pdo->prepare("
+                SELECT 
+                    COUNT(*) as total_votes,
+                    COUNT(CASE WHEN vote_type IN ('in', 'vote_in') THEN 1 END) as votes_in,
+                    COUNT(CASE WHEN vote_type IN ('out', 'vote_out') THEN 1 END) as votes_out,
+                    COUNT(DISTINCT DATE(created_at)) as voting_days,
+                    MIN(created_at) as created_at
+                FROM votes 
+                WHERE voter_ip = ? AND user_id IS NULL
+            ");
+            $stmt->execute([$fallback_ip]);
+        }
+        $voting_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Get spin stats
+        if ($user_id) {
+            $stmt = $pdo->prepare("
+                SELECT 
+                    COUNT(*) as total_spins,
+                    COUNT(DISTINCT DATE(spin_time)) as spin_days
+                FROM spin_results 
+                WHERE user_id = ?
+            ");
+            $stmt->execute([$user_id]);
+        } else {
+            $stmt = $pdo->prepare("
+                SELECT 
+                    COUNT(*) as total_spins,
+                    COUNT(DISTINCT DATE(spin_time)) as spin_days
+                FROM spin_results 
+                WHERE user_ip = ? AND user_id IS NULL
+            ");
+            $stmt->execute([$fallback_ip]);
+        }
+        $spin_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Get balance using QRCoinManager
+        require_once __DIR__ . '/qr_coin_manager.php';
+        $user_points = $user_id ? QRCoinManager::getBalance($user_id) : 0;
+        
+        // Ensure all values are properly set
+        $voting_stats = $voting_stats ?: $default_stats['voting_stats'];
+        $spin_stats = $spin_stats ?: $default_stats['spin_stats'];
+        
+        // Convert null values to 0 for number_format compatibility
+        foreach (['total_votes', 'votes_in', 'votes_out', 'voting_days'] as $key) {
+            $voting_stats[$key] = (int)($voting_stats[$key] ?? 0);
+        }
+        
+        foreach (['total_spins', 'spin_days'] as $key) {
+            $spin_stats[$key] = (int)($spin_stats[$key] ?? 0);
+        }
+        
+        return [
+            'voting_stats' => $voting_stats,
+            'spin_stats' => $spin_stats,
+            'user_points' => (int)$user_points
+        ];
+        
+    } catch (Exception $e) {
+        error_log("Error in getUserStats(): " . $e->getMessage());
+        return $default_stats;
     }
-    $voting_stats = $stmt->fetch();
-
-    // Get spin stats - same logic, but also include prize points
-    if ($user_id) {
-        $stmt = $pdo->prepare("
-            SELECT 
-                COUNT(*) as total_spins,
-                COUNT(DISTINCT DATE(spin_time)) as spin_days,
-                COALESCE(SUM(prize_points), 0) as total_prize_points
-            FROM spin_results 
-            WHERE user_id = ?
-        ");
-        $stmt->execute([$user_id]);
-    } else {
-        $stmt = $pdo->prepare("
-            SELECT 
-                COUNT(*) as total_spins,
-                COUNT(DISTINCT DATE(spin_time)) as spin_days,
-                COALESCE(SUM(prize_points), 0) as total_prize_points
-            FROM spin_results 
-            WHERE user_ip = ? AND user_id IS NULL
-        ");
-        $stmt->execute([$fallback_ip]);
-    }
-    $spin_stats = $stmt->fetch();
-
-    // Calculate points using the improved formula (includes actual prize points)
-    $base_points = ($voting_stats['total_votes'] * 10) + ($spin_stats['total_spins'] * 25);
-    $bonus_points = ($voting_stats['voting_days'] * 50) + ($spin_stats['spin_days'] * 100);
-    $prize_points = $spin_stats['total_prize_points']; // NEW: Actual prize points from spin wheel
-    $user_points = $base_points + $bonus_points + $prize_points;
-
-    return [
-        'voting_stats' => $voting_stats,
-        'spin_stats' => $spin_stats,
-        'user_points' => $user_points
-    ];
 }

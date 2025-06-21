@@ -67,8 +67,8 @@ try {
         $purchase_code = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 8));
     }
     
-    // Deduct QR coins
-    QRCoinManager::addTransaction(
+    // Deduct QR coins - handle transaction properly
+    $qr_transaction_success = QRCoinManager::addTransaction(
         $_SESSION['user_id'],
         'spending',
         'business_discount_purchase',
@@ -81,6 +81,11 @@ try {
             'purchase_code' => $purchase_code
         ]
     );
+    
+    if (!$qr_transaction_success) {
+        $pdo->rollback();
+        throw new Exception('Failed to process QR coin transaction. Please try again.');
+    }
     
     // Create purchase record
     $expires_at = date('Y-m-d H:i:s', strtotime('+30 days')); // 30-day expiration

@@ -1,0 +1,13 @@
+# Casino Directory - Prevent Redirects
+RewriteEngine On
+
+# Allow direct access to casino files
+RewriteRule ^.*$ - [L]
+
+# Ensure no redirects for casino files
+<Files "*.php">
+    Header unset Location
+</Files>
+
+# Disable any parent redirect rules
+RewriteOptions inherit 

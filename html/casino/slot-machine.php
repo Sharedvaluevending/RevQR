@@ -11,8 +11,29 @@ if (!is_logged_in()) {
 
 // Accept both business_id and location_id for compatibility
 $business_id = $_GET['business_id'] ?? $_GET['location_id'] ?? null;
+
+// If no business_id provided, try to get the default/first available casino business
 if (!$business_id) {
-    $_SESSION['error'] = 'Business/Location ID required';
+    $stmt = $pdo->query("
+        SELECT b.id 
+        FROM businesses b 
+        JOIN business_casino_participation bcp ON b.id = bcp.business_id 
+        WHERE bcp.casino_enabled = 1 
+        ORDER BY b.id ASC 
+        LIMIT 1
+    ");
+    $default_business = $stmt->fetch();
+    if ($default_business) {
+        $business_id = $default_business['id'];
+        error_log("SLOT MACHINE: No business_id provided, using default business ID: $business_id");
+    }
+}
+
+// Debug logging
+error_log("SLOT MACHINE DEBUG - URL params: business_id=" . ($_GET['business_id'] ?? 'null') . ", location_id=" . ($_GET['location_id'] ?? 'null') . ", final business_id=" . ($business_id ?? 'null'));
+
+if (!$business_id) {
+    $_SESSION['error'] = 'No casino businesses available. Please contact support.';
     header('Location: ' . APP_URL . '/casino/');
     exit;
 }
@@ -31,6 +52,9 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$_SESSION['user_id'], $business_id]);
 $business = $stmt->fetch();
+
+// Debug logging
+error_log("SLOT MACHINE DEBUG - Business lookup result for ID $business_id: " . ($business ? json_encode(['id' => $business['id'], 'name' => $business['name'], 'casino_enabled' => $business['casino_enabled']]) : 'null'));
 
 if (!$business) {
     $_SESSION['error'] = 'Casino not available for this business';
@@ -345,13 +369,41 @@ include '../core/includes/header.php';
 <!-- Pass data to JavaScript -->
 <script>
 window.casinoData = {
-    businessId: <?php echo $business_id; ?>,
+    businessId: <?php echo $business_id ? (int)$business_id : 'null'; ?>,
     userBalance: <?php echo $user_balance; ?>,
     jackpotMultiplier: 6,
     avatars: <?php echo json_encode($user_avatars); ?>,
     appUrl: '<?php echo APP_URL; ?>',
     spinInfo: <?php echo json_encode($spin_info); ?>
 };
+
+// Debug logging
+console.log('🎰 Casino Data Loaded:', window.casinoData);
+
+// Validate critical data and provide helpful debugging
+if (!window.casinoData.businessId) {
+    console.error('🚨 Critical Error: businessId is missing!');
+    console.error('URL:', window.location.href);
+    console.error('URL Parameters:', new URLSearchParams(window.location.search));
+    
+    // Create a user-friendly error message
+    const urlParams = new URLSearchParams(window.location.search);
+    const locationId = urlParams.get('location_id');
+    const businessId = urlParams.get('business_id');
+    
+    let errorMessage = 'Casino configuration error: Business ID is missing.\\n';
+    errorMessage += `URL: ${window.location.pathname}${window.location.search}\\n`;
+    errorMessage += `Location ID: ${locationId || 'Not provided'}\\n`;
+    errorMessage += `Business ID: ${businessId || 'Not provided'}\\n`;
+    errorMessage += '\\nThis usually happens when accessing the casino without proper parameters.';
+    
+    alert(errorMessage);
+    
+    // Redirect to casino lobby
+    window.location.href = '/casino/';
+} else {
+    console.log('✅ Casino configuration valid - businessId:', window.casinoData.businessId);
+}
 </script>
 
 <style>
