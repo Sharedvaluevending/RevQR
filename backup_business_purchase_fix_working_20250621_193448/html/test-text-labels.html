@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Labels Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; max-width: 1000px; }
+        .test-container { display: flex; gap: 20px; }
+        .form-section { flex: 1; }
+        .preview-section { flex: 1; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
+        .btn:hover { background: #0056b3; }
+        .preview-container { border: 1px solid #ddd; padding: 20px; text-align: center; min-height: 400px; }
+        #qrPreview { margin: 20px auto; }
+        #qrPreview img { max-width: 100%; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; }
+        .checkbox-group input[type="checkbox"] { width: auto; }
+    </style>
+</head>
+<body>
+    <h2>🔤 Text Labels Test</h2>
+    
+    <div class="test-container">
+        <div class="form-section">
+            <h3>QR Generator with Text</h3>
+            <form id="testForm">
+                <div class="form-group">
+                    <label>Content URL:</label>
+                    <input type="text" name="content" value="https://example.com/test" id="contentInput">
+                </div>
+                
+                <div class="form-group">
+                    <label>QR Type:</label>
+                    <select name="qr_type">
+                        <option value="static">Static</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="enable_label" id="enableLabel" checked>
+                        <label for="enableLabel">Enable Top Label</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Top Label Text:</label>
+                    <input type="text" name="label_text" value="SCAN ME!" id="labelText">
+                </div>
+                
+                <div class="form-group">
+                    <label>Label Size:</label>
+                    <input type="number" name="label_size" value="20" min="8" max="48">
+                </div>
+                
+                <div class="form-group">
+                    <label>Label Color:</label>
+                    <input type="color" name="label_color" value="#FF0000">
+                </div>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="enable_bottom_text" id="enableBottomText" checked>
+                        <label for="enableBottomText">Enable Bottom Text</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Bottom Text:</label>
+                    <input type="text" name="bottom_text" value="example.com" id="bottomText">
+                </div>
+                
+                <div class="form-group">
+                    <label>Bottom Text Size:</label>
+                    <input type="number" name="bottom_size" value="16" min="8" max="48">
+                </div>
+                
+                <div class="form-group">
+                    <label>Bottom Text Color:</label>
+                    <input type="color" name="bottom_color" value="#0000FF">
+                </div>
+                
+                <button type="button" class="btn" onclick="testPreview()">
+                    Generate Preview
+                </button>
+                
+                <button type="button" class="btn" onclick="testGenerate()" style="background: #28a745;">
+                    Generate & Download
+                </button>
+            </form>
+            
+            <div id="status"></div>
+        </div>
+        
+        <div class="preview-section">
+            <h3>Preview</h3>
+            <div class="preview-container">
+                <div id="qrPreview">
+                    <p>QR code with text labels will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function testPreview() {
+            const form = document.getElementById('testForm');
+            const formData = new FormData(form);
+            
+            showStatus('Generating preview...', 'info');
+            
+            try {
+                const response = await fetch('/api/qr/enhanced-preview.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('qrPreview').innerHTML = 
+                        `<img src="${result.preview_url}" alt="QR Preview" style="max-width: 100%; height: auto;">`;
+                    showStatus('Preview generated successfully!', 'success');
+                } else {
+                    showStatus('Preview failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showStatus('Preview error: ' + error.message, 'error');
+            }
+        }
+
+        async function testGenerate() {
+            const form = document.getElementById('testForm');
+            const formData = new FormData(form);
+            
+            showStatus('Generating QR code...', 'info');
+            
+            try {
+                const response = await fetch('/api/qr/enhanced-generate.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    // Create download link
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'qr-with-text-labels.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    showStatus('QR code generated and downloaded!', 'success');
+                } else {
+                    const errorText = await response.text();
+                    showStatus('Generation failed: ' + errorText, 'error');
+                }
+            } catch (error) {
+                showStatus('Generation error: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-generate preview on page load
+        window.addEventListener('load', () => {
+            setTimeout(testPreview, 500);
+        });
+    </script>
+</body>
+</html> 

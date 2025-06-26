@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Download Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; max-width: 600px; }
+        .test-btn { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 10px; }
+        .test-btn:hover { background: #0056b3; }
+        .result { margin: 20px 0; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h2>🔽 QR Download Test</h2>
+    
+    <button class="test-btn" onclick="testDataUriDownload()">
+        Test Data URI Download (Preview Mode)
+    </button>
+    
+    <button class="test-btn" onclick="testFileUrlDownload()">
+        Test File URL Download (Generated Mode)
+    </button>
+    
+    <div id="result" class="result"></div>
+
+    <script>
+        // Simulate the QRGenerator download function
+        function downloadQR(qrUrl, isDataUri) {
+            try {
+                if (qrUrl.startsWith('data:')) {
+                    // Handle data URI directly without fetch to avoid CSP violation
+                    const a = document.createElement('a');
+                    a.href = qrUrl;
+                    a.download = isDataUri ? 'qr-preview.png' : 'qr-code.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    return 'Data URI download successful';
+                } else {
+                    // For demo, we'll just show success (real version would use fetch)
+                    return 'File URL download would work (fetch required)';
+                }
+            } catch (error) {
+                return 'Download failed: ' + error.message;
+            }
+        }
+
+        async function testDataUriDownload() {
+            // Generate a simple test data URI
+            const canvas = document.createElement('canvas');
+            canvas.width = 100;
+            canvas.height = 100;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw a simple QR-like pattern
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, 100, 100);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(10, 10, 80, 80);
+            ctx.fillStyle = '#000';
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    if ((i + j) % 2 === 0) {
+                        ctx.fillRect(15 + i * 10, 15 + j * 10, 8, 8);
+                    }
+                }
+            }
+            
+            const dataUri = canvas.toDataURL('image/png');
+            const result = downloadQR(dataUri, true);
+            document.getElementById('result').innerHTML = `
+                <strong>Data URI Test:</strong> ${result}<br>
+                <small>Data URI length: ${dataUri.length} characters</small>
+            `;
+        }
+
+        function testFileUrlDownload() {
+            const fileUrl = '/uploads/qr/test-qr.png';
+            const result = downloadQR(fileUrl, false);
+            document.getElementById('result').innerHTML = `
+                <strong>File URL Test:</strong> ${result}<br>
+                <small>URL: ${fileUrl}</small>
+            `;
+        }
+    </script>
+</body>
+</html> 

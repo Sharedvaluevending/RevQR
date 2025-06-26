@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Blue Line Diagnostic</title>
+    <style>
+        body { 
+            padding: 50px; 
+            font-family: Arial, sans-serif; 
+            background: white;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+        
+        select {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 300px;
+        }
+        
+        .clean-select {
+            /* Absolutely no styling */
+        }
+        
+        .diagnosed-select {
+            /* Only address the specific issue */
+            spellcheck: false;
+            autocomplete: off;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 DROPDOWN BLUE LINE DIAGNOSTIC</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Completely Clean Dropdown</h3>
+        <p>No CSS, no attributes, pure HTML:</p>
+        <select class="clean-select">
+            <option value="">Select an option</option>
+            <option value="1">Option 1 with some text</option>
+            <option value="2">Option 2 with different text</option>
+            <option value="3">Option 3 with more text content</option>
+        </select>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 2: Spellcheck Disabled</h3>
+        <p>Testing if browser spellcheck causes blue lines:</p>
+        <select spellcheck="false">
+            <option value="">Select an option</option>
+            <option value="1">Option 1 with some text</option>
+            <option value="2">Option 2 with different text</option>
+            <option value="3">Option 3 with more text content</option>
+        </select>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 3: Autocomplete Disabled</h3>
+        <p>Testing if browser autocomplete causes blue lines:</p>
+        <select autocomplete="off">
+            <option value="">Select an option</option>
+            <option value="1">Option 1 with some text</option>
+            <option value="2">Option 2 with different text</option>
+            <option value="3">Option 3 with more text content</option>
+        </select>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 4: Both Disabled</h3>
+        <p>Testing with both spellcheck and autocomplete disabled:</p>
+        <select class="diagnosed-select">
+            <option value="">Select an option</option>
+            <option value="1">Option 1 with some text</option>
+            <option value="2">Option 2 with different text</option>
+            <option value="3">Option 3 with more text content</option>
+        </select>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 5: Form Context</h3>
+        <p>Testing in a form (might trigger validation styling):</p>
+        <form>
+            <select required>
+                <option value="">Select an option</option>
+                <option value="1">Option 1 with some text</option>
+                <option value="2">Option 2 with different text</option>
+                <option value="3">Option 3 with more text content</option>
+            </select>
+        </form>
+    </div>
+    
+    <h2>🎯 INSTRUCTIONS:</h2>
+    <ol>
+        <li><strong>Click each dropdown to open it</strong></li>
+        <li><strong>Look at the options when they appear</strong></li>
+        <li><strong>Note which ones have blue lines and which don't</strong></li>
+        <li><strong>This will tell us the EXACT cause</strong></li>
+    </ol>
+    
+    <p><strong>If all dropdowns have blue lines:</strong> It's a browser setting or extension</p>
+    <p><strong>If some don't have blue lines:</strong> We found the specific cause!</p>
+</body>
+</html> 

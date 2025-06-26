@@ -1,0 +1,185 @@
+/* Combined and Minified CSS - Auto-generated for production */
+/* Source: custom.css + enhanced-gradients.css */
+
+/* Core Styles */
+.gradient-card-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:0;box-shadow:0 10px 30px rgba(102,126,234,.3)}
+.gradient-card-success{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border:0;box-shadow:0 10px 30px rgba(79,172,254,.3)}
+.gradient-card-warning{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border:0;box-shadow:0 10px 30px rgba(240,147,251,.3)}
+.gradient-card-danger{background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);border:0;box-shadow:0 10px 30px rgba(250,112,154,.3)}
+.gradient-card-info{background:linear-gradient(135deg,#a8edea 0%,#fed6e3 100%);border:0;box-shadow:0 10px 30px rgba(168,237,234,.3)}
+.gradient-card-dark{background:linear-gradient(135deg,#434343 0%,#000000 100%);border:0;box-shadow:0 10px 30px rgba(67,67,67,.3)}
+
+/* Buttons */
+.btn-gradient-primary{background:linear-gradient(45deg,#667eea,#764ba2);border:0;color:#fff;transition:all .3s ease}
+.btn-gradient-primary:hover{background:linear-gradient(45deg,#764ba2,#667eea);transform:translateY(-2px);box-shadow:0 5px 15px rgba(102,126,234,.4)}
+.btn-gradient-success{background:linear-gradient(45deg,#4facfe,#00f2fe);border:0;color:#fff;transition:all .3s ease}
+.btn-gradient-success:hover{background:linear-gradient(45deg,#00f2fe,#4facfe);transform:translateY(-2px);box-shadow:0 5px 15px rgba(79,172,254,.4)}
+.btn-gradient-warning{background:linear-gradient(45deg,#f093fb,#f5576c);border:0;color:#fff;transition:all .3s ease}
+.btn-gradient-warning:hover{background:linear-gradient(45deg,#f5576c,#f093fb);transform:translateY(-2px);box-shadow:0 5px 15px rgba(240,147,251,.4)}
+
+/* Animations */
+@keyframes fadeInUp{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes glow{0%{box-shadow:0 0 5px rgba(102,126,234,.5)}50%{box-shadow:0 0 20px rgba(102,126,234,.8)}100%{box-shadow:0 0 5px rgba(102,126,234,.5)}}
+
+/* Utility Classes */
+.fade-in-up{animation:fadeInUp .6s ease-out}
+.pulse{animation:pulse 2s infinite}
+.spinning{animation:spin 1s linear infinite}
+.glow-effect{animation:glow 2s ease-in-out infinite}
+
+/* Forms */
+.form-control:focus{border-color:#667eea;box-shadow:0 0 0 .2rem rgba(102,126,234,.25)}
+.form-select:focus{border-color:#667eea;box-shadow:0 0 0 .2rem rgba(102,126,234,.25)}
+
+/* Tables */
+.table-hover tbody tr:hover{background-color:rgba(102,126,234,.1)}
+
+/* Navigation */
+.navbar-brand{font-weight:700;font-size:1.5rem}
+
+/* QR Code Container */
+.qr-container{background:#fff;padding:20px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.1);display:inline-block}
+
+/* Responsive Design */
+@media (max-width:768px){
+    .gradient-card-primary,.gradient-card-success,.gradient-card-warning,.gradient-card-danger,.gradient-card-info,.gradient-card-dark{
+        margin-bottom:1rem
+    }
+    .btn-gradient-primary,.btn-gradient-success,.btn-gradient-warning{
+        width:100%;margin-bottom:.5rem
+    }
+    /* Spin wheel mobile responsive */
+    .spin-wheel-container{
+        max-width:280px!important;
+        padding:10px!important;
+        margin:0 auto!important
+    }
+    #business-prize-wheel,#dashboard-prize-wheel,#prize-wheel{
+        width:260px!important;
+        height:260px!important
+    }
+    .metrics-glass-card{
+        margin-top:20px!important
+    }
+    .metrics-glass-card .list-group-item{
+        padding:12px 16px!important;
+        font-size:14px!important
+    }
+    .metrics-number{
+        font-size:18px!important;
+        padding:6px 12px!important
+    }
+    #test-spin-btn,.dashboard-spin-btn{
+        width:100%!important;
+        margin-top:16px!important;
+        font-size:16px!important;
+        padding:12px 24px!important
+    }
+    .container{
+        padding-left:10px!important;
+        padding-right:10px!important
+    }
+    .card{
+        margin-bottom:16px!important
+    }
+}
+
+@media (max-width:576px){
+    .spin-wheel-container{
+        max-width:240px!important;
+        padding:8px!important
+    }
+    #business-prize-wheel,#dashboard-prize-wheel,#prize-wheel{
+        width:220px!important;
+        height:220px!important
+    }
+    .metrics-glass-card h4{
+        font-size:1.1rem!important
+    }
+    .metrics-glass-card .list-group-item{
+        padding:10px 12px!important;
+        font-size:13px!important
+    }
+}
+
+/* Enhanced Gradients */
+.enhanced-bg-1{background:linear-gradient(45deg,#667eea 0%,#764ba2 50%,#f093fb 100%)}
+.enhanced-bg-2{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 50%,#a8edea 100%)}
+.enhanced-bg-3{background:linear-gradient(225deg,#fa709a 0%,#fee140 50%,#ffecd2 100%)}
+.enhanced-bg-4{background:linear-gradient(315deg,#434343 0%,#000000 50%,#667db6 100%)}
+
+/* Spin Wheel Optimized Styles */
+.spin-wheel-container{position:relative;padding:20px;background:transparent;border-radius:50%;transition:all .4s cubic-bezier(.25,.46,.45,.94)}
+.spin-wheel-container:hover{transform:scale(1.02) translateY(-2px)}
+#business-prize-wheel,#prize-wheel{border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:all .4s ease;border:2px solid rgba(0,0,0,.6)}
+#business-prize-wheel:hover,#prize-wheel:hover{box-shadow:0 12px 32px rgba(0,0,0,.5)}
+
+/* Enhanced translucent glass effects for metrics */
+.metrics-glass-card{
+    background:rgba(255,255,255,.12)!important;
+    backdrop-filter:blur(25px)!important;
+    border:1px solid rgba(255,255,255,.2)!important;
+    border-radius:16px!important;
+    box-shadow:0 8px 32px rgba(31,38,135,.37),inset 0 1px 0 rgba(255,255,255,.1)!important
+}
+.metrics-glass-card .list-group-item{
+    background:rgba(255,255,255,.08)!important;
+    backdrop-filter:blur(15px)!important;
+    border:1px solid rgba(255,255,255,.1)!important;
+    color:rgba(255,255,255,.95)!important;
+    margin-bottom:4px!important;
+    border-radius:8px!important;
+    transition:all .3s ease!important
+}
+.metrics-glass-card .list-group-item:hover{
+    background:rgba(255,255,255,.15)!important;
+    transform:translateX(4px)!important;
+    border:1px solid rgba(255,255,255,.2)!important
+}
+.metrics-glass-card h4,.metrics-glass-card h6{
+    color:rgba(255,255,255,.95)!important;
+    text-shadow:0 2px 4px rgba(0,0,0,.3)!important
+}
+.metrics-glass-card .badge{
+    background:rgba(13,202,240,.8)!important;
+    backdrop-filter:blur(10px)!important;
+    border:1px solid rgba(255,255,255,.2)!important;
+    color:rgba(255,255,255,.95)!important;
+    font-weight:600!important;
+    text-shadow:0 1px 2px rgba(0,0,0,.3)!important
+}
+.metrics-number{
+    background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.05))!important;
+    backdrop-filter:blur(10px)!important;
+    border:1px solid rgba(255,255,255,.2)!important;
+    border-radius:12px!important;
+    padding:8px 16px!important;
+    color:#ffffff!important;
+    font-weight:700!important;
+    text-shadow:0 2px 4px rgba(0,0,0,.4)!important;
+    box-shadow:0 4px 12px rgba(0,0,0,.2)!important
+}
+
+/* Loading States */
+.loading{position:relative;overflow:hidden}
+.loading::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:loading 1.5s infinite}
+@keyframes loading{0%{left:-100%}100%{left:100%}}
+
+/* Performance Optimized Shadows */
+.shadow-soft{box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.shadow-medium{box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.shadow-hard{box-shadow:0 8px 30px rgba(0,0,0,.2)}
+
+/* Text Utilities */
+.text-gradient-primary{background:linear-gradient(45deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-success{background:linear-gradient(45deg,#4facfe,#00f2fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* Critical Above-the-fold Styles */
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;line-height:1.6;color:#333;background:#f8f9fa}
+.container{max-width:1200px}
+.card{border-radius:15px;overflow:hidden;transition:transform .3s ease,box-shadow .3s ease}
+.card:hover{transform:translateY(-5px)}
+.btn{border-radius:25px;padding:.5rem 1.5rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;transition:all .3s ease}
+.btn:hover{transform:translateY(-1px)} 

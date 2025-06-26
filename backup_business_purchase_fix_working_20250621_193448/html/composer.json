@@ -1,0 +1,16 @@
+{
+    "name": "revenueqr/vending-platform",
+    "description": "QR Code-based vending machine voting platform",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "endroid/qr-code": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "RevenueQR\\": "src/"
+        }
+    }
+}

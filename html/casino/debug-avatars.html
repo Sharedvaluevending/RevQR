@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Avatar Loading Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .avatar-test { 
+            display: inline-block; 
+            margin: 10px; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            text-align: center;
+            width: 150px;
+        }
+        .avatar-test img { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            border: 2px solid #ccc;
+        }
+        .success { border-color: green; }
+        .error { border-color: red; }
+        .loading { border-color: orange; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Avatar Loading Diagnostic</h1>
+    <p>Testing all avatar files referenced in slot machine...</p>
+    
+    <div id="results"></div>
+    
+    <script>
+        const avatars = [
+            { name: 'QR Ted', image: '/assets/img/avatars/qrted.png' },
+            { name: 'QR Steve', image: '/assets/img/avatars/qrsteve.png' },
+            { name: 'QR Bob', image: '/assets/img/avatars/qrbob.png' },
+            { name: 'QR Alice', image: '/assets/img/avatars/qralice.png' },
+            { name: 'QR Charlie', image: '/assets/img/avatars/qrcharlie.png' },
+            { name: 'QR Diana', image: '/assets/img/avatars/qrdiana.png' },
+            { name: 'QR Frank', image: '/assets/img/avatars/qrfrank.png' },
+            { name: 'Lord Pixel', image: '/assets/img/avatars/qrLordPixel.png' },
+            { name: 'Wild QR', image: '/assets/img/avatars/qrEasybake.png' }
+        ];
+        
+        const resultsDiv = document.getElementById('results');
+        
+        avatars.forEach(avatar => {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'avatar-test loading';
+            testDiv.innerHTML = `
+                <h4>${avatar.name}</h4>
+                <div>Loading...</div>
+                <div><small>${avatar.image}</small></div>
+            `;
+            resultsDiv.appendChild(testDiv);
+            
+            const img = new Image();
+            
+            img.onload = () => {
+                testDiv.className = 'avatar-test success';
+                testDiv.innerHTML = `
+                    <h4>${avatar.name}</h4>
+                    <img src="${avatar.image}" alt="${avatar.name}">
+                    <div style="color: green;">✅ SUCCESS</div>
+                    <div><small>${avatar.image}</small></div>
+                `;
+                console.log(`✅ ${avatar.name} loaded successfully`);
+            };
+            
+            img.onerror = () => {
+                testDiv.className = 'avatar-test error';
+                testDiv.innerHTML = `
+                    <h4>${avatar.name}</h4>
+                    <div style="color: red;">❌ FAILED</div>
+                    <div><small>${avatar.image}</small></div>
+                `;
+                console.error(`❌ ${avatar.name} failed to load: ${avatar.image}`);
+            };
+            
+            img.src = avatar.image;
+        });
+        
+        // Test with full URL as well
+        setTimeout(() => {
+            console.log('=== Testing with full URLs ===');
+            const baseUrl = window.location.origin;
+            
+            avatars.forEach(avatar => {
+                const fullUrl = baseUrl + avatar.image;
+                const img = new Image();
+                
+                img.onload = () => {
+                    console.log(`✅ Full URL works: ${fullUrl}`);
+                };
+                
+                img.onerror = () => {
+                    console.error(`❌ Full URL failed: ${fullUrl}`);
+                };
+                
+                img.src = fullUrl;
+            });
+        }, 2000);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,577 @@
+/* Enhanced Gradient and Border Styles for RevenueQR */
+
+/* ===== BACKGROUND GRADIENTS ===== */
+
+/* Linear Gradients */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #cc9a06 100%);
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+}
+
+.bg-gradient-dark {
+    background: linear-gradient(135deg, #212529 0%, #16181b 100%);
+}
+
+/* Multi-color Gradients */
+.bg-gradient-rainbow {
+    background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+    background-size: 400% 400%;
+    animation: gradientShift 10s ease infinite;
+}
+
+.bg-gradient-sunset {
+    background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 50%, #ff6b6b 100%);
+}
+
+.bg-gradient-ocean {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+.bg-gradient-forest {
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 50%, #a8e6cf 100%);
+}
+
+.bg-gradient-fire {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 50%, #ff9a56 100%);
+}
+
+/* Radial Gradients */
+.bg-radial-primary {
+    background: radial-gradient(circle, #0d6efd 0%, #0a58ca 70%, #084298 100%);
+}
+
+.bg-radial-success {
+    background: radial-gradient(circle, #198754 0%, #146c43 70%, #0f5132 100%);
+}
+
+.bg-radial-sunset {
+    background: radial-gradient(circle, #ff7e5f 0%, #feb47b 50%, #ff6b6b 100%);
+}
+
+/* Conic Gradients */
+.bg-conic-rainbow {
+    background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3, #ff0000);
+}
+
+.bg-conic-primary {
+    background: conic-gradient(from 45deg, #0d6efd, #6610f2, #d63384, #dc3545, #fd7e14, #ffc107, #198754, #20c997, #0dcaf0, #0d6efd);
+}
+
+/* ===== BORDER STYLES ===== */
+
+/* Border Widths */
+.border-thin { border-width: 1px !important; }
+.border-medium { border-width: 2px !important; }
+.border-thick { border-width: 3px !important; }
+.border-extra-thick { border-width: 5px !important; }
+
+/* Border Styles */
+.border-solid { border-style: solid !important; }
+.border-dashed { border-style: dashed !important; }
+.border-dotted { border-style: dotted !important; }
+.border-double { border-style: double !important; }
+.border-groove { border-style: groove !important; }
+.border-ridge { border-style: ridge !important; }
+.border-inset { border-style: inset !important; }
+.border-outset { border-style: outset !important; }
+
+/* Border Radius Variations */
+.rounded-xs { border-radius: 2px !important; }
+.rounded-sm { border-radius: 4px !important; }
+.rounded-md { border-radius: 8px !important; }
+.rounded-lg { border-radius: 12px !important; }
+.rounded-xl { border-radius: 16px !important; }
+.rounded-2xl { border-radius: 20px !important; }
+.rounded-3xl { border-radius: 24px !important; }
+
+/* Specific Corner Radius */
+.rounded-top-left { border-top-left-radius: 12px !important; }
+.rounded-top-right { border-top-right-radius: 12px !important; }
+.rounded-bottom-left { border-bottom-left-radius: 12px !important; }
+.rounded-bottom-right { border-bottom-right-radius: 12px !important; }
+
+/* Border Colors */
+.border-primary-gradient {
+    border: 2px solid;
+    border-image: linear-gradient(45deg, #0d6efd, #6610f2) 1;
+}
+
+.border-success-gradient {
+    border: 2px solid;
+    border-image: linear-gradient(45deg, #198754, #20c997) 1;
+}
+
+.border-rainbow-gradient {
+    border: 3px solid;
+    border-image: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3) 1;
+}
+
+/* ===== ENHANCED CARD STYLES ===== */
+
+/* Gradient Cards with Borders */
+.card-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border: 2px solid rgba(13, 110, 253, 0.3);
+    border-radius: 12px;
+    color: white;
+}
+
+.card-gradient-success {
+    background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+    border: 2px solid rgba(25, 135, 84, 0.3);
+    border-radius: 12px;
+    color: white;
+}
+
+.card-gradient-sunset {
+    background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 50%, #ff6b6b 100%);
+    border: 2px solid rgba(255, 126, 95, 0.3);
+    border-radius: 12px;
+    color: white;
+}
+
+.card-gradient-ocean {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    color: white;
+}
+
+/* Glass Effect Cards */
+.card-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.card-glass-dark {
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== BUTTON GRADIENTS ===== */
+
+.btn-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-primary:hover {
+    background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    color: white;
+}
+
+.btn-gradient-success {
+    background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-success:hover {
+    background: linear-gradient(135deg, #157347 0%, #0f5132 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+    color: white;
+}
+
+.btn-gradient-sunset {
+    background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-sunset:hover {
+    background: linear-gradient(135deg, #ff6b47 0%, #fd9853 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 126, 95, 0.3);
+    color: white;
+}
+
+/* ===== QR CODE SPECIFIC STYLES ===== */
+
+/* QR Container with Enhanced Borders */
+.qr-container-fancy {
+    padding: 20px;
+    border: 3px solid;
+    border-image: linear-gradient(45deg, #0d6efd, #6610f2, #d63384) 1;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(102, 16, 242, 0.05) 100%);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.qr-container-neon {
+    padding: 20px;
+    border: 2px solid #00ff00;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.9);
+    box-shadow: 
+        0 0 10px #00ff00,
+        0 0 20px #00ff00,
+        0 0 30px #00ff00,
+        inset 0 0 10px rgba(0, 255, 0, 0.1);
+}
+
+.qr-container-retro {
+    padding: 20px;
+    border: 4px solid #ff6b6b;
+    border-style: dashed;
+    border-radius: 0;
+    background: linear-gradient(45deg, #ff6b6b 25%, transparent 25%), 
+                linear-gradient(-45deg, #ff6b6b 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #ff6b6b 75%), 
+                linear-gradient(-45deg, transparent 75%, #ff6b6b 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Shadow Variations */
+.shadow-gradient {
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+}
+
+.shadow-success {
+    box-shadow: 0 4px 15px rgba(25, 135, 84, 0.2);
+}
+
+.shadow-sunset {
+    box-shadow: 0 4px 15px rgba(255, 126, 95, 0.2);
+}
+
+.shadow-neon {
+    box-shadow: 
+        0 0 5px currentColor,
+        0 0 10px currentColor,
+        0 0 15px currentColor;
+}
+
+/* Glow Effects */
+.glow-primary {
+    box-shadow: 0 0 20px rgba(13, 110, 253, 0.5);
+}
+
+.glow-success {
+    box-shadow: 0 0 20px rgba(25, 135, 84, 0.5);
+}
+
+.glow-warning {
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+}
+
+.glow-danger {
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.5);
+}
+
+/* Animated Gradients */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes gradientPulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes gradientRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes borderGlow {
+    0% { box-shadow: 0 0 5px currentColor; }
+    50% { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+    100% { box-shadow: 0 0 5px currentColor; }
+}
+
+.bg-gradient-animated {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+.bg-gradient-pulse {
+    background: linear-gradient(-45deg, #0d6efd, #6610f2, #d63384, #dc3545);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+}
+
+/* Additional Animation Keyframes for QR Previews */
+@keyframes gradientPulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes gradientRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes borderGlow {
+    0% { box-shadow: 0 0 5px currentColor; }
+    50% { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+    100% { box-shadow: 0 0 5px currentColor; }
+}
+
+/* QR Preview Animation Classes */
+.qr-preview-shift {
+    animation: gradientShift 5s ease infinite;
+}
+
+.qr-preview-pulse {
+    animation: gradientPulse 3s ease infinite;
+}
+
+.qr-preview-rotate {
+    animation: gradientRotate 10s linear infinite;
+}
+
+.qr-preview-border-glow {
+    animation: borderGlow 2s ease infinite;
+}
+
+/* Animation Speed Variants */
+.animation-slow {
+    animation-duration: 5s;
+}
+
+.animation-medium {
+    animation-duration: 3s;
+}
+
+.animation-fast {
+    animation-duration: 1s;
+}
+
+/* Border Animation Classes */
+.border-animated-glow {
+    animation: borderGlow 2s ease infinite;
+}
+
+.border-animated-pulse {
+    animation: gradientPulse 2s ease infinite;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card-gradient-primary,
+    .card-gradient-success,
+    .card-gradient-sunset,
+    .card-gradient-ocean {
+        border-radius: 8px;
+        border-width: 1px;
+    }
+    
+    .qr-container-fancy,
+    .qr-container-neon,
+    .qr-container-retro {
+        padding: 15px;
+        border-width: 2px;
+    }
+}
+
+/* ===== QR STORE CARD HEADER DARK GRADIENTS ===== */
+
+/* Dark gradient for VIP/Legendary cards */
+.card-header.bg-warning {
+    background: linear-gradient(135deg, #2c1810 0%, #5d3a1a 50%, #8b4513 100%) !important;
+    border-bottom: 2px solid rgba(255, 193, 7, 0.3) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Dark gradient for Epic/Info cards */
+.card-header.bg-info {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
+    border-bottom: 2px solid rgba(13, 202, 240, 0.3) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Dark gradient for Rare/Success cards */
+.card-header.bg-success {
+    background: linear-gradient(135deg, #0f1419 0%, #1a2e1a 50%, #2d5a2d 100%) !important;
+    border-bottom: 2px solid rgba(25, 135, 84, 0.3) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Dark gradient for Common/Secondary cards */
+.card-header.bg-secondary {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #404040 100%) !important;
+    border-bottom: 2px solid rgba(108, 117, 125, 0.3) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Enhanced text styling for dark headers */
+.card-header.bg-warning,
+.card-header.bg-info,
+.card-header.bg-success,
+.card-header.bg-secondary {
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+/* Badge styling for dark headers */
+.card-header .badge.bg-light {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+    text-shadow: none !important;
+}
+
+/* Icon styling for dark headers */
+.card-header .bi {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Hover effects for dark header cards */
+.card:hover .card-header.bg-warning {
+    background: linear-gradient(135deg, #3d2318 0%, #6e4622 50%, #a0591c 100%) !important;
+}
+
+.card:hover .card-header.bg-info {
+    background: linear-gradient(135deg, #1e2a3a 0%, #2d3e50 50%, #3a4d63 100%) !important;
+}
+
+.card:hover .card-header.bg-success {
+    background: linear-gradient(135deg, #1a2520 0%, #2d4532 50%, #3a5a3a 100%) !important;
+}
+
+.card:hover .card-header.bg-secondary {
+    background: linear-gradient(135deg, #2a2a2a 0%, #3d3d3d 50%, #505050 100%) !important;
+}
+
+/* ===== AVATAR PREVIEW STYLING ===== */
+
+/* Avatar preview containers */
+.avatar-preview-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* Avatar preview images */
+.avatar-preview {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.avatar-preview:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+}
+
+/* Avatar glow effect for special avatars */
+.avatar-glow {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 215, 0, 0.1) 50%, transparent 100%);
+    animation: avatarGlow 2s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes avatarGlow {
+    0% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* Rarity-specific avatar glows */
+.avatar-preview-container[data-rarity="legendary"] .avatar-glow {
+    background: radial-gradient(circle, rgba(255, 193, 7, 0.4) 0%, rgba(255, 193, 7, 0.1) 50%, transparent 100%);
+}
+
+.avatar-preview-container[data-rarity="epic"] .avatar-glow {
+    background: radial-gradient(circle, rgba(13, 202, 240, 0.4) 0%, rgba(13, 202, 240, 0.1) 50%, transparent 100%);
+}
+
+.avatar-preview-container[data-rarity="rare"] .avatar-glow {
+    background: radial-gradient(circle, rgba(25, 135, 84, 0.4) 0%, rgba(25, 135, 84, 0.1) 50%, transparent 100%);
+}
+
+.avatar-preview-container[data-rarity="common"] .avatar-glow {
+    background: radial-gradient(circle, rgba(108, 117, 125, 0.4) 0%, rgba(108, 117, 125, 0.1) 50%, transparent 100%);
+}
+
+/* Avatar card body adjustments */
+.card .card-body:has(.avatar-preview-container) {
+    padding-top: 1.5rem;
+}
+
+/* Avatar fallback styling */
+.avatar-preview[src$=".png"]:not([src*="/"]) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Avatar hover effects for different rarities */
+.card:hover .avatar-preview {
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4)) brightness(1.1);
+}
+
+/* Special effects for legendary avatars */
+.card .avatar-preview-container[data-rarity="legendary"] .avatar-preview {
+    animation: legendaryPulse 3s ease-in-out infinite;
+}
+
+@keyframes legendaryPulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 193, 7, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 193, 7, 0.6), 0 0 40px rgba(255, 193, 7, 0.3);
+    }
+}
+
+/* Responsive avatar sizing */
+@media (max-width: 768px) {
+    .avatar-preview {
+        width: 100px !important;
+        height: 100px !important;
+    }
+    
+    .avatar-glow {
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+    }
+} 

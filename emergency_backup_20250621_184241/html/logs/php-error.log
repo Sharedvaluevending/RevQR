@@ -1,0 +1,34 @@
+[21-Jun-2025 08:21:52 America/Toronto] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'store_item_id' in 'where clause' in /var/www/test_delete_item.php:41
+Stack trace:
+#0 /var/www/test_delete_item.php(41): PDO->prepare()
+#1 {main}
+  thrown in /var/www/test_delete_item.php on line 41
+[21-Jun-2025 08:21:58 America/Toronto] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'store_item_id' in 'where clause' in /var/www/test_delete_item.php:41
+Stack trace:
+#0 /var/www/test_delete_item.php(41): PDO->prepare()
+#1 {main}
+  thrown in /var/www/test_delete_item.php on line 41
+[21-Jun-2025 08:59:06 America/Toronto] PHP Fatal error:  Uncaught Error: Class "QRCoinManager" not found in /var/www/test_purchase_system.php:13
+Stack trace:
+#0 {main}
+  thrown in /var/www/test_purchase_system.php on line 13
+[21-Jun-2025 18:28:31 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[21-Jun-2025 18:28:31 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[21-Jun-2025 18:28:31 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 79
+[21-Jun-2025 18:29:40 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[21-Jun-2025 18:29:40 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[21-Jun-2025 18:29:40 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 79
+[21-Jun-2025 18:30:49 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[21-Jun-2025 18:30:49 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[21-Jun-2025 18:30:49 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 79
+[21-Jun-2025 18:33:27 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 77
+[21-Jun-2025 18:33:27 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 78
+[21-Jun-2025 18:33:27 America/Toronto] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /var/www/html/core/config.php on line 79
+[21-Jun-2025 18:33:27 America/Toronto] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /var/www/test_fixed_purchase.php on line 56
+[21-Jun-2025 18:33:27 America/Toronto] PHP Warning:  Cannot modify header information - headers already sent by (output started at /var/www/test_fixed_purchase.php:2) in /var/www/html/api/purchase-discount.php on line 7
+[21-Jun-2025 18:33:27 America/Toronto] PHP Deprecated:  Creation of dynamic property TestInputWrapper::$context is deprecated in /var/www/html/api/purchase-discount.php on line 54
+[21-Jun-2025 18:33:27 America/Toronto] Purchase discount API error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'business_store_item_id' in 'field list'
+[21-Jun-2025 18:33:27 America/Toronto] PHP Warning:  http_response_code(): Cannot set response code - headers already sent (output started at /var/www/test_fixed_purchase.php:2) in /var/www/html/api/purchase-discount.php on line 217
+[21-Jun-2025 18:38:44 America/Toronto] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /var/www/html/core/session.php on line 5
+[21-Jun-2025 18:38:44 America/Toronto] PHP Warning:  session_set_cookie_params(): Session cookie parameters cannot be changed when a session is active in /var/www/html/core/session.php on line 6
+[21-Jun-2025 18:38:44 America/Toronto] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from /var/www/discount_purchase_diagnostic.php on line 7) in /var/www/html/core/session.php on line 14

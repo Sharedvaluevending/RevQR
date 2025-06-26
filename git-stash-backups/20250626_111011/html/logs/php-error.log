@@ -1,0 +1,14 @@
+[21-Jun-2025 08:21:52 America/Toronto] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'store_item_id' in 'where clause' in /var/www/test_delete_item.php:41
+Stack trace:
+#0 /var/www/test_delete_item.php(41): PDO->prepare()
+#1 {main}
+  thrown in /var/www/test_delete_item.php on line 41
+[21-Jun-2025 08:21:58 America/Toronto] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'store_item_id' in 'where clause' in /var/www/test_delete_item.php:41
+Stack trace:
+#0 /var/www/test_delete_item.php(41): PDO->prepare()
+#1 {main}
+  thrown in /var/www/test_delete_item.php on line 41
+[21-Jun-2025 08:59:06 America/Toronto] PHP Fatal error:  Uncaught Error: Class "QRCoinManager" not found in /var/www/test_purchase_system.php:13
+Stack trace:
+#0 {main}
+  thrown in /var/www/test_purchase_system.php on line 13

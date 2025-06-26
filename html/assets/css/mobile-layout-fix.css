@@ -1,0 +1,73 @@
+/*
+ * mobile-layout-fix.css
+ * ----------------------------------
+ * Targeted, mobile-first overrides that restore Bootstrap grid behaviour
+ * after earlier emergency patches and improve card/badge alignment.
+ *
+ * Scope: ≤ 991.98px only. No changes are applied to desktop (lg+) views.
+ */
+
+/* ----------------------------------
+   Restore Bootstrap row flex behaviour
+   and center contents on extra-small
+   hand-held screens
+---------------------------------- */
+@media (max-width: 575.98px) {
+  /* Make sure rows keep flex display and center children */
+  .row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+
+  /* Full-width columns so cards stack neatly */
+  .row > [class*="col-"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  /* Give breathing room between stacked cards */
+  .row > [class*="col-"] + [class*="col-"] {
+    margin-top: 1rem !important;
+  }
+
+  /* Ensure images inside metric/preview cards are centered */
+  .card img,
+  .avatar-preview img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Badge spacing under avatar previews */
+  .card .badge {
+    margin-top: 0.35rem !important;
+  }
+}
+
+/* ----------------------------------
+   Tablet (sm/md) – two-column layout
+---------------------------------- */
+@media (min-width: 576px) and (max-width: 991.98px) {
+  /* Convert .col-md-3 (25%) to 50% so four-up desktop rows become two-up */
+  .col-md-3 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+}
+
+/* ----------------------------------
+   General protection – avoid horizontal scroll
+---------------------------------- */
+body {
+  overflow-x: hidden;
+}
+
+/* Move hamburger toggler to far right on mobile */
+@media (max-width: 991.98px) {
+  .navbar-toggler {
+    margin-left: auto !important;
+  }
+} 

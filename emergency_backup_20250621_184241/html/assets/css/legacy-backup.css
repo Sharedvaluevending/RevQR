@@ -1,0 +1,101 @@
+/* LEGACY CSS BACKUP - Original inline styles from header.php */
+/* This file serves as a backup in case we need to revert changes */
+
+/* Critical CSS - Masculine Dark Blue/Steel Theme */
+html, body {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #34495e 75%, #2c3e50 100%) !important;
+    background-attachment: fixed !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    min-height: 100vh !important;
+}
+
+/* Glass morphism cards */
+.card {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Navigation */
+.navbar {
+    background: rgba(30, 60, 114, 0.15) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.nav-link:hover {
+    color: #64b5f6 !important;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 16px !important;
+    transition: all 0.3s ease !important;
+}
+
+.card-metric {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #ffffff !important;
+}
+
+.card-title {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 600;
+}
+
+/* Text colors */
+.text-primary { color: #64b5f6 !important; }
+.text-success { color: #4caf50 !important; }
+.text-warning { color: #ff9800 !important; }
+.text-info { color: #00bcd4 !important; }
+.text-muted { color: rgba(255, 255, 255, 0.75) !important; }
+
+/* Better text visibility */
+.text-light { color: rgba(255, 255, 255, 0.9) !important; }
+.small, small { color: rgba(255, 255, 255, 0.8) !important; }
+
+/* Form controls */
+.form-control {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: #64b5f6 !important;
+    box-shadow: 0 0 0 0.25rem rgba(100, 181, 246, 0.25) !important;
+}
+
+/* UNIVERSAL DROPDOWN STYLING - CLEAN AND SIMPLE */
+.form-select,
+select.form-select,
+select {
+    background: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    color: #333333 !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    spellcheck: false !important;
+}
+
+/* Rest of legacy styles truncated for brevity... */ 

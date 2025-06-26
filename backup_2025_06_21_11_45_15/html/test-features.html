@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Advanced QR Features Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-form { max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .preview { margin-top: 20px; text-align: center; }
+        .preview img { max-width: 300px; border: 1px solid #ddd; }
+        .alert { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="test-form">
+        <h2>🎨 Advanced QR Code Features Test</h2>
+        <form id="testForm">
+            <div class="form-group">
+                <label>Content:</label>
+                <input type="text" name="content" value="https://example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Gradient Type:</label>
+                <select name="gradient_type">
+                    <option value="none">None</option>
+                    <option value="linear" selected>Linear</option>
+                    <option value="radial">Radial</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Gradient Start Color:</label>
+                <input type="color" name="gradient_start" value="#000000">
+            </div>
+            
+            <div class="form-group">
+                <label>Gradient End Color:</label>
+                <input type="color" name="gradient_end" value="#ff0000">
+            </div>
+            
+            <div class="form-group">
+                <label>Label Text (Above):</label>
+                <input type="text" name="label_text" value="SCAN ME">
+            </div>
+            
+            <div class="form-group">
+                <label>Bottom Text:</label>
+                <input type="text" name="bottom_text" value="RevenueQR.com">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="shadow" value="1" checked> Enable Shadow
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label>Frame Style:</label>
+                <select name="frame_style">
+                    <option value="none">None</option>
+                    <option value="solid" selected>Solid</option>
+                    <option value="dashed">Dashed</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Frame Color:</label>
+                <input type="color" name="frame_color" value="#0066cc">
+            </div>
+            
+            <button type="button" class="btn" onclick="testAdvancedFeatures()">
+                🎯 Test Advanced Features
+            </button>
+        </form>
+        
+        <div id="messages"></div>
+        <div id="preview" class="preview"></div>
+    </div>
+
+    <script>
+        async function testAdvancedFeatures() {
+            const form = document.getElementById('testForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Add required fields
+            data.qr_type = 'static';
+            data.preview = true;
+            
+            showMessage('Testing advanced features...', 'info');
+            
+            try {
+                // Test with direct API call (bypassing auth for testing)
+                const testData = {
+                    type: 'static',
+                    content: data.content,
+                    size: 300,
+                    foreground_color: '#000000',
+                    background_color: '#FFFFFF',
+                    error_correction_level: 'H',
+                    preview: true,
+                    
+                    // Advanced features
+                    gradient: {
+                        type: data.gradient_type,
+                        start: data.gradient_start,
+                        end: data.gradient_end,
+                        angle: 45,
+                        opacity: 1.0
+                    },
+                    
+                    label: {
+                        text: data.label_text,
+                        size: 16,
+                        color: '#000000',
+                        font: 'Arial',
+                        alignment: 'center'
+                    },
+                    
+                    bottom_text: {
+                        text: data.bottom_text,
+                        size: 12,
+                        color: '#666666',
+                        font: 'Arial',
+                        alignment: 'center'
+                    },
+                    
+                    shadow: data.shadow ? {
+                        color: '#000000',
+                        blur: 5,
+                        offset_x: 3,
+                        offset_y: 3,
+                        opacity: 0.3
+                    } : null,
+                    
+                    frame: data.frame_style !== 'none' ? {
+                        style: data.frame_style,
+                        color: data.frame_color,
+                        width: 3,
+                        radius: 5
+                    } : null
+                };
+                
+                // Test the QRGenerator class directly
+                const response = await fetch('/test-direct-qr.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('✅ Advanced features working! Gradient, text, shadow, and frame applied.', 'success');
+                    document.getElementById('preview').innerHTML = 
+                        `<img src="${result.url}" alt="Advanced QR Code">`;
+                } else {
+                    showMessage(`❌ Test failed: ${result.message}`, 'error');
+                }
+                
+            } catch (error) {
+                showMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            
+            if (type === 'success') {
+                setTimeout(() => messagesDiv.innerHTML = '', 5000);
+            }
+        }
+    </script>
+</body>
+</html> 

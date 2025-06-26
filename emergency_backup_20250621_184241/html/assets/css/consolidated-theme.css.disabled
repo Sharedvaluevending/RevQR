@@ -1,0 +1,579 @@
+/* RevenueQR Consolidated Theme - Resolves All CSS Conflicts */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ===========================================
+   CSS VARIABLES - SINGLE SOURCE OF TRUTH
+   =========================================== */
+:root {
+    /* Primary Colors */
+    --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #34495e 75%, #2c3e50 100%);
+    --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    /* Glass Morphism Variables */
+    --glass-bg-primary: rgba(255, 255, 255, 0.12);
+    --glass-bg-secondary: rgba(255, 255, 255, 0.15);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-border-hover: rgba(255, 255, 255, 0.25);
+    --blur-strength: 20px;
+    
+    /* Shadows */
+    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 8px 32px rgba(31, 38, 135, 0.37);
+    
+    /* Spacing & Layout */
+    --border-radius: 16px;
+    --border-radius-sm: 8px;
+    --border-radius-lg: 24px;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s ease;
+    
+    /* Text Colors */
+    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --text-muted: rgba(255, 255, 255, 0.75);
+    --text-light: rgba(255, 255, 255, 0.7);
+    
+    /* Brand Colors */
+    --brand-primary: #64b5f6;
+    --brand-success: #4caf50;
+    --brand-warning: #ff9800;
+    --brand-danger: #f44336;
+    --brand-info: #00bcd4;
+    
+    /* Form Colors */
+    --form-bg: #ffffff;
+    --form-border: #ced4da;
+    --form-focus-border: #667eea;
+    --form-text: #333333;
+    
+    /* Promotion Card Gradients */
+    --promo-card-1: linear-gradient(45deg, #2B32B2, #1488CC);
+    --promo-card-2: linear-gradient(45deg, #1A2980, #26D0CE);
+    --promo-card-3: linear-gradient(45deg, #16222A, #3A6073);
+}
+
+/* ===========================================
+   GLOBAL BASE STYLES
+   =========================================== */
+html, body {
+    background: var(--primary-gradient) !important;
+    background-attachment: fixed !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    min-height: 100vh !important;
+}
+
+body {
+    display: flex !important;
+    flex-direction: column !important;
+    color: var(--text-primary);
+}
+
+/* ===========================================
+   CARD SYSTEM - UNIFIED APPROACH
+   =========================================== */
+.card {
+    background: var(--glass-bg-primary) !important;
+    backdrop-filter: blur(var(--blur-strength)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--border-radius) !important;
+    box-shadow: var(--shadow-soft) !important;
+    transition: all var(--transition-medium) !important;
+}
+
+.card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-hover) !important;
+    border: 1px solid var(--glass-border-hover) !important;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    cursor: pointer;
+    background: var(--glass-bg-primary) !important;
+    backdrop-filter: blur(var(--blur-strength)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--border-radius) !important;
+    transition: all var(--transition-medium) !important;
+}
+
+/* Promotion Cards - Specific Gradients */
+.promotion-card-primary {
+    background: var(--promo-card-1) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.promotion-card-secondary {
+    background: var(--promo-card-2) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.promotion-card-tertiary {
+    background: var(--promo-card-3) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.card-metric {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #ffffff !important;
+}
+
+.card-title {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+}
+
+.card-subtitle, .card-text {
+    color: var(--text-secondary) !important;
+}
+
+/* ===========================================
+   NAVIGATION SYSTEM
+   =========================================== */
+.navbar {
+    background: var(--glass-bg-secondary) !important;
+    backdrop-filter: blur(var(--blur-strength)) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+.nav-link {
+    color: var(--text-primary) !important;
+    transition: all var(--transition-medium);
+}
+
+.nav-link:hover {
+    color: var(--brand-primary) !important;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm);
+}
+
+/* ===========================================
+   FORM SYSTEM - CONSISTENT STYLING
+   =========================================== */
+.form-control {
+    background: var(--form-bg) !important;
+    border: 1px solid var(--form-border) !important;
+    color: var(--form-text) !important;
+    border-radius: var(--border-radius-sm) !important;
+    transition: all var(--transition-fast) !important;
+}
+
+.form-control:focus {
+    background: var(--form-bg) !important;
+    border-color: var(--form-focus-border) !important;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25) !important;
+    color: var(--form-text) !important;
+}
+
+.form-control::placeholder {
+    color: rgba(51, 51, 51, 0.6) !important;
+}
+
+/* SELECT DROPDOWNS - UNIFIED STYLING */
+.form-select,
+select.form-select,
+select {
+    background: var(--form-bg) !important;
+    border: 1px solid var(--form-border) !important;
+    color: var(--form-text) !important;
+    border-radius: var(--border-radius-sm) !important;
+    text-decoration: none !important;
+    transition: all var(--transition-fast) !important;
+}
+
+.form-select:focus,
+select.form-select:focus,
+select:focus {
+    background: var(--form-bg) !important;
+    border-color: var(--form-focus-border) !important;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25) !important;
+    color: var(--form-text) !important;
+    outline: none !important;
+    text-decoration: none !important;
+}
+
+.form-select option,
+select.form-select option,
+select option {
+    background: var(--form-bg) !important;
+    color: var(--form-text) !important;
+    text-decoration: none !important;
+}
+
+/* Form Labels */
+.form-label, label {
+    color: var(--text-primary) !important;
+    font-weight: 500 !important;
+}
+
+.form-text {
+    color: var(--text-light) !important;
+}
+
+/* ===========================================
+   BUTTON SYSTEM
+   =========================================== */
+.btn {
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-medium);
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3) !important;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%) !important;
+    border: none !important;
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--brand-primary) !important;
+    color: var(--brand-primary) !important;
+    background: transparent !important;
+}
+
+.btn-outline-primary:hover {
+    background: var(--brand-primary) !important;
+    color: #1e3c72 !important;
+    border-color: var(--brand-primary) !important;
+}
+
+/* ===========================================
+   ALERT SYSTEM
+   =========================================== */
+.alert {
+    border: none !important;
+    border-radius: 12px !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.alert-success {
+    background: rgba(76, 175, 80, 0.15) !important;
+    border: 1px solid rgba(76, 175, 80, 0.3) !important;
+    color: var(--brand-success) !important;
+}
+
+.alert-danger {
+    background: rgba(244, 67, 54, 0.15) !important;
+    border: 1px solid rgba(244, 67, 54, 0.3) !important;
+    color: var(--brand-danger) !important;
+}
+
+.alert-warning {
+    background: rgba(255, 152, 0, 0.15) !important;
+    border: 1px solid rgba(255, 152, 0, 0.3) !important;
+    color: var(--brand-warning) !important;
+}
+
+.alert-info {
+    background: rgba(0, 188, 212, 0.15) !important;
+    border: 1px solid rgba(0, 188, 212, 0.3) !important;
+    color: var(--brand-info) !important;
+}
+
+/* ===========================================
+   TABLE SYSTEM
+   =========================================== */
+.table {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(10px) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--border-radius-sm) !important;
+    overflow: hidden !important;
+}
+
+.table thead th {
+    background: rgba(30, 60, 114, 0.3) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ===========================================
+   MODAL SYSTEM
+   =========================================== */
+.modal-content {
+    background: rgba(30, 60, 114, 0.95) !important;
+    backdrop-filter: blur(var(--blur-strength)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--border-radius) !important;
+    color: #ffffff !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--glass-border) !important;
+}
+
+/* ===========================================
+   BADGE SYSTEM
+   =========================================== */
+.badge.bg-success { 
+    background: var(--brand-success) !important; 
+    color: white !important;
+}
+.badge.bg-warning { 
+    background: #f57c00 !important; 
+    color: white !important;
+}
+.badge.bg-danger { 
+    background: var(--brand-danger) !important; 
+    color: white !important;
+}
+.badge.bg-info { 
+    background: var(--brand-info) !important; 
+    color: white !important;
+}
+.badge.bg-primary { 
+    background: #1976d2 !important; 
+    color: white !important;
+}
+.badge.bg-secondary {
+    background: rgba(52, 73, 94, 0.8) !important;
+    color: #ffffff !important;
+}
+
+/* ===========================================
+   TEXT COLOR SYSTEM
+   =========================================== */
+.text-primary { color: var(--brand-primary) !important; }
+.text-success { color: var(--brand-success) !important; }
+.text-warning { color: var(--brand-warning) !important; }
+.text-info { color: var(--brand-info) !important; }
+.text-danger { color: var(--brand-danger) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-light { color: var(--text-light) !important; }
+.text-dark { color: var(--text-primary) !important; }
+
+/* Better text visibility */
+p, div, span, li {
+    color: var(--text-primary) !important;
+}
+
+small, .small {
+    color: var(--text-secondary) !important;
+}
+
+/* ===========================================
+   BACKGROUND OVERRIDES
+   =========================================== */
+.bg-white {
+    background: var(--glass-bg-primary) !important;
+    backdrop-filter: blur(var(--blur-strength)) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+.bg-light {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.card-header.bg-white {
+    background: rgba(30, 60, 114, 0.2) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.card-header.bg-white h5, 
+.card-header.bg-white .h5 {
+    color: var(--text-primary) !important;
+}
+
+/* ===========================================
+   BREADCRUMB SYSTEM
+   =========================================== */
+.breadcrumb {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: var(--border-radius-sm) !important;
+    padding: 0.75rem 1rem !important;
+}
+
+.breadcrumb-item a {
+    color: var(--brand-primary) !important;
+    text-decoration: none !important;
+}
+
+.breadcrumb-item a:hover {
+    color: #ffffff !important;
+}
+
+.breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* ===========================================
+   PROGRESS BARS
+   =========================================== */
+.progress {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: var(--border-radius-sm) !important;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, #1976d2 100%) !important;
+}
+
+/* ===========================================
+   FOOTER SYSTEM
+   =========================================== */
+.footer {
+    background: var(--glass-bg-secondary) !important;
+    backdrop-filter: blur(var(--blur-strength)) !important;
+    border-top: 1px solid var(--glass-border) !important;
+}
+
+.footer .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.footer a {
+    color: rgba(255, 255, 255, 0.85) !important;
+    text-decoration: none !important;
+}
+
+.footer a:hover {
+    color: var(--brand-primary) !important;
+}
+
+/* ===========================================
+   WELCOME SECTION
+   =========================================== */
+.welcome-section {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(var(--blur-strength)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--border-radius) !important;
+    padding: var(--spacing-md) !important;
+}
+
+.welcome-section h1 {
+    color: #ffffff !important;
+}
+
+/* ===========================================
+   UTILITY CLASSES
+   =========================================== */
+.border-bottom {
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.border-top {
+    border-top: 1px solid var(--glass-border) !important;
+}
+
+.sticky-top {
+    background: rgba(30, 60, 114, 0.95) !important;
+    backdrop-filter: blur(var(--blur-strength)) !important;
+}
+
+/* Input group styling */
+.input-group-text {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* ===========================================
+   RESPONSIVE DESIGN
+   =========================================== */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-metric {
+        font-size: 2rem;
+    }
+    
+    .welcome-section {
+        padding: var(--spacing-sm) !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-metric {
+        font-size: 1.75rem;
+    }
+    
+    .btn {
+        font-size: 0.875rem;
+    }
+}
+
+/* ===========================================
+   ANIMATION ENHANCEMENTS
+   =========================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.dashboard-card:hover {
+    animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* ===========================================
+   HIGH CONTRAST MODE SUPPORT
+   =========================================== */
+@media (prefers-contrast: high) {
+    :root {
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.9);
+    }
+}
+
+/* ===========================================
+   PRINT STYLES
+   =========================================== */
+@media print {
+    .navbar, .footer {
+        display: none !important;
+    }
+    
+    .card {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+    }
+} 

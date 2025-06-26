@@ -1,0 +1,60 @@
+[2025-06-08 15:29:42] QR System Migration initialized
+[2025-06-08 15:29:42] Backup directory: /var/www/qr_migration_backup_2025_06_08_15_29_42
+[2025-06-08 15:29:42] 
+=== QR SYSTEM UNIFICATION MIGRATION ===
+[2025-06-08 15:29:42] 
+--- Analyzing Current QR System ---
+[2025-06-08 15:29:42] ✓ Found endpoint: html/api/qr/generate.php
+[2025-06-08 15:29:42] ✓ Found endpoint: html/api/qr/enhanced-generate.php
+[2025-06-08 15:29:42] ✓ Found endpoint: html/api/qr/unified-generate.php
+[2025-06-08 15:29:42] ✓ Found endpoint: html/api/qr/generate_unified.php
+[2025-06-08 15:29:42] 
+--- Database Analysis ---
+[2025-06-08 15:29:42] ✓ qr_codes table found with 13 columns
+[2025-06-08 15:29:42] ⚠ Database analysis warning: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'type' in 'field list'
+[2025-06-08 15:29:42] 
+--- Frontend Usage Analysis ---
+[2025-06-08 15:29:42] Found 4 files with QR generation references
+[2025-06-08 15:29:42]   - html/business/view-qr.php
+[2025-06-08 15:29:42]   - html/assets/js/qr-generator.js
+[2025-06-08 15:29:42]   - html/assets/js/custom.js
+[2025-06-08 15:29:42]   - html/assets/js/qr-generator-v2.js
+[2025-06-08 15:29:42] 
+--- Creating API Keys Table ---
+[2025-06-08 15:29:43] ✓ business_api_keys table created/verified
+[2025-06-08 15:29:43] 
+--- Generating API Keys ---
+[2025-06-08 15:29:43] ⚠ API keys table creation warning: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause'
+[2025-06-08 15:29:43] 
+--- Backing Up Old Endpoints ---
+[2025-06-08 15:29:43] ✓ Backed up: html/api/qr/generate.php
+[2025-06-08 15:29:43] ✓ Backed up: html/api/qr/enhanced-generate.php
+[2025-06-08 15:29:43] ✓ Backed up: html/api/qr/unified-generate.php
+[2025-06-08 15:29:43] 
+--- Updating Frontend References ---
+[2025-06-08 15:29:43] ✓ Updated references in: html/assets/js/qr-generator.js
+[2025-06-08 15:29:43] 
+--- Testing Unified Endpoint ---
+[2025-06-08 15:29:43] ✓ Unified endpoint file exists
+[2025-06-08 15:29:43] ✓ QRService dependency found
+[2025-06-08 15:29:43] 
+--- Cleanup Recommendations ---
+[2025-06-08 15:29:43] After testing, consider removing these old endpoints:
+[2025-06-08 15:29:43]   - html/api/qr/generate.php (backed up in /var/www/qr_migration_backup_2025_06_08_15_29_42)
+[2025-06-08 15:29:43]   - html/api/qr/enhanced-generate.php (backed up in /var/www/qr_migration_backup_2025_06_08_15_29_42)
+[2025-06-08 15:29:43] 
+=== MIGRATION COMPLETED SUCCESSFULLY ===
+[2025-06-08 15:29:43] 
+=== MIGRATION SUMMARY ===
+[2025-06-08 15:29:43] ✓ QR system analysis completed
+[2025-06-08 15:29:43] ✓ API authentication system established
+[2025-06-08 15:29:43] ✓ Old endpoints backed up to: /var/www/qr_migration_backup_2025_06_08_15_29_42
+[2025-06-08 15:29:43] ✓ Frontend references updated to unified endpoint
+[2025-06-08 15:29:43] ✓ System validation completed
+[2025-06-08 15:29:43] 
+Next Steps:
+[2025-06-08 15:29:43] 1. Test QR generation in admin panel
+[2025-06-08 15:29:43] 2. Test QR generation in business panel
+[2025-06-08 15:29:43] 3. Verify all QR types work correctly
+[2025-06-08 15:29:43] 4. Monitor error logs for any issues
+[2025-06-08 15:29:43] 5. After 1 week of stable operation, remove old endpoints

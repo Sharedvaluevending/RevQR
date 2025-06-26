@@ -1,0 +1,56 @@
+// Browser Back/Forward Cache (bfcache) Fix - SAFE VERSION
+// Only prevents back button cache issues, not manual reloads
+
+(function() {
+    'use strict';
+    
+    console.log('🔄 bfcache fix loaded (safe mode)');
+    
+    // Track if this is a manual reload vs back button
+    let isManualReload = false;
+    
+    // Detect manual reload (F5, Ctrl+R, reload button)
+    if (performance.navigation && performance.navigation.type === 1) {
+        isManualReload = true;
+    }
+    
+    // Only prevent back/forward cache, not manual reloads
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted && !isManualReload) {
+            console.log('🔄 Page loaded from back/forward cache - refreshing');
+            window.location.reload(true);
+        } else if (event.persisted && isManualReload) {
+            console.log('🔄 Manual reload detected - allowing');
+        }
+    });
+    
+    // Only mark for back button issues, not manual navigation
+    window.addEventListener('beforeunload', function() {
+        // Only set flag if NOT a manual reload
+        if (!isManualReload) {
+            sessionStorage.setItem('wasNavigatingAway', 'true');
+        }
+    });
+    
+    // Force no-cache for XHR requests
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options = {}) {
+        options.headers = options.headers || {};
+        options.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+        options.headers['Pragma'] = 'no-cache';
+        return originalFetch(url, options);
+    };
+    
+    // Override jQuery AJAX if present
+    if (window.jQuery) {
+        jQuery.ajaxSetup({
+            cache: false,
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        });
+    }
+    
+    console.log('✅ bfcache fix active');
+})(); 

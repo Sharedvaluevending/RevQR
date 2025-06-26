@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Enhanced QR Generator JavaScript</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/enhanced-gradients.css">
+</head>
+<body>
+    <div class="container py-4">
+        <h1>🧪 JavaScript Functionality Test</h1>
+        <p>This page tests the enhanced QR generator JavaScript without PHP authentication.</p>
+        
+        <form id="qrForm">
+            <!-- QR Type Selection -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>QR Type Selection</h5>
+                </div>
+                <div class="card-body">
+                    <select class="form-select" name="qr_type" id="qrType">
+                        <option value="static">Static QR Code</option>
+                        <option value="dynamic">Dynamic QR Code</option>
+                        <option value="dynamic_voting">Dynamic Voting QR Code</option>
+                    </select>
+                    
+                    <!-- Dynamic Fields -->
+                    <div id="urlFields" class="mt-3" style="display: none;">
+                        <label class="form-label">URL</label>
+                        <input type="url" class="form-control" name="url" placeholder="https://example.com">
+                    </div>
+                    
+                    <div id="campaignFields" class="mt-3" style="display: none;">
+                        <label class="form-label">Campaign</label>
+                        <select class="form-select" name="campaign_id">
+                            <option value="">Select a campaign</option>
+                            <option value="1">Test Campaign 1</option>
+                            <option value="2">Test Campaign 2</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" name="location" placeholder="Test Location">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Background Gradients -->
+            <div class="card mb-4">
+                <div class="card-header bg-gradient-sunset text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-palette"></i> Background Gradients</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="enable_background_gradient" id="enableBgGradient">
+                        <label class="form-check-label" for="enableBgGradient">
+                            <strong>Enable Background Gradient</strong>
+                        </label>
+                    </div>
+                    
+                    <div id="backgroundGradientOptions" style="display: none;">
+                        <div class="alert alert-success">
+                            ✅ Background gradient options are now visible!
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Preset Styles</label>
+                                <select class="form-select" name="bg_gradient_preset" id="bgGradientPreset">
+                                    <option value="custom">Custom</option>
+                                    <option value="sunset">Sunset</option>
+                                    <option value="ocean">Ocean</option>
+                                    <option value="forest">Forest</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Start Color</label>
+                                <input type="color" class="form-control form-control-color" name="bg_gradient_start" value="#ff7e5f">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">End Color</label>
+                                <input type="color" class="form-control form-control-color" name="bg_gradient_end" value="#ff6b6b">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Borders -->
+            <div class="card mb-4">
+                <div class="card-header bg-gradient-ocean text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-border-style"></i> Enhanced Borders</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="enable_enhanced_border" id="enableEnhancedBorder">
+                        <label class="form-check-label" for="enableEnhancedBorder">
+                            <strong>Enable Enhanced Borders</strong>
+                        </label>
+                    </div>
+                    
+                    <div id="enhancedBorderOptions" style="display: none;">
+                        <div class="alert alert-success">
+                            ✅ Enhanced border options are now visible!
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Border Style</label>
+                                <select class="form-select" name="border_style">
+                                    <option value="solid">Solid</option>
+                                    <option value="dashed">Dashed</option>
+                                    <option value="gradient">Gradient</option>
+                                    <option value="neon">Neon Glow</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Border Width</label>
+                                <select class="form-select" name="border_width">
+                                    <option value="2">Medium (2px)</option>
+                                    <option value="5">Extra Thick (5px)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Primary Color</label>
+                                <input type="color" class="form-control form-control-color" name="border_color_primary" value="#0d6efd">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Code Gradients -->
+            <div class="card mb-4">
+                <div class="card-header bg-gradient-forest text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-droplet"></i> QR Code Gradients</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="enable_qr_gradient" id="enableQrGradient">
+                        <label class="form-check-label" for="enableQrGradient">
+                            <strong>Enable QR Code Gradient</strong>
+                        </label>
+                    </div>
+                    
+                    <div id="qrGradientOptions" style="display: none;">
+                        <div class="alert alert-success">
+                            ✅ QR gradient options are now visible!
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Preset Styles</label>
+                                <select class="form-select" name="qr_gradient_preset">
+                                    <option value="custom">Custom</option>
+                                    <option value="blue-purple">Blue to Purple</option>
+                                    <option value="green-blue">Green to Blue</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Start Color</label>
+                                <input type="color" class="form-control form-control-color" name="qr_gradient_start" value="#000000">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">End Color</label>
+                                <input type="color" class="form-control form-control-color" name="qr_gradient_end" value="#333333">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Buttons -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <button type="button" class="btn btn-primary" onclick="testPreview()">
+                        <i class="bi bi-eye"></i> Test Preview Function
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="testFormData()">
+                        <i class="bi bi-list"></i> Show Form Data
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Test Results -->
+        <div id="testResults" class="mt-4"></div>
+    </div>
+
+    <script>
+    // Enhanced QR Generator JavaScript (simplified for testing)
+    class EnhancedQRGenerator {
+        constructor() {
+            this.form = document.getElementById('qrForm');
+            this.setupEventListeners();
+            console.log('✅ Enhanced QR Generator initialized successfully');
+        }
+
+        setupEventListeners() {
+            // QR Type change handler
+            const qrTypeEl = document.getElementById('qrType');
+            if (qrTypeEl) {
+                qrTypeEl.addEventListener('change', (e) => {
+                    console.log('QR Type changed to:', e.target.value);
+                    this.handleQRTypeChange(e.target.value);
+                });
+                console.log('✅ QR Type listener added');
+            } else {
+                console.error('❌ QR Type element not found');
+            }
+
+            // Toggle sections
+            const enableBgGradient = document.getElementById('enableBgGradient');
+            if (enableBgGradient) {
+                enableBgGradient.addEventListener('change', (e) => {
+                    console.log('Background gradient toggled:', e.target.checked);
+                    const options = document.getElementById('backgroundGradientOptions');
+                    if (options) {
+                        options.style.display = e.target.checked ? 'block' : 'none';
+                    }
+                });
+                console.log('✅ Background gradient toggle listener added');
+            } else {
+                console.error('❌ enableBgGradient element not found');
+            }
+
+            const enableEnhancedBorder = document.getElementById('enableEnhancedBorder');
+            if (enableEnhancedBorder) {
+                enableEnhancedBorder.addEventListener('change', (e) => {
+                    console.log('Enhanced border toggled:', e.target.checked);
+                    const options = document.getElementById('enhancedBorderOptions');
+                    if (options) {
+                        options.style.display = e.target.checked ? 'block' : 'none';
+                    }
+                });
+                console.log('✅ Enhanced border toggle listener added');
+            } else {
+                console.error('❌ enableEnhancedBorder element not found');
+            }
+
+            const enableQrGradient = document.getElementById('enableQrGradient');
+            if (enableQrGradient) {
+                enableQrGradient.addEventListener('change', (e) => {
+                    console.log('QR gradient toggled:', e.target.checked);
+                    const options = document.getElementById('qrGradientOptions');
+                    if (options) {
+                        options.style.display = e.target.checked ? 'block' : 'none';
+                    }
+                });
+                console.log('✅ QR gradient toggle listener added');
+            } else {
+                console.error('❌ enableQrGradient element not found');
+            }
+        }
+
+        handleQRTypeChange(type) {
+            console.log('Handling QR type change:', type);
+            
+            // Hide all dynamic fields first
+            const fields = ['urlFields', 'campaignFields'];
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.style.display = 'none';
+                }
+            });
+
+            // Show relevant fields based on type
+            switch(type) {
+                case 'static':
+                case 'dynamic':
+                    const urlFields = document.getElementById('urlFields');
+                    if (urlFields) {
+                        urlFields.style.display = 'block';
+                        console.log('✅ URL fields shown');
+                    }
+                    break;
+                case 'dynamic_voting':
+                    const campaignFields = document.getElementById('campaignFields');
+                    if (campaignFields) {
+                        campaignFields.style.display = 'block';
+                        console.log('✅ Campaign fields shown');
+                    }
+                    break;
+            }
+        }
+    }
+
+    // Test functions
+    function testPreview() {
+        console.log('🧪 Testing preview function...');
+        const results = document.getElementById('testResults');
+        results.innerHTML = '<div class="alert alert-info">Preview function called! Check console for details.</div>';
+        
+        if (window.qrGenerator) {
+            console.log('✅ QR Generator instance exists');
+        } else {
+            console.error('❌ QR Generator instance not found');
+        }
+    }
+
+    function testFormData() {
+        console.log('🧪 Testing form data collection...');
+        const formData = new FormData(document.getElementById('qrForm'));
+        const data = {};
+        
+        for (let [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+        
+        console.log('Form data:', data);
+        
+        const results = document.getElementById('testResults');
+        results.innerHTML = `
+            <div class="alert alert-success">
+                <h6>Form Data Collected:</h6>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            </div>
+        `;
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 DOM loaded, initializing test...');
+        
+        // Check if required elements exist
+        const form = document.getElementById('qrForm');
+        if (!form) {
+            console.error('❌ Form element #qrForm not found!');
+            return;
+        }
+        
+        window.qrGenerator = new EnhancedQRGenerator();
+        
+        // Trigger initial field setup
+        const qrType = document.getElementById('qrType');
+        if (qrType && qrType.value) {
+            console.log('Setting initial QR type:', qrType.value);
+            window.qrGenerator.handleQRTypeChange(qrType.value);
+        }
+        
+        console.log('🎉 Test initialization complete!');
+    });
+    </script>
+</body>
+</html> 

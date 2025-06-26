@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #1e3c72; color: white; padding: 20px; }
+        .test { border: 3px solid; padding: 20px; margin: 20px 0; background: rgba(255,255,255,0.1); }
+        .blue { border-color: blue; }
+        .red { border-color: red; }
+        .green { border-color: green; }
+    </style>
+</head>
+<body>
+    <h1>LAYOUT TEST - WHICH IS LEFT-ALIGNED?</h1>
+    
+    <div class="test blue">
+        <h3>BLUE: Bootstrap</h3>
+        <div class="container">
+            <div class="row">
+                <div class="col-6">Left</div>
+                <div class="col-6">Right</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test red">
+        <h3>RED: Fixed 1200px</h3>
+        <div style="max-width:1200px; margin:0 auto;">
+            <div class="row">
+                <div class="col-6">Left</div>
+                <div class="col-6">Right</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test green">
+        <h3>GREEN: Full Width</h3>
+        <div style="width:100%;">
+            <div class="row">
+                <div class="col-6">Left</div>
+                <div class="col-6">Right</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

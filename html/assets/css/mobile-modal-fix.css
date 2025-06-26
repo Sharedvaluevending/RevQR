@@ -1,0 +1,30 @@
+/* REMOVED - Bandaid fixes removed to find root cause */
+
+/* MINIMAL TARGETED FIX - Only fix the actual issues found */
+
+/* Fix modal backdrop interaction on mobile - Bootstrap 5.3.0 compatible */
+.modal-backdrop {
+    pointer-events: none !important;
+}
+
+.modal.show {
+    pointer-events: auto !important;
+}
+
+.modal-dialog {
+    pointer-events: auto !important;
+}
+
+/* Ensure modal content and buttons are clickable */
+.modal-content,
+.modal-content button,
+.modal-content .btn,
+.modal-content [data-bs-dismiss="modal"],
+.modal-content .btn-close {
+    pointer-events: auto !important;
+}
+
+/* Fix hamburger menu alignment */
+.navbar-toggler {
+    margin-left: auto !important;
+} 
